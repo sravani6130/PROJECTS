@@ -1,0 +1,101 @@
+Subscription_Tier,Budget_Category,ROI_Category,Subscription_Length_Category,Discount_Category,Satisfaction_Category,Common_Keywords,Count
+Basic,High,Average,Medium,High,Low,Stylish,7
+Premium,Medium,Good,Medium,Medium,Low,Affordable,7
+Premium,Low,Average,Medium,Very High,Low,Innovative,7
+Basic,Very High,Good,Long,Low,Low,Stylish,7
+Premium,Medium,Average,Very Long,Medium,Low,Stylish,7
+Premium,Very High,Good,Medium,High,Low,Durable,7
+Basic,High,Average,Medium,High,Low,Durable,6
+Basic,High,Excellent,Long,High,Low,Innovative,6
+Basic,High,Excellent,Short,Low,Low,Innovative,6
+Basic,High,Average,Long,Low,Low,Innovative,6
+Standard,Medium,Excellent,Long,Low,Low,Stylish,6
+Standard,Medium,Poor,Long,High,Low,Stylish,6
+Basic,High,Excellent,Very Long,Very High,High,Affordable,6
+Basic,Very High,Average,Very Long,Medium,Low,Affordable,6
+Basic,Very High,Excellent,Short,Very High,Low,Durable,6
+Basic,Medium,Excellent,Medium,Medium,Low,Durable,6
+Standard,High,Good,Medium,Low,Low,Innovative,6
+Basic,Medium,Average,Short,High,Low,Durable,6
+Standard,Very High,Average,Medium,High,Low,Affordable,6
+Premium,High,Average,Very Long,Medium,Low,Innovative,6
+Standard,Medium,Excellent,Long,High,Low,Durable,6
+Standard,Low,Good,Very Long,Very High,Low,Affordable,6
+Premium,High,Average,Very Long,Very High,Low,Affordable,6
+Premium,Medium,Good,Long,Low,Low,Innovative,6
+Premium,Very High,Poor,Long,Very High,Low,Affordable,6
+Standard,Very High,Good,Medium,Medium,Low,Stylish,6
+Basic,Low,Excellent,Long,Very High,Low,Durable,6
+Standard,Medium,Excellent,Short,Very High,Low,Durable,6
+Basic,Medium,Good,Long,Very High,Low,Durable,5
+Basic,Medium,Good,Long,Very High,Low,Affordable,5
+Standard,Very High,Poor,Short,Medium,Low,Durable,5
+Standard,High,Excellent,Very Long,High,High,Stylish,5
+Standard,Very High,Average,Short,Very High,Low,Stylish,5
+Standard,Very High,Average,Long,Very High,Low,Innovative,5
+Basic,Medium,Excellent,Short,Medium,Low,Affordable,5
+Basic,Low,Average,Long,High,Low,Affordable,5
+Basic,High,Excellent,Long,High,Medium,Stylish,5
+Basic,High,Excellent,Very Long,Very High,Low,Durable,5
+Basic,High,Good,Short,Very High,Low,Affordable,5
+Basic,High,Excellent,Medium,High,Low,Durable,5
+Standard,High,Good,Medium,Medium,Low,Stylish,5
+Standard,High,Poor,Long,Medium,Low,Innovative,5
+Standard,High,Excellent,Short,Medium,Low,Affordable,5
+Basic,Low,Poor,Medium,Low,Medium,Durable,5
+Basic,Medium,Excellent,Medium,Very High,Low,Stylish,5
+Basic,Low,Average,Long,Low,Low,Affordable,5
+Basic,High,Poor,Short,Very High,Low,Innovative,5
+Basic,High,Poor,Medium,Low,Low,Affordable,5
+Basic,High,Poor,Medium,Medium,Low,Durable,5
+Basic,High,Poor,Very Long,Low,Low,Stylish,5
+Basic,High,Average,Short,Medium,Low,Innovative,5
+Basic,High,Average,Short,Very High,Low,Innovative,5
+Basic,Medium,Excellent,Medium,Very High,Low,Affordable,5
+Premium,Low,Excellent,Medium,Very High,Low,Affordable,5
+Premium,Low,Good,Very Long,High,Low,Durable,5
+Premium,Low,Excellent,Very Long,High,Low,Affordable,5
+Standard,Medium,Poor,Long,Low,Low,Durable,5
+Standard,Medium,Poor,Very Long,Medium,Low,Innovative,5
+Standard,Medium,Poor,Medium,High,Low,Innovative,5
+Standard,Low,Excellent,Medium,Very High,Low,Innovative,5
+Premium,Low,Excellent,Long,Low,Low,Innovative,5
+Basic,Very High,Good,Long,Very High,Low,Affordable,5
+Premium,Low,Poor,Short,High,Low,Affordable,5
+Premium,Low,Poor,Medium,Low,Low,Affordable,5
+Premium,Low,Good,Short,Very High,Low,Affordable,5
+Basic,Very High,Excellent,Very Long,High,Low,Stylish,5
+Basic,Very High,Average,Long,Very High,Low,Stylish,5
+Standard,Medium,Excellent,Very Long,High,Medium,Durable,5
+Standard,Low,Average,Long,High,Low,Affordable,5
+Standard,Low,Average,Medium,Very High,Medium,Stylish,5
+Premium,Medium,Average,Medium,Very High,Low,Stylish,5
+Premium,Medium,Average,Long,Medium,Medium,Innovative,5
+Premium,Medium,Average,Short,High,Low,Durable,5
+Premium,Medium,Average,Short,Medium,Low,Stylish,5
+Standard,Medium,Average,Medium,Medium,Low,Stylish,5
+Premium,Medium,Poor,Medium,Very High,Low,Innovative,5
+Premium,High,Average,Medium,Medium,Low,Affordable,5
+Premium,High,Average,Short,High,Low,Innovative,5
+Premium,High,Poor,Long,Medium,Low,Affordable,5
+Premium,High,Good,Short,Very High,Low,Innovative,5
+Premium,High,Excellent,Long,Medium,Low,Affordable,5
+Standard,Low,Good,Very Long,Very High,Low,Innovative,5
+Standard,Low,Good,Long,Very High,Low,Affordable,5
+Standard,Low,Good,Medium,Medium,Low,Affordable,5
+Premium,Very High,Average,Medium,Low,Low,Stylish,5
+Premium,Very High,Average,Short,High,Low,Affordable,5
+Premium,High,Excellent,Very Long,Medium,High,Durable,5
+Premium,Very High,Good,Short,Very High,Low,Stylish,5
+Standard,Low,Poor,Very Long,Low,Low,Affordable,5
+Standard,Low,Poor,Very Long,High,Low,Innovative,5
+Premium,Very High,Excellent,Medium,High,Low,Innovative,5
+Standard,Low,Poor,Long,Very High,Low,Stylish,5
+Basic,Low,Good,Long,Very High,Low,Stylish,5
+Standard,Low,Poor,Very Long,High,Low,Stylish,5
+Basic,Low,Excellent,Very Long,Medium,Low,Durable,5
+Basic,Low,Good,Very Long,Very High,Low,Innovative,5
+Basic,Low,Excellent,Very Long,High,Low,Innovative,5
+Standard,Very High,Good,Very Long,High,Low,Durable,5
+Standard,Very High,Excellent,Short,Very High,Low,Innovative,5
+Standard,Very High,Excellent,Medium,Medium,Low,Innovative,5

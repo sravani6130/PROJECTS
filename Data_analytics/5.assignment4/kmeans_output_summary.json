@@ -1,0 +1,1209 @@
+{
+    "2": {
+        "SSE": 27816.04504729435,
+        "Silhouette": 0.1744782604818972,
+        "Clusters": [
+            {
+                "cluster": 0,
+                "count": 406,
+                "percentage": 40.6,
+                "numeric_means": {
+                    "Age": 57.98275862068966,
+                    "Income": 72270.17733990148,
+                    "Recency": 48.01724137931034,
+                    "NumWebVisitsMonth": 3.605911330049261,
+                    "Kidhome": 0.0665024630541872,
+                    "Teenhome": 0.4014778325123153,
+                    "MntWines": 607.0147783251232,
+                    "MntFruits": 53.25369458128079,
+                    "MntMeatProducts": 368.48522167487687,
+                    "MntFishProducts": 78.26600985221675,
+                    "MntSweetProducts": 57.06896551724138,
+                    "MntGoldProds": 77.3103448275862,
+                    "NumDealsPurchases": 2.0172413793103448,
+                    "NumCatalogPurchases": 5.541871921182266,
+                    "NumStorePurchases": 8.509852216748769,
+                    "NumWebPurchases": 5.610837438423645,
+                    "AcceptedCmp3": 0.0665024630541872,
+                    "AcceptedCmp4": 0.1330049261083744,
+                    "AcceptedCmp5": 0.1748768472906404,
+                    "AcceptedCmp1": 0.15517241379310345,
+                    "AcceptedCmp2": 0.03201970443349754,
+                    "Complain": 0.0,
+                    "Response": 0.21182266009852216
+                },
+                "education_distribution": {
+                    "Graduation": 0.5517241379310345,
+                    "PhD": 0.2512315270935961,
+                    "Master": 0.1330049261083744,
+                    "2n Cycle": 0.06403940886699508
+                },
+                "marital_distribution": {
+                    "Married": 0.3522167487684729,
+                    "Together": 0.2512315270935961,
+                    "Single": 0.23399014778325122,
+                    "Divorced": 0.12561576354679804,
+                    "Widow": 0.03694581280788178
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.0665024630541872,
+                    "AcceptedCmp4": 0.1330049261083744,
+                    "AcceptedCmp5": 0.1748768472906404,
+                    "AcceptedCmp1": 0.15517241379310345,
+                    "AcceptedCmp2": 0.03201970443349754,
+                    "Complain": 0.0,
+                    "Response": 0.21182266009852216
+                }
+            },
+            {
+                "cluster": 1,
+                "count": 594,
+                "percentage": 59.4,
+                "numeric_means": {
+                    "Age": 54.97979797979798,
+                    "Income": 38980.47306397306,
+                    "Recency": 49.68181818181818,
+                    "NumWebVisitsMonth": 6.356902356902357,
+                    "Kidhome": 0.7121212121212122,
+                    "Teenhome": 0.5420875420875421,
+                    "MntWines": 106.06060606060606,
+                    "MntFruits": 6.538720538720539,
+                    "MntMeatProducts": 37.622895622895626,
+                    "MntFishProducts": 10.811447811447811,
+                    "MntSweetProducts": 7.166666666666667,
+                    "MntGoldProds": 22.90740740740741,
+                    "NumDealsPurchases": 2.4764309764309766,
+                    "NumCatalogPurchases": 0.8956228956228957,
+                    "NumStorePurchases": 4.011784511784512,
+                    "NumWebPurchases": 2.9074074074074074,
+                    "AcceptedCmp3": 0.06734006734006734,
+                    "AcceptedCmp4": 0.03535353535353535,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.003367003367003367,
+                    "AcceptedCmp2": 0.0016835016835016834,
+                    "Complain": 0.013468013468013467,
+                    "Response": 0.08754208754208755
+                },
+                "education_distribution": {
+                    "Graduation": 0.468013468013468,
+                    "PhD": 0.21043771043771045,
+                    "Master": 0.1835016835016835,
+                    "2n Cycle": 0.10774410774410774,
+                    "Basic": 0.030303030303030304
+                },
+                "marital_distribution": {
+                    "Married": 0.3838383838383838,
+                    "Together": 0.26262626262626265,
+                    "Single": 0.21548821548821548,
+                    "Divorced": 0.10101010101010101,
+                    "Widow": 0.037037037037037035
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.06734006734006734,
+                    "AcceptedCmp4": 0.03535353535353535,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.003367003367003367,
+                    "AcceptedCmp2": 0.0016835016835016834,
+                    "Complain": 0.013468013468013467,
+                    "Response": 0.08754208754208755
+                }
+            }
+        ]
+    },
+    "5": {
+        "SSE": 24278.161090149963,
+        "Silhouette": 0.10751116440197177,
+        "Clusters": [
+            {
+                "cluster": 0,
+                "count": 51,
+                "percentage": 5.1,
+                "numeric_means": {
+                    "Age": 56.86274509803921,
+                    "Income": 83118.94117647059,
+                    "Recency": 34.80392156862745,
+                    "NumWebVisitsMonth": 3.215686274509804,
+                    "Kidhome": 0.0392156862745098,
+                    "Teenhome": 0.11764705882352941,
+                    "MntWines": 937.1764705882352,
+                    "MntFruits": 52.90196078431372,
+                    "MntMeatProducts": 434.88235294117646,
+                    "MntFishProducts": 74.01960784313725,
+                    "MntSweetProducts": 57.13725490196079,
+                    "MntGoldProds": 65.70588235294117,
+                    "NumDealsPurchases": 1.0,
+                    "NumCatalogPurchases": 6.352941176470588,
+                    "NumStorePurchases": 8.0,
+                    "NumWebPurchases": 5.764705882352941,
+                    "AcceptedCmp3": 0.09803921568627451,
+                    "AcceptedCmp4": 0.6274509803921569,
+                    "AcceptedCmp5": 0.8431372549019608,
+                    "AcceptedCmp1": 0.7450980392156863,
+                    "AcceptedCmp2": 0.21568627450980393,
+                    "Complain": 0.0,
+                    "Response": 0.803921568627451
+                },
+                "education_distribution": {
+                    "Graduation": 0.5686274509803921,
+                    "PhD": 0.2549019607843137,
+                    "Master": 0.13725490196078433,
+                    "2n Cycle": 0.0392156862745098
+                },
+                "marital_distribution": {
+                    "Married": 0.35294117647058826,
+                    "Together": 0.29411764705882354,
+                    "Single": 0.2549019607843137,
+                    "Divorced": 0.0784313725490196,
+                    "Widow": 0.0196078431372549
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.09803921568627451,
+                    "AcceptedCmp4": 0.6274509803921569,
+                    "AcceptedCmp5": 0.8431372549019608,
+                    "AcceptedCmp1": 0.7450980392156863,
+                    "AcceptedCmp2": 0.21568627450980393,
+                    "Complain": 0.0,
+                    "Response": 0.803921568627451
+                }
+            },
+            {
+                "cluster": 1,
+                "count": 39,
+                "percentage": 3.9,
+                "numeric_means": {
+                    "Age": 60.94871794871795,
+                    "Income": 58184.153846153844,
+                    "Recency": 53.02564102564103,
+                    "NumWebVisitsMonth": 6.333333333333333,
+                    "Kidhome": 0.23076923076923078,
+                    "Teenhome": 0.8205128205128205,
+                    "MntWines": 602.1282051282051,
+                    "MntFruits": 9.333333333333334,
+                    "MntMeatProducts": 109.74358974358974,
+                    "MntFishProducts": 9.820512820512821,
+                    "MntSweetProducts": 9.153846153846153,
+                    "MntGoldProds": 33.64102564102564,
+                    "NumDealsPurchases": 3.2051282051282053,
+                    "NumCatalogPurchases": 2.769230769230769,
+                    "NumStorePurchases": 7.333333333333333,
+                    "NumWebPurchases": 5.461538461538462,
+                    "AcceptedCmp3": 0.0,
+                    "AcceptedCmp4": 1.0,
+                    "AcceptedCmp5": 0.1282051282051282,
+                    "AcceptedCmp1": 0.07692307692307693,
+                    "AcceptedCmp2": 0.05128205128205128,
+                    "Complain": 0.0,
+                    "Response": 0.20512820512820512
+                },
+                "education_distribution": {
+                    "PhD": 0.41025641025641024,
+                    "Graduation": 0.41025641025641024,
+                    "Master": 0.1794871794871795
+                },
+                "marital_distribution": {
+                    "Married": 0.38461538461538464,
+                    "Together": 0.23076923076923078,
+                    "Single": 0.1794871794871795,
+                    "Divorced": 0.1282051282051282,
+                    "Widow": 0.07692307692307693
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.0,
+                    "AcceptedCmp4": 1.0,
+                    "AcceptedCmp5": 0.1282051282051282,
+                    "AcceptedCmp1": 0.07692307692307693,
+                    "AcceptedCmp2": 0.05128205128205128,
+                    "Complain": 0.0,
+                    "Response": 0.20512820512820512
+                }
+            },
+            {
+                "cluster": 2,
+                "count": 272,
+                "percentage": 27.200000000000003,
+                "numeric_means": {
+                    "Age": 60.731617647058826,
+                    "Income": 57198.55147058824,
+                    "Recency": 50.8235294117647,
+                    "NumWebVisitsMonth": 5.466911764705882,
+                    "Kidhome": 0.23529411764705882,
+                    "Teenhome": 0.9117647058823529,
+                    "MntWines": 416.6727941176471,
+                    "MntFruits": 19.801470588235293,
+                    "MntMeatProducts": 132.50735294117646,
+                    "MntFishProducts": 29.13235294117647,
+                    "MntSweetProducts": 22.871323529411764,
+                    "MntGoldProds": 58.95955882352941,
+                    "NumDealsPurchases": 3.5183823529411766,
+                    "NumCatalogPurchases": 2.974264705882353,
+                    "NumStorePurchases": 7.455882352941177,
+                    "NumWebPurchases": 5.775735294117647,
+                    "AcceptedCmp3": 0.051470588235294115,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.022058823529411766,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.003676470588235294,
+                    "Response": 0.0625
+                },
+                "education_distribution": {
+                    "Graduation": 0.41544117647058826,
+                    "PhD": 0.3161764705882353,
+                    "Master": 0.21323529411764705,
+                    "2n Cycle": 0.05514705882352941
+                },
+                "marital_distribution": {
+                    "Married": 0.36764705882352944,
+                    "Together": 0.3014705882352941,
+                    "Divorced": 0.15073529411764705,
+                    "Single": 0.13602941176470587,
+                    "Widow": 0.04411764705882353
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.051470588235294115,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.022058823529411766,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.003676470588235294,
+                    "Response": 0.0625
+                }
+            },
+            {
+                "cluster": 3,
+                "count": 217,
+                "percentage": 21.7,
+                "numeric_means": {
+                    "Age": 56.64055299539171,
+                    "Income": 75150.7465437788,
+                    "Recency": 48.49308755760369,
+                    "NumWebVisitsMonth": 2.6635944700460827,
+                    "Kidhome": 0.04608294930875576,
+                    "Teenhome": 0.17511520737327188,
+                    "MntWines": 514.3594470046083,
+                    "MntFruits": 69.11059907834101,
+                    "MntMeatProducts": 463.61290322580646,
+                    "MntFishProducts": 106.11059907834101,
+                    "MntSweetProducts": 72.62672811059907,
+                    "MntGoldProds": 83.23502304147465,
+                    "NumDealsPurchases": 1.4746543778801844,
+                    "NumCatalogPurchases": 6.207373271889401,
+                    "NumStorePurchases": 8.36405529953917,
+                    "NumWebPurchases": 4.9953917050691246,
+                    "AcceptedCmp3": 0.06451612903225806,
+                    "AcceptedCmp4": 0.018433179723502304,
+                    "AcceptedCmp5": 0.10599078341013825,
+                    "AcceptedCmp1": 0.08294930875576037,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.1382488479262673
+                },
+                "education_distribution": {
+                    "Graduation": 0.6036866359447005,
+                    "PhD": 0.19815668202764977,
+                    "Master": 0.1152073732718894,
+                    "2n Cycle": 0.08294930875576037
+                },
+                "marital_distribution": {
+                    "Married": 0.35023041474654376,
+                    "Single": 0.2764976958525346,
+                    "Together": 0.23963133640552994,
+                    "Divorced": 0.0967741935483871,
+                    "Widow": 0.03686635944700461
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.06451612903225806,
+                    "AcceptedCmp4": 0.018433179723502304,
+                    "AcceptedCmp5": 0.10599078341013825,
+                    "AcceptedCmp1": 0.08294930875576037,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.1382488479262673
+                }
+            },
+            {
+                "cluster": 4,
+                "count": 421,
+                "percentage": 42.1,
+                "numeric_means": {
+                    "Age": 52.52256532066508,
+                    "Income": 33544.24465558195,
+                    "Recency": 49.44418052256532,
+                    "NumWebVisitsMonth": 6.565320665083135,
+                    "Kidhome": 0.8669833729216152,
+                    "Teenhome": 0.3824228028503563,
+                    "MntWines": 31.39667458432304,
+                    "MntFruits": 4.89311163895487,
+                    "MntMeatProducts": 21.016627078384797,
+                    "MntFishProducts": 7.339667458432304,
+                    "MntSweetProducts": 5.166270783847981,
+                    "MntGoldProds": 14.805225653206652,
+                    "NumDealsPurchases": 1.98812351543943,
+                    "NumCatalogPurchases": 0.46080760095011875,
+                    "NumStorePurchases": 3.0902612826603324,
+                    "NumWebPurchases": 2.002375296912114,
+                    "AcceptedCmp3": 0.08076009501187649,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0023752969121140144,
+                    "Complain": 0.0166270783847981,
+                    "Response": 0.0997624703087886
+                },
+                "education_distribution": {
+                    "Graduation": 0.505938242280285,
+                    "PhD": 0.16389548693586697,
+                    "Master": 0.15676959619952494,
+                    "2n Cycle": 0.13064133016627077,
+                    "Basic": 0.04275534441805225
+                },
+                "marital_distribution": {
+                    "Married": 0.3847980997624703,
+                    "Single": 0.2517814726840855,
+                    "Together": 0.2375296912114014,
+                    "Divorced": 0.09501187648456057,
+                    "Widow": 0.030878859857482184
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.08076009501187649,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0023752969121140144,
+                    "Complain": 0.0166270783847981,
+                    "Response": 0.0997624703087886
+                }
+            }
+        ]
+    },
+    "7": {
+        "SSE": 22779.68959085419,
+        "Silhouette": 0.11351648039378924,
+        "Clusters": [
+            {
+                "cluster": 0,
+                "count": 51,
+                "percentage": 5.1,
+                "numeric_means": {
+                    "Age": 57.6078431372549,
+                    "Income": 82494.98039215687,
+                    "Recency": 36.68627450980392,
+                    "NumWebVisitsMonth": 3.215686274509804,
+                    "Kidhome": 0.0392156862745098,
+                    "Teenhome": 0.09803921568627451,
+                    "MntWines": 953.8823529411765,
+                    "MntFruits": 53.411764705882355,
+                    "MntMeatProducts": 419.2549019607843,
+                    "MntFishProducts": 70.6470588235294,
+                    "MntSweetProducts": 57.294117647058826,
+                    "MntGoldProds": 66.2156862745098,
+                    "NumDealsPurchases": 1.0196078431372548,
+                    "NumCatalogPurchases": 6.215686274509804,
+                    "NumStorePurchases": 7.96078431372549,
+                    "NumWebPurchases": 5.529411764705882,
+                    "AcceptedCmp3": 0.0784313725490196,
+                    "AcceptedCmp4": 0.6666666666666666,
+                    "AcceptedCmp5": 0.8823529411764706,
+                    "AcceptedCmp1": 0.7058823529411765,
+                    "AcceptedCmp2": 0.21568627450980393,
+                    "Complain": 0.0,
+                    "Response": 0.7647058823529411
+                },
+                "education_distribution": {
+                    "Graduation": 0.5882352941176471,
+                    "PhD": 0.2549019607843137,
+                    "Master": 0.13725490196078433,
+                    "2n Cycle": 0.0196078431372549
+                },
+                "marital_distribution": {
+                    "Married": 0.37254901960784315,
+                    "Together": 0.29411764705882354,
+                    "Single": 0.21568627450980393,
+                    "Divorced": 0.0784313725490196,
+                    "Widow": 0.0392156862745098
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.0784313725490196,
+                    "AcceptedCmp4": 0.6666666666666666,
+                    "AcceptedCmp5": 0.8823529411764706,
+                    "AcceptedCmp1": 0.7058823529411765,
+                    "AcceptedCmp2": 0.21568627450980393,
+                    "Complain": 0.0,
+                    "Response": 0.7647058823529411
+                }
+            },
+            {
+                "cluster": 1,
+                "count": 37,
+                "percentage": 3.6999999999999997,
+                "numeric_means": {
+                    "Age": 60.24324324324324,
+                    "Income": 57469.75675675676,
+                    "Recency": 52.513513513513516,
+                    "NumWebVisitsMonth": 6.486486486486487,
+                    "Kidhome": 0.24324324324324326,
+                    "Teenhome": 0.8648648648648649,
+                    "MntWines": 580.5135135135135,
+                    "MntFruits": 8.0,
+                    "MntMeatProducts": 105.27027027027027,
+                    "MntFishProducts": 8.783783783783784,
+                    "MntSweetProducts": 8.297297297297296,
+                    "MntGoldProds": 32.729729729729726,
+                    "NumDealsPurchases": 3.324324324324324,
+                    "NumCatalogPurchases": 2.72972972972973,
+                    "NumStorePurchases": 7.324324324324325,
+                    "NumWebPurchases": 5.594594594594595,
+                    "AcceptedCmp3": 0.0,
+                    "AcceptedCmp4": 1.0,
+                    "AcceptedCmp5": 0.08108108108108109,
+                    "AcceptedCmp1": 0.08108108108108109,
+                    "AcceptedCmp2": 0.05405405405405406,
+                    "Complain": 0.0,
+                    "Response": 0.21621621621621623
+                },
+                "education_distribution": {
+                    "PhD": 0.43243243243243246,
+                    "Graduation": 0.3783783783783784,
+                    "Master": 0.1891891891891892
+                },
+                "marital_distribution": {
+                    "Married": 0.3783783783783784,
+                    "Together": 0.24324324324324326,
+                    "Single": 0.1891891891891892,
+                    "Divorced": 0.13513513513513514,
+                    "Widow": 0.05405405405405406
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.0,
+                    "AcceptedCmp4": 1.0,
+                    "AcceptedCmp5": 0.08108108108108109,
+                    "AcceptedCmp1": 0.08108108108108109,
+                    "AcceptedCmp2": 0.05405405405405406,
+                    "Complain": 0.0,
+                    "Response": 0.21621621621621623
+                }
+            },
+            {
+                "cluster": 2,
+                "count": 247,
+                "percentage": 24.7,
+                "numeric_means": {
+                    "Age": 60.45748987854251,
+                    "Income": 55932.1012145749,
+                    "Recency": 50.26720647773279,
+                    "NumWebVisitsMonth": 5.684210526315789,
+                    "Kidhome": 0.2631578947368421,
+                    "Teenhome": 0.9554655870445344,
+                    "MntWines": 389.65587044534414,
+                    "MntFruits": 19.23076923076923,
+                    "MntMeatProducts": 123.98380566801619,
+                    "MntFishProducts": 27.17408906882591,
+                    "MntSweetProducts": 22.02834008097166,
+                    "MntGoldProds": 61.2753036437247,
+                    "NumDealsPurchases": 3.748987854251012,
+                    "NumCatalogPurchases": 2.7813765182186234,
+                    "NumStorePurchases": 7.392712550607287,
+                    "NumWebPurchases": 5.7854251012145745,
+                    "AcceptedCmp3": 0.06072874493927125,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.008097165991902834,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.06882591093117409
+                },
+                "education_distribution": {
+                    "Graduation": 0.46153846153846156,
+                    "PhD": 0.2874493927125506,
+                    "Master": 0.1902834008097166,
+                    "2n Cycle": 0.06072874493927125
+                },
+                "marital_distribution": {
+                    "Married": 0.340080971659919,
+                    "Together": 0.291497975708502,
+                    "Divorced": 0.16194331983805668,
+                    "Single": 0.15384615384615385,
+                    "Widow": 0.05263157894736842
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.06072874493927125,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.008097165991902834,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.06882591093117409
+                }
+            },
+            {
+                "cluster": 3,
+                "count": 128,
+                "percentage": 12.8,
+                "numeric_means": {
+                    "Age": 53.5625,
+                    "Income": 73582.921875,
+                    "Recency": 49.40625,
+                    "NumWebVisitsMonth": 2.8125,
+                    "Kidhome": 0.0625,
+                    "Teenhome": 0.25,
+                    "MntWines": 455.109375,
+                    "MntFruits": 82.6640625,
+                    "MntMeatProducts": 414.0078125,
+                    "MntFishProducts": 120.1328125,
+                    "MntSweetProducts": 86.265625,
+                    "MntGoldProds": 106.2421875,
+                    "NumDealsPurchases": 1.390625,
+                    "NumCatalogPurchases": 5.375,
+                    "NumStorePurchases": 8.3828125,
+                    "NumWebPurchases": 5.171875,
+                    "AcceptedCmp3": 0.078125,
+                    "AcceptedCmp4": 0.0234375,
+                    "AcceptedCmp5": 0.125,
+                    "AcceptedCmp1": 0.046875,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.1328125
+                },
+                "education_distribution": {
+                    "Graduation": 0.8671875,
+                    "2n Cycle": 0.078125,
+                    "Master": 0.0390625,
+                    "PhD": 0.015625
+                },
+                "marital_distribution": {
+                    "Single": 0.328125,
+                    "Married": 0.296875,
+                    "Together": 0.1796875,
+                    "Divorced": 0.140625,
+                    "Widow": 0.0546875
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.078125,
+                    "AcceptedCmp4": 0.0234375,
+                    "AcceptedCmp5": 0.125,
+                    "AcceptedCmp1": 0.046875,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.1328125
+                }
+            },
+            {
+                "cluster": 4,
+                "count": 406,
+                "percentage": 40.6,
+                "numeric_means": {
+                    "Age": 52.99261083743843,
+                    "Income": 34469.5197044335,
+                    "Recency": 49.85960591133005,
+                    "NumWebVisitsMonth": 6.480295566502463,
+                    "Kidhome": 0.8669950738916257,
+                    "Teenhome": 0.39408866995073893,
+                    "MntWines": 33.1871921182266,
+                    "MntFruits": 4.802955665024631,
+                    "MntMeatProducts": 21.37192118226601,
+                    "MntFishProducts": 7.167487684729064,
+                    "MntSweetProducts": 4.975369458128079,
+                    "MntGoldProds": 14.758620689655173,
+                    "NumDealsPurchases": 1.9605911330049262,
+                    "NumCatalogPurchases": 0.4975369458128079,
+                    "NumStorePurchases": 3.0960591133004924,
+                    "NumWebPurchases": 2.0,
+                    "AcceptedCmp3": 0.07635467980295567,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0024630541871921183,
+                    "Complain": 0.017241379310344827,
+                    "Response": 0.09852216748768473
+                },
+                "education_distribution": {
+                    "Graduation": 0.5197044334975369,
+                    "PhD": 0.17733990147783252,
+                    "Master": 0.16748768472906403,
+                    "2n Cycle": 0.1354679802955665
+                },
+                "marital_distribution": {
+                    "Married": 0.37438423645320196,
+                    "Single": 0.2512315270935961,
+                    "Together": 0.24876847290640394,
+                    "Divorced": 0.0960591133004926,
+                    "Widow": 0.029556650246305417
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.07635467980295567,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0024630541871921183,
+                    "Complain": 0.017241379310344827,
+                    "Response": 0.09852216748768473
+                }
+            },
+            {
+                "cluster": 5,
+                "count": 113,
+                "percentage": 11.3,
+                "numeric_means": {
+                    "Age": 61.06194690265487,
+                    "Income": 75648.30088495575,
+                    "Recency": 47.876106194690266,
+                    "NumWebVisitsMonth": 2.7787610619469025,
+                    "Kidhome": 0.02654867256637168,
+                    "Teenhome": 0.168141592920354,
+                    "MntWines": 630.8938053097345,
+                    "MntFruits": 44.80530973451327,
+                    "MntMeatProducts": 480.07964601769913,
+                    "MntFishProducts": 80.05309734513274,
+                    "MntSweetProducts": 48.7787610619469,
+                    "MntGoldProds": 47.469026548672566,
+                    "NumDealsPurchases": 1.6725663716814159,
+                    "NumCatalogPurchases": 6.938053097345133,
+                    "NumStorePurchases": 8.442477876106194,
+                    "NumWebPurchases": 5.168141592920354,
+                    "AcceptedCmp3": 0.04424778761061947,
+                    "AcceptedCmp4": 0.008849557522123894,
+                    "AcceptedCmp5": 0.061946902654867256,
+                    "AcceptedCmp1": 0.1592920353982301,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.008849557522123894,
+                    "Response": 0.1415929203539823
+                },
+                "education_distribution": {
+                    "PhD": 0.4690265486725664,
+                    "Master": 0.25663716814159293,
+                    "Graduation": 0.19469026548672566,
+                    "2n Cycle": 0.07964601769911504
+                },
+                "marital_distribution": {
+                    "Married": 0.4778761061946903,
+                    "Together": 0.3008849557522124,
+                    "Single": 0.17699115044247787,
+                    "Divorced": 0.035398230088495575,
+                    "Widow": 0.008849557522123894
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.04424778761061947,
+                    "AcceptedCmp4": 0.008849557522123894,
+                    "AcceptedCmp5": 0.061946902654867256,
+                    "AcceptedCmp1": 0.1592920353982301,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.008849557522123894,
+                    "Response": 0.1415929203539823
+                }
+            },
+            {
+                "cluster": 6,
+                "count": 18,
+                "percentage": 1.7999999999999998,
+                "numeric_means": {
+                    "Age": 46.0,
+                    "Income": 21430.11111111111,
+                    "Recency": 44.388888888888886,
+                    "NumWebVisitsMonth": 7.055555555555555,
+                    "Kidhome": 0.6111111111111112,
+                    "Teenhome": 0.05555555555555555,
+                    "MntWines": 3.1666666666666665,
+                    "MntFruits": 7.833333333333333,
+                    "MntMeatProducts": 7.388888888888889,
+                    "MntFishProducts": 12.5,
+                    "MntSweetProducts": 10.166666666666666,
+                    "MntGoldProds": 17.61111111111111,
+                    "NumDealsPurchases": 1.4444444444444444,
+                    "NumCatalogPurchases": 0.16666666666666666,
+                    "NumStorePurchases": 2.8333333333333335,
+                    "NumWebPurchases": 1.6111111111111112,
+                    "AcceptedCmp3": 0.1111111111111111,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.05555555555555555
+                },
+                "education_distribution": {
+                    "Basic": 1.0
+                },
+                "marital_distribution": {
+                    "Married": 0.5555555555555556,
+                    "Together": 0.2222222222222222,
+                    "Single": 0.16666666666666666,
+                    "Divorced": 0.05555555555555555
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.1111111111111111,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.05555555555555555
+                }
+            }
+        ]
+    },
+    "9": {
+        "SSE": 21299.126603031502,
+        "Silhouette": 0.09853399288371904,
+        "Clusters": [
+            {
+                "cluster": 0,
+                "count": 14,
+                "percentage": 1.4000000000000001,
+                "numeric_means": {
+                    "Age": 58.857142857142854,
+                    "Income": 71764.35714285714,
+                    "Recency": 33.57142857142857,
+                    "NumWebVisitsMonth": 5.0,
+                    "Kidhome": 0.07142857142857142,
+                    "Teenhome": 0.42857142857142855,
+                    "MntWines": 973.5,
+                    "MntFruits": 29.785714285714285,
+                    "MntMeatProducts": 273.14285714285717,
+                    "MntFishProducts": 39.42857142857143,
+                    "MntSweetProducts": 37.357142857142854,
+                    "MntGoldProds": 43.357142857142854,
+                    "NumDealsPurchases": 1.5714285714285714,
+                    "NumCatalogPurchases": 5.714285714285714,
+                    "NumStorePurchases": 8.142857142857142,
+                    "NumWebPurchases": 3.9285714285714284,
+                    "AcceptedCmp3": 0.14285714285714285,
+                    "AcceptedCmp4": 0.7857142857142857,
+                    "AcceptedCmp5": 0.5,
+                    "AcceptedCmp1": 0.5714285714285714,
+                    "AcceptedCmp2": 1.0,
+                    "Complain": 0.0,
+                    "Response": 0.6428571428571429
+                },
+                "education_distribution": {
+                    "Graduation": 0.5714285714285714,
+                    "PhD": 0.35714285714285715,
+                    "Master": 0.07142857142857142
+                },
+                "marital_distribution": {
+                    "Together": 0.5,
+                    "Married": 0.21428571428571427,
+                    "Divorced": 0.14285714285714285,
+                    "Single": 0.14285714285714285
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.14285714285714285,
+                    "AcceptedCmp4": 0.7857142857142857,
+                    "AcceptedCmp5": 0.5,
+                    "AcceptedCmp1": 0.5714285714285714,
+                    "AcceptedCmp2": 1.0,
+                    "Complain": 0.0,
+                    "Response": 0.6428571428571429
+                }
+            },
+            {
+                "cluster": 1,
+                "count": 35,
+                "percentage": 3.5000000000000004,
+                "numeric_means": {
+                    "Age": 60.0,
+                    "Income": 57577.65714285714,
+                    "Recency": 51.885714285714286,
+                    "NumWebVisitsMonth": 6.4,
+                    "Kidhome": 0.2571428571428571,
+                    "Teenhome": 0.8571428571428571,
+                    "MntWines": 546.7142857142857,
+                    "MntFruits": 8.457142857142857,
+                    "MntMeatProducts": 107.71428571428571,
+                    "MntFishProducts": 9.285714285714286,
+                    "MntSweetProducts": 8.4,
+                    "MntGoldProds": 32.48571428571429,
+                    "NumDealsPurchases": 3.342857142857143,
+                    "NumCatalogPurchases": 2.657142857142857,
+                    "NumStorePurchases": 7.114285714285714,
+                    "NumWebPurchases": 5.714285714285714,
+                    "AcceptedCmp3": 0.0,
+                    "AcceptedCmp4": 1.0,
+                    "AcceptedCmp5": 0.08571428571428572,
+                    "AcceptedCmp1": 0.08571428571428572,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.22857142857142856
+                },
+                "education_distribution": {
+                    "PhD": 0.42857142857142855,
+                    "Graduation": 0.4,
+                    "Master": 0.17142857142857143
+                },
+                "marital_distribution": {
+                    "Married": 0.37142857142857144,
+                    "Together": 0.22857142857142856,
+                    "Single": 0.2,
+                    "Divorced": 0.14285714285714285,
+                    "Widow": 0.05714285714285714
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.0,
+                    "AcceptedCmp4": 1.0,
+                    "AcceptedCmp5": 0.08571428571428572,
+                    "AcceptedCmp1": 0.08571428571428572,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.22857142857142856
+                }
+            },
+            {
+                "cluster": 2,
+                "count": 209,
+                "percentage": 20.9,
+                "numeric_means": {
+                    "Age": 60.813397129186605,
+                    "Income": 59145.15789473684,
+                    "Recency": 49.41626794258373,
+                    "NumWebVisitsMonth": 5.526315789473684,
+                    "Kidhome": 0.1722488038277512,
+                    "Teenhome": 0.9904306220095693,
+                    "MntWines": 478.1100478468899,
+                    "MntFruits": 22.6555023923445,
+                    "MntMeatProducts": 152.4306220095694,
+                    "MntFishProducts": 30.708133971291865,
+                    "MntSweetProducts": 26.885167464114833,
+                    "MntGoldProds": 67.22966507177034,
+                    "NumDealsPurchases": 3.61244019138756,
+                    "NumCatalogPurchases": 3.2822966507177034,
+                    "NumStorePurchases": 8.177033492822966,
+                    "NumWebPurchases": 6.320574162679426,
+                    "AcceptedCmp3": 0.05741626794258373,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.028708133971291867,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.08133971291866028
+                },
+                "education_distribution": {
+                    "Graduation": 0.45933014354066987,
+                    "PhD": 0.31100478468899523,
+                    "Master": 0.16267942583732056,
+                    "2n Cycle": 0.06698564593301436
+                },
+                "marital_distribution": {
+                    "Married": 0.35406698564593303,
+                    "Together": 0.2822966507177033,
+                    "Single": 0.1674641148325359,
+                    "Divorced": 0.16267942583732056,
+                    "Widow": 0.03349282296650718
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.05741626794258373,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.028708133971291867,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.08133971291866028
+                }
+            },
+            {
+                "cluster": 3,
+                "count": 95,
+                "percentage": 9.5,
+                "numeric_means": {
+                    "Age": 53.810526315789474,
+                    "Income": 72206.62105263158,
+                    "Recency": 46.6,
+                    "NumWebVisitsMonth": 2.9263157894736844,
+                    "Kidhome": 0.05263157894736842,
+                    "Teenhome": 0.30526315789473685,
+                    "MntWines": 441.5052631578947,
+                    "MntFruits": 100.30526315789474,
+                    "MntMeatProducts": 383.0210526315789,
+                    "MntFishProducts": 129.14736842105262,
+                    "MntSweetProducts": 92.3578947368421,
+                    "MntGoldProds": 101.36842105263158,
+                    "NumDealsPurchases": 1.4842105263157894,
+                    "NumCatalogPurchases": 5.3052631578947365,
+                    "NumStorePurchases": 8.43157894736842,
+                    "NumWebPurchases": 5.315789473684211,
+                    "AcceptedCmp3": 0.05263157894736842,
+                    "AcceptedCmp4": 0.031578947368421054,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.05263157894736842,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.11578947368421053
+                },
+                "education_distribution": {
+                    "Graduation": 0.8210526315789474,
+                    "Master": 0.08421052631578947,
+                    "2n Cycle": 0.07368421052631578,
+                    "PhD": 0.021052631578947368
+                },
+                "marital_distribution": {
+                    "Single": 0.3368421052631579,
+                    "Married": 0.2631578947368421,
+                    "Together": 0.22105263157894736,
+                    "Divorced": 0.11578947368421053,
+                    "Widow": 0.06315789473684211
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.05263157894736842,
+                    "AcceptedCmp4": 0.031578947368421054,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.05263157894736842,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.11578947368421053
+                }
+            },
+            {
+                "cluster": 4,
+                "count": 282,
+                "percentage": 28.199999999999996,
+                "numeric_means": {
+                    "Age": 51.93971631205674,
+                    "Income": 33943.82978723404,
+                    "Recency": 51.47163120567376,
+                    "NumWebVisitsMonth": 6.51418439716312,
+                    "Kidhome": 0.8297872340425532,
+                    "Teenhome": 0.37943262411347517,
+                    "MntWines": 36.47872340425532,
+                    "MntFruits": 6.358156028368795,
+                    "MntMeatProducts": 25.078014184397162,
+                    "MntFishProducts": 11.347517730496454,
+                    "MntSweetProducts": 6.836879432624113,
+                    "MntGoldProds": 17.78723404255319,
+                    "NumDealsPurchases": 2.1347517730496453,
+                    "NumCatalogPurchases": 0.5425531914893617,
+                    "NumStorePurchases": 3.297872340425532,
+                    "NumWebPurchases": 2.1914893617021276,
+                    "AcceptedCmp3": 0.06028368794326241,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.0673758865248227
+                },
+                "education_distribution": {
+                    "Graduation": 0.8156028368794326,
+                    "2n Cycle": 0.18439716312056736
+                },
+                "marital_distribution": {
+                    "Married": 0.40425531914893614,
+                    "Together": 0.24468085106382978,
+                    "Single": 0.21631205673758866,
+                    "Divorced": 0.09219858156028368,
+                    "Widow": 0.0425531914893617
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.06028368794326241,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.0673758865248227
+                }
+            },
+            {
+                "cluster": 5,
+                "count": 105,
+                "percentage": 10.5,
+                "numeric_means": {
+                    "Age": 58.63809523809524,
+                    "Income": 75682.54285714286,
+                    "Recency": 50.21904761904762,
+                    "NumWebVisitsMonth": 2.4761904761904763,
+                    "Kidhome": 0.02857142857142857,
+                    "Teenhome": 0.0761904761904762,
+                    "MntWines": 548.6,
+                    "MntFruits": 37.352380952380955,
+                    "MntMeatProducts": 512.1333333333333,
+                    "MntFishProducts": 87.31428571428572,
+                    "MntSweetProducts": 49.733333333333334,
+                    "MntGoldProds": 60.7047619047619,
+                    "NumDealsPurchases": 1.5142857142857142,
+                    "NumCatalogPurchases": 7.161904761904762,
+                    "NumStorePurchases": 8.266666666666667,
+                    "NumWebPurchases": 4.561904761904762,
+                    "AcceptedCmp3": 0.0761904761904762,
+                    "AcceptedCmp4": 0.009523809523809525,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.14285714285714285,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.14285714285714285
+                },
+                "education_distribution": {
+                    "PhD": 0.4,
+                    "Graduation": 0.3619047619047619,
+                    "Master": 0.1523809523809524,
+                    "2n Cycle": 0.08571428571428572
+                },
+                "marital_distribution": {
+                    "Married": 0.41904761904761906,
+                    "Single": 0.26666666666666666,
+                    "Together": 0.22857142857142856,
+                    "Divorced": 0.06666666666666667,
+                    "Widow": 0.01904761904761905
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.0761904761904762,
+                    "AcceptedCmp4": 0.009523809523809525,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.14285714285714285,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.14285714285714285
+                }
+            },
+            {
+                "cluster": 6,
+                "count": 18,
+                "percentage": 1.7999999999999998,
+                "numeric_means": {
+                    "Age": 46.0,
+                    "Income": 21430.11111111111,
+                    "Recency": 44.388888888888886,
+                    "NumWebVisitsMonth": 7.055555555555555,
+                    "Kidhome": 0.6111111111111112,
+                    "Teenhome": 0.05555555555555555,
+                    "MntWines": 3.1666666666666665,
+                    "MntFruits": 7.833333333333333,
+                    "MntMeatProducts": 7.388888888888889,
+                    "MntFishProducts": 12.5,
+                    "MntSweetProducts": 10.166666666666666,
+                    "MntGoldProds": 17.61111111111111,
+                    "NumDealsPurchases": 1.4444444444444444,
+                    "NumCatalogPurchases": 0.16666666666666666,
+                    "NumStorePurchases": 2.8333333333333335,
+                    "NumWebPurchases": 1.6111111111111112,
+                    "AcceptedCmp3": 0.1111111111111111,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.05555555555555555
+                },
+                "education_distribution": {
+                    "Basic": 1.0
+                },
+                "marital_distribution": {
+                    "Married": 0.5555555555555556,
+                    "Together": 0.2222222222222222,
+                    "Single": 0.16666666666666666,
+                    "Divorced": 0.05555555555555555
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.1111111111111111,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.05555555555555555
+                }
+            },
+            {
+                "cluster": 7,
+                "count": 179,
+                "percentage": 17.9,
+                "numeric_means": {
+                    "Age": 56.6927374301676,
+                    "Income": 39524.1843575419,
+                    "Recency": 48.29050279329609,
+                    "NumWebVisitsMonth": 6.251396648044692,
+                    "Kidhome": 0.8212290502793296,
+                    "Teenhome": 0.5251396648044693,
+                    "MntWines": 72.39664804469274,
+                    "MntFruits": 4.23463687150838,
+                    "MntMeatProducts": 31.452513966480446,
+                    "MntFishProducts": 5.653631284916201,
+                    "MntSweetProducts": 3.446927374301676,
+                    "MntGoldProds": 16.11173184357542,
+                    "NumDealsPurchases": 2.2793296089385473,
+                    "NumCatalogPurchases": 0.7821229050279329,
+                    "NumStorePurchases": 3.441340782122905,
+                    "NumWebPurchases": 2.474860335195531,
+                    "AcceptedCmp3": 0.0893854748603352,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0446927374301676,
+                    "Response": 0.12849162011173185
+                },
+                "education_distribution": {
+                    "Master": 0.49162011173184356,
+                    "PhD": 0.4748603351955307,
+                    "2n Cycle": 0.0223463687150838,
+                    "Graduation": 0.0111731843575419
+                },
+                "marital_distribution": {
+                    "Married": 0.3463687150837989,
+                    "Together": 0.2681564245810056,
+                    "Single": 0.24581005586592178,
+                    "Divorced": 0.10614525139664804,
+                    "Widow": 0.0335195530726257
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.0893854748603352,
+                    "AcceptedCmp4": 0.0,
+                    "AcceptedCmp5": 0.0,
+                    "AcceptedCmp1": 0.0,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0446927374301676,
+                    "Response": 0.12849162011173185
+                }
+            },
+            {
+                "cluster": 8,
+                "count": 63,
+                "percentage": 6.3,
+                "numeric_means": {
+                    "Age": 58.301587301587304,
+                    "Income": 83743.0,
+                    "Recency": 43.3968253968254,
+                    "NumWebVisitsMonth": 2.6984126984126986,
+                    "Kidhome": 0.06349206349206349,
+                    "Teenhome": 0.047619047619047616,
+                    "MntWines": 855.7142857142857,
+                    "MntFruits": 62.12698412698413,
+                    "MntMeatProducts": 468.3333333333333,
+                    "MntFishProducts": 79.82539682539682,
+                    "MntSweetProducts": 67.73015873015873,
+                    "MntGoldProds": 79.03174603174604,
+                    "NumDealsPurchases": 0.9523809523809523,
+                    "NumCatalogPurchases": 5.888888888888889,
+                    "NumStorePurchases": 7.936507936507937,
+                    "NumWebPurchases": 5.634920634920635,
+                    "AcceptedCmp3": 0.07936507936507936,
+                    "AcceptedCmp4": 0.3968253968253968,
+                    "AcceptedCmp5": 0.9682539682539683,
+                    "AcceptedCmp1": 0.4444444444444444,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.5555555555555556
+                },
+                "education_distribution": {
+                    "Graduation": 0.5714285714285714,
+                    "PhD": 0.20634920634920634,
+                    "Master": 0.15873015873015872,
+                    "2n Cycle": 0.06349206349206349
+                },
+                "marital_distribution": {
+                    "Married": 0.4126984126984127,
+                    "Together": 0.2857142857142857,
+                    "Single": 0.1746031746031746,
+                    "Divorced": 0.09523809523809523,
+                    "Widow": 0.031746031746031744
+                },
+                "campaign_response_rates": {
+                    "AcceptedCmp3": 0.07936507936507936,
+                    "AcceptedCmp4": 0.3968253968253968,
+                    "AcceptedCmp5": 0.9682539682539683,
+                    "AcceptedCmp1": 0.4444444444444444,
+                    "AcceptedCmp2": 0.0,
+                    "Complain": 0.0,
+                    "Response": 0.5555555555555556
+                }
+            }
+        ]
+    }
+}
