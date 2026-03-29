@@ -1,0 +1,148 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .home-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+  }
+  
+  .background {
+    flex: 1;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('../assets/supermarket1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    padding: 100px;
+    box-sizing: border-box;
+    justify-content: S;
+    align-items: flex-start;
+  }
+  
+  .background::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5); /* slightly brighter for readability */
+    z-index: 1;
+  }
+  
+  /* Headline: refined color and layout */
+  .headline {
+    position: relative;
+    z-index: 2;
+    font-family: 'Playfair Display', serif;
+    font-size: 3.8rem;
+    font-weight: 700;
+    color: #003566; /* Elegant deep navy blue */
+    text-align: center;
+    max-width: 40%;
+    margin-top: 120px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    margin-left: 100px;
+  
+  
+  }
+  
+  /* Intro paragraph: right-aligned and with softer text */
+  .intro-paragraph {
+    position: relative;
+    z-index: 2;
+    font-size: 1.9rem;
+    font-family: 'Segoe UI', sans-serif;
+    color: #042249;
+    font-weight: 400;
+    line-height: 1.7;
+    max-width: 45%;
+    text-align: center;
+    margin-top: 60px;
+    margin-left: 50px;
+    
+    /* 👇 Background box */
+    background:#e3f2fd; /* Soft white glassy look */
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px); /* Optional: Glass effect */
+  }
+  
+  
+  .start-button {
+    position: absolute;
+    bottom: 120px;
+    left: 20%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 100px;
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: linear-gradient(145deg, #a7e4f7, #299cbe);
+    color: #1a3540;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15),
+                inset 0 1px 3px rgba(255, 255, 255, 0.4);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    overflow: hidden;
+  }
+  
+  /* Hover state with shimmer effect */
+  .start-button:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2),
+                inset 0 1px 5px rgba(255, 255, 255, 0.6);
+    background: linear-gradient(145deg, #1e83a5, #8cd9f0);
+  }
+  
+  .start-button:hover::after,
+  .start-button:active::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(30deg);
+    animation: shimmer 2s infinite linear;
+    pointer-events: none;
+  }
+  
+  .start-button:active {
+    transform: translateX(-50%) scale(0.98);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1),
+                inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Shimmer animation */
+  @keyframes shimmer {
+    from {
+      transform: translateX(-100%) rotate(30deg);
+    }
+    to {
+      transform: translateX(100%) rotate(30deg);
+    }
+  }
+  

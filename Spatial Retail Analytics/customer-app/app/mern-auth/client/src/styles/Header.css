@@ -1,0 +1,338 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Montserrat:wght@300;400;500&display=swap');
+
+.header {
+  height: 100px;
+  background: linear-gradient(135deg, #e6f7fa, #d1e5f0, #f0f0f0);
+  color: #1b263b;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.header-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-sizing: border-box;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+  margin-left: 40px;
+  position: relative;
+  text-decoration: none;
+}
+
+/* Remove focus outline from all interactive elements in header */
+.nav-links a:focus,
+.menu-button:focus,
+.logo-container:focus,
+.mobile-nav a:focus {
+  outline: none;
+}
+
+.logo-container::after {
+  content: '';
+  position: absolute;
+  right: -30px;
+  height: 60px;
+  width: 1px;
+  background: rgba(27, 38, 59, 0.1);
+}
+
+@media (min-width: 1440px) {
+  .logo-container {
+    padding-left: 10px;
+  }
+}
+
+.logo {
+  width: 85px;
+  height: 85px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.logo:hover {
+  transform: translateY(-3px) rotate(1deg);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 1);
+}
+
+.site-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.8rem;
+  font-weight: 600;
+  color: #1b263b;
+  margin-right: 330px;
+  margin-left: -400px;
+  letter-spacing: 1.2px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.site-name::before {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 2px;
+  right: 2px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(27, 38, 59, 0.1), rgba(27, 38, 59, 0.5), rgba(27, 38, 59, 0.1));
+}
+
+@media (min-width: 1024px) {
+  .site-name {
+    display: inline-block;
+  }
+}
+
+.nav-links {
+  margin-right: 50px;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .nav-links {
+    display: flex;
+    gap: 20px;
+    font-size: 18px;
+  }
+
+  .nav-links a {
+    font-family: 'Montserrat', sans-serif;
+    color: #1b263b;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    position: relative;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background-color: #1b263b;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .nav-links a:hover {
+    background: rgba(27, 38, 59, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .nav-links a:hover::after {
+    transform: scaleX(1);
+  }
+
+  .nav-links a.active {
+    background: rgba(27, 38, 59, 0.08);
+    font-weight: 600;
+  }
+  
+  .nav-links a.active::after {
+    transform: scaleX(1);
+    background-color: #1b263b;
+  }
+}
+
+.menu-button {
+  display: block;
+  background: rgba(27, 38, 59, 0.05);
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.menu-button:hover {
+  background: rgba(27, 38, 59, 0.1);
+  transform: rotate(90deg);
+}
+
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  color: #1b263b;
+}
+
+@media (min-width: 768px) {
+  .menu-button {
+    display: none;
+  }
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(240, 240, 240, 0.98);
+  backdrop-filter: blur(10px);
+  padding: 24px;
+  gap: 16px;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transform-origin: top center;
+  animation: slideDown 0.3s ease-out forwards;
+  position: absolute;
+  top: 120px;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.mobile-nav a {
+  color: #1b263b;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  text-decoration: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: rgba(27, 38, 59, 0.03);
+  border: 1px solid rgba(27, 38, 59, 0.08);
+}
+
+.mobile-nav a:hover {
+  background: rgba(27, 38, 59, 0.07);
+  transform: translateX(5px);
+}
+
+/* Responsive tweaks for smaller screens */
+@media (max-width: 900px) {
+  .site-name {
+    font-size: 2.2rem;
+    margin-left: 20px;
+  }
+  
+  .logo-container {
+    margin-left: 10px;
+  }
+  
+  .nav-links {
+    display: none;
+  }
+  
+  .menu-button {
+    display: flex;
+  }
+}
+
+@media (max-width: 600px) {
+  .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  .site-name {
+    font-size: 1.8rem;
+    margin-left: 10px;
+  }
+  
+  .header {
+    height: 80px;
+  }
+  
+  .mobile-nav {
+    top: 80px;
+  }
+  
+  .logo-container::after {
+    display: none;
+  }
+}
+
+/* Additional elegant touches */
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #9ad3db, #adc9df, #9ad3db);
+}
+
+.decorative-element {
+  position: absolute;
+  top: 50%;
+  right: 40px;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(154, 211, 219, 0.15) 0%, rgba(154, 211, 219, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  display: none;
+}
+
+@media (min-width: 1200px) {
+  .decorative-element {
+    display: block;
+  }
+}
+
+.decorative-element::before,
+.decorative-element::after {
+  content: '';
+  position: absolute;
+  background: rgba(27, 38, 59, 0.03);
+  border-radius: 50%;
+}
+
+.decorative-element::before {
+  width: 40px;
+  height: 40px;
+  top: 10px;
+  left: 10px;
+}
+
+.decorative-element::after {
+  width: 20px;
+  height: 20px;
+  bottom: 15px;
+  right: 15px;
+}

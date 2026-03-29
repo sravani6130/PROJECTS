@@ -1,0 +1,396 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Montserrat:wght@300;400;500;600&display=swap');
+
+/* Reset & Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(135deg, #e6f7fa, #d1e5f0, #f0f0f0);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s ease-in-out;
+  overflow-x: hidden;
+}
+
+/* Login Container */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Card-Like Login Box with side transition */
+.login-box {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.08);
+  width: 720px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.7s ease-in-out;
+  animation: slideInFromLeft 1.2s ease-in-out;
+}
+
+/* Decorative dots */
+.decorative-dots {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  opacity: 0.6;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin: 4px;
+  background: linear-gradient(90deg, #9ad3db, #adc9df);
+}
+
+.dot-1 {
+  position: absolute;
+  right: 0;
+}
+
+.dot-2 {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+
+.dot-3 {
+  position: absolute;
+  right: 8px;
+  top: 20px;
+}
+
+/* Login Header */
+.login-header {
+  margin-bottom: 30px;
+}
+
+h2 {
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  font-size: 28px;
+  color: #1b263b;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(27, 38, 59, 0.1), rgba(27, 38, 59, 0.5), rgba(27, 38, 59, 0.1));
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Form Styles */
+form {
+  margin-top: 20px;
+}
+
+/* Label styling */
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+/* Input Fields */
+.textbox {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.textbox input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 15px;
+  border: 1.5px solid rgba(27, 38, 59, 0.08);
+  border-radius: 8px;
+  background: rgba(244, 247, 252, 0.6);
+  outline: none;
+  transition: all 0.3s ease-in-out;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.textbox input:focus {
+  border-color: #1b263b;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(27, 38, 59, 0.08);
+}
+
+.textbox input::placeholder {
+  color: #9ca3af;
+  opacity: 0.7;
+}
+
+/* Password Field Specific Styling */
+.password-container {
+  position: relative;
+}
+
+.password-container input {
+  width: 100%;
+  padding-right: 40px; /* Make room for the eye icon */
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 16px;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+
+.eye-icon:hover {
+  color: #1b263b;
+}
+
+/* Submit Button Styling - Updated Gradient */
+.btn {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.5px;
+  box-shadow: 0 3px 10px rgba(0, 114, 255, 0.3);
+  margin-top: 10px;
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #0072ff, #0056b3);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 114, 255, 0.4);
+}
+
+/* Light button variant */
+.btn-light {
+  background: linear-gradient(135deg, #f0f0f0, #e6e6e6);
+  color: #1b263b;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-light:hover {
+  background: linear-gradient(135deg, #e6e6e6, #d9d9d9);
+  box-shadow: 0 5px 15px rgba(27, 38, 59, 0.2);
+}
+
+/* Options (Remember Me & Forgot Password) */
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0 25px;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+}
+
+.remember-me input {
+  margin-right: 8px;
+  accent-color: #1b263b;
+  cursor: pointer;
+}
+
+.remember-me label {
+  font-size: 13px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.forgot-link {
+  color: #1b263b;
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.forgot-link:hover {
+  color: #415a77;
+}
+
+.forgot-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: #415a77;
+  transition: width 0.3s ease;
+}
+
+.forgot-link:hover::after {
+  width: 100%;
+}
+
+/* Signup Section */
+.signup {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.signup-link {
+  color: #1b263b;
+  font-weight: 600;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.signup-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: #1b263b;
+  transition: width 0.3s ease;
+}
+
+.signup-link:hover::after {
+  width: 100%;
+}
+
+/* Error message styling */
+.error-container {
+  min-height: 40px;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  color: #e63946;
+  font-size: 13px;
+  text-align: left;
+  background: rgba(230, 57, 70, 0.08);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #e63946;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s ease-in-out;
+}
+
+.error-message.show {
+  opacity: 1;
+  max-height: 70px;
+}
+
+/* Focus effects for better accessibility */
+input:focus, 
+button:focus,
+a:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 114, 255, 0.3);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .login-box {
+    width: 90%;
+    max-width: 500px;
+    padding: 35px 25px;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-box {
+    width: 100%;
+    padding: 30px 20px;
+    border-radius: 12px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+  
+  .options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .forgot-link {
+    align-self: flex-end;
+  }
+}
+
+/* Slide in from left animation */
+@keyframes slideInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  70% {
+    opacity: 0.8;
+    transform: translateX(10px);
+  }
+  85% {
+    transform: translateX(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Improve animation smoothness */
+@media (prefers-reduced-motion: reduce) {
+  .login-box {
+    animation: none;
+  }
+  
+  * {
+    transition-duration: 0.1s !important;
+  }
+}

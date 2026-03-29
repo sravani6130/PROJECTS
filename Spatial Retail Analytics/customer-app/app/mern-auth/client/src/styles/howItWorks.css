@@ -1,0 +1,57 @@
+/* howitworks.css */
+.how-it-works {
+  padding: 80px 20px;
+  background-color: #f9fafb;
+  text-align: center;
+}
+
+.section-header {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.section-description {
+  font-size: 1.1rem;
+  color: #4b5563;
+  max-width: 700px;
+  margin: 10px auto 0;
+}
+
+.steps-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.step-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 260px;
+  padding: 20px;
+  transition: transform 0.3s;
+}
+
+.step-card:hover {
+  transform: scale(1.05);
+}
+
+.step-number {
+  background-color: #2563eb;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin: 0 auto 10px;
+  font-size: 1.2rem;
+}

@@ -1,0 +1,72 @@
+.container { min-height:100vh; background:linear-gradient(to bottom right,#ecfeff,#eff6ff,#f8fafc); padding:24px; font-family:'Inter',sans-serif }
+.header { background:white; border-radius:20px; padding:32px; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.06); border:1px solid rgba(226,232,240,0.8) }
+.headerContent { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px }
+.headerTitle { font-size:clamp(1.5rem,3vw,2rem); font-weight:700; color:#0c4a6e; margin-bottom:8px }
+.headerSubtitle { color:#64748b; font-size:1rem }
+.headerActions { display:flex; gap:12px }
+.notificationBtn { position:relative; width:48px; height:48px; border-radius:50%; border:none; background:linear-gradient(135deg,#06b6d4,#3b82f6); color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .2s; box-shadow:0 4px 12px rgba(6,182,212,0.3) }
+.badge { position:absolute; top:-4px; right:-4px; background:#ef4444; color:white; border-radius:50%; width:20px; height:20px; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; border:2px solid white }
+.statsGrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-bottom:24px }
+.statCard { background:white; border-radius:16px; padding:24px; display:flex; align-items:center; gap:16px; box-shadow:0 4px 16px rgba(0,0,0,0.06); border:1px solid rgba(226,232,240,0.8); animation:slideUp .6s ease-out forwards; transition:transform .3s, box-shadow .3s; cursor:pointer }
+.statIconWrapper { position:relative }
+.statIcon { width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 16px rgba(0,0,0,0.1) }
+.statInfo { flex:1 }
+.statLabel { color:#64748b; font-size:.875rem; margin-bottom:4px }
+.statValue { font-size:1.75rem; font-weight:700; color:#0c4a6e }
+.mainContent { display:grid; grid-template-columns:1fr 380px; gap:24px }
+.leftColumn { display:flex; flex-direction:column; gap:24px }
+.rightColumn { display:flex; flex-direction:column; gap:24px }
+.section { background:white; border-radius:20px; padding:28px; box-shadow:0 4px 20px rgba(0,0,0,0.06); border:1px solid rgba(226,232,240,0.8) }
+.sectionHeader { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px }
+.sectionTitleWrapper { display:flex; align-items:center; gap:12px }
+.sectionTitle { font-size:1.25rem; font-weight:700; color:#0c4a6e }
+.viewAllBtn { display:flex; align-items:center; gap:4px; background:none; border:none; color:#06b6d4; font-weight:600; font-size:.875rem; cursor:pointer; transition:transform .2s }
+.challengesContainer { display:flex; flex-direction:column; gap:16px }
+.challengeCard { padding:20px; border-radius:12px; background:linear-gradient(135deg,#f8fafc,#ffffff); border:1px solid #e2e8f0; transition:all .3s; cursor:pointer }
+.challengeHeader { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; gap:12px }
+.challengeTitle { font-size:1rem; font-weight:600; color:#0c4a6e; margin-bottom:4px }
+.challengeDesc { font-size:.875rem; color:#64748b }
+.rewardBadge { display:flex; align-items:center; gap:4px; background:#fef3c7; padding:6px 12px; border-radius:20px; font-size:.875rem; font-weight:600; color:#92400e; white-space:nowrap }
+.progressContainer { display:flex; align-items:center; gap:12px; margin-bottom:12px }
+.progressBar { flex:1; height:8px; background:#e2e8f0; border-radius:4px; overflow:hidden }
+.progressFill { height:100%; border-radius:4px; transition:width .6s ease-out }
+.progressText { font-size:.875rem; font-weight:600; color:#64748b; min-width:40px }
+.challengeFooter { display:flex; justify-content:space-between; align-items:center }
+.zoneTag { display:flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; font-size:.75rem; font-weight:600 }
+.offersGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px }
+.offerCard { position:relative; padding:20px; border-radius:12px; background:linear-gradient(135deg,#f8fafc,#ffffff); border:1px solid #e2e8f0; transition:all .3s; cursor:pointer }
+.offerDiscount { position:absolute; top:12px; right:12px; color:white; padding:6px 12px; border-radius:8px; font-size:.875rem; font-weight:700 }
+.offerTitle { font-size:1rem; font-weight:600; color:#0c4a6e; margin-bottom:8px; margin-right:60px }
+.offerDesc { font-size:.875rem; color:#64748b; margin-bottom:16px; line-height:1.5 }
+.offerFooter { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap }
+.expiryText { font-size:.75rem; color:#64748b; font-weight:500 }
+.claimBtn { padding:8px 16px; border-radius:20px; border:none; color:white; font-size:.875rem; font-weight:600; cursor:pointer; transition:transform .2s }
+.levelCard { background:linear-gradient(135deg,#06b6d4,#3b82f6); border-radius:20px; padding:28px; color:white; box-shadow:0 8px 24px rgba(6,182,212,0.3) }
+.levelHeader { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px }
+.levelTitle { font-size:1.5rem; font-weight:700 }
+.levelNext { font-size:.875rem; opacity:.9 }
+.levelProgressContainer { margin-top:16px }
+.levelProgressBar { height:12px; background:rgba(255,255,255,.2); border-radius:6px; overflow:hidden; margin-bottom:8px }
+.levelProgressFill { height:100%; width:70%; background:white; border-radius:6px; transition:width .6s ease-out }
+.levelProgressText { font-size:.875rem; opacity:.9 }
+.badgesGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+.badgeCard { position:relative; aspect-ratio:1; background:linear-gradient(135deg,#f8fafc,#ffffff); border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:12px; border:1px solid #e2e8f0; transition:all .3s; cursor:pointer }
+.badgeIcon { font-size:2rem }
+.badgeName { font-size:.75rem; font-weight:600; color:#64748b; text-align:center }
+.unlockedIndicator { position:absolute; top:8px; right:8px; width:20px; height:20px; border-radius:50%; background:#10b981; color:white; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700 }
+.activityList { display:flex; flex-direction:column; gap:12px }
+.activityItem { display:flex; align-items:center; gap:12px; padding:12px; border-radius:8px; background:#f8fafc; transition:background .2s; cursor:pointer }
+.activityIcon { width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg,#e0f2fe,#dbeafe); display:flex; align-items:center; justify-content:center; color:#0c4a6e }
+.activityContent { flex:1 }
+.activityAction { font-size:.875rem; font-weight:600; color:#0c4a6e; margin-bottom:2px }
+.activityRight { display:flex; flex-direction:column; align-items:flex-end; gap:2px }
+.activityPoints { font-size:.875rem; font-weight:700; color:#10b981 }
+.activityTime { font-size:.75rem; color:#94a3b8 }
+
+/* animation and media queries */
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px) }
+  to { opacity:1; transform:translateY(0) }
+}
+@media (max-width:1200px){ .mainContent{ grid-template-columns:1fr !important } }
+@media (max-width:640px){ .statsGrid{ grid-template-columns:repeat(2,1fr) !important } .offersGrid{ grid-template-columns:1fr !important } .badgesGrid{ grid-template-columns:repeat(2,1fr) !important } }
