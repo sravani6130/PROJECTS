@@ -409,7 +409,7 @@ pytest backend/rag/
 
 ## 🧭 License
 
-MIT License © 2025 [Jabade Susheel Krishna]
+MIT License © 2025
 
 ---
 
