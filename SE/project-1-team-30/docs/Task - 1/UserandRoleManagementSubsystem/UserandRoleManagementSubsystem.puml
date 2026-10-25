@@ -1,0 +1,454 @@
+@startuml User and Role Management Subsystem - Improved
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty members
+
+title User and Role Management Subsystem - Class Diagram (Improved)
+
+' ===================== DOMAIN MODEL (POJOS) =====================
+
+class User <<Entity>> {
+    - id: String
+    - userName: String
+    - password: String
+    - openIdUrl: String
+    - screenName: String
+    - fullName: String
+    - emailAddress: String
+    - dateCreated: Date
+    - locale: String
+    - timeZone: String
+    - enabled: Boolean
+    - activationCode: String
+    + hasGlobalPermission(String): boolean
+    + hasGlobalPermissions(List<String>): boolean
+    + resetPassword(String): void
+}
+
+class UserRole <<Entity>> {
+    - id: String
+    - userName: String
+    - role: String
+}
+
+abstract class RollerPermission <<Abstract>> {
+    # {abstract} setActions(String): void
+    # {abstract} getActions(): String
+    + getActionsAsList(): List<String>
+    + setActionsAsList(List<String>): void
+    + hasAction(String): boolean
+    + hasActions(List<String>): boolean
+    + addActions(List<String>): void
+    + addActions(ObjectPermission): void
+    + removeActions(List<String>): void
+    + isEmpty(): boolean
+}
+
+abstract class ObjectPermission <<Abstract>> {
+    # id: String
+    # userName: String
+    # objectType: String
+    # objectId: String
+    # pending: boolean
+    # dateCreated: Date
+    # actions: String
+    + isPending(): boolean
+    + setPending(boolean): void
+    + getUserName(): String
+    + setUserName(String): void
+    + getObjectId(): String
+    + setObjectId(String): void
+}
+
+class GlobalPermission {
+    - actions: String
+    + {static} LOGIN: String = "login"
+    + {static} WEBLOG: String = "weblog"
+    + {static} ADMIN: String = "admin"
+    + GlobalPermission(User): <<constructor>>
+    + GlobalPermission(List<String>): <<constructor>>
+    + GlobalPermission(User, List<String>): <<constructor>>
+    + implies(Permission): boolean
+}
+
+class WeblogPermission <<Entity>> {
+    + {static} EDIT_DRAFT: String = "edit_draft"
+    + {static} POST: String = "post"
+    + {static} ADMIN: String = "admin"
+    + {static} ALL_ACTIONS: List<String>
+    + WeblogPermission(Weblog, User, String): <<constructor>>
+    + WeblogPermission(Weblog, User, List<String>): <<constructor>>
+    + getWeblog(): Weblog
+    + getUser(): User
+    + implies(Permission): boolean
+}
+
+' ===================== BUSINESS LAYER =====================
+
+interface UserManager <<Interface>> {
+    + addUser(User): void
+    + saveUser(User): void
+    + removeUser(User): void
+    + getUser(String): User
+    + getUserByUserName(String): User
+    + getUserByUserName(String, Boolean): User
+    + getUserByOpenIdUrl(String): User
+    + getUserByActivationCode(String): User
+    + getUsers(Boolean, Date, Date, int, int): List<User>
+    + getUsersStartingWith(String, Boolean, int, int): List<User>
+    + getUserNameLetterMap(): Map<String, Long>
+    + getUsersByLetter(char, int, int): List<User>
+    + getUserCount(): long
+    + checkPermission(RollerPermission, User): boolean
+    + grantWeblogPermission(Weblog, User, List<String>): void
+    + grantWeblogPermissionPending(Weblog, User, List<String>): void
+    + confirmWeblogPermission(Weblog, User): void
+    + declineWeblogPermission(Weblog, User): void
+    + revokeWeblogPermission(Weblog, User, List<String>): void
+    + getWeblogPermissions(User): List<WeblogPermission>
+    + getWeblogPermissions(Weblog): List<WeblogPermission>
+    + getPendingWeblogPermissions(User): List<WeblogPermission>
+    + getPendingWeblogPermissions(Weblog): List<WeblogPermission>
+    + getWeblogPermissionsIncludingPending(Weblog): List<WeblogPermission>
+    + getWeblogPermission(Weblog, User): WeblogPermission
+    + getWeblogPermissionIncludingPending(Weblog, User): WeblogPermission
+    + grantRole(String, User): void
+    + revokeRole(String, User): void
+    + hasRole(String, User): boolean
+    + getRoles(User): List<String>
+    + release(): void
+}
+
+class JPAUserManagerImpl <<Service>> {
+    - strategy: JPAPersistenceStrategy
+    - userNameToIdMap: Map<String, String>
+}
+
+' ===================== PERSISTENCE LAYER =====================
+
+interface JPAPersistenceStrategy <<Interface>> {
+    + store(Object): void
+    + remove(Object): void
+    + load(Class, String): Object
+    + getNamedQuery(String, Class): TypedQuery
+}
+
+class EntityManager <<JPA>> {
+    + persist(Object): void
+    + merge(Object): Object
+    + remove(Object): void
+    + find(Class, Object): Object
+    + createNamedQuery(String, Class): TypedQuery
+    + createQuery(String, Class): TypedQuery
+    + getTransaction(): EntityTransaction
+    + flush(): void
+    + clear(): void
+}
+
+class TypedQuery <<JPA>> {
+    + setParameter(String, Object): TypedQuery
+    + setFirstResult(int): TypedQuery
+    + setMaxResults(int): TypedQuery
+    + getResultList(): List
+    + getSingleResult(): Object
+}
+
+class EntityTransaction <<JPA>> {
+    + begin(): void
+    + commit(): void
+    + rollback(): void
+    + isActive(): boolean
+}
+
+interface EntityManagerFactory <<JPA>> {
+    + createEntityManager(): EntityManager
+    + isOpen(): boolean
+    + close(): void
+}
+
+class PersistenceProvider <<JPA>> {
+    + createEntityManagerFactory(String, Map): EntityManagerFactory
+}
+
+note right of User
+  JPA Annotations:
+  @Entity
+  @Table(name="roller_user")
+  @NamedQueries(...)
+end note
+
+note right of UserRole
+  JPA Annotations:
+  @Entity
+  @Table(name="userrole")
+end note
+
+note right of WeblogPermission
+  JPA Annotations:
+  @Entity
+  @Table(name="roller_permission")
+  @Inheritance(strategy=SINGLE_TABLE)
+  @NamedQueries(...)
+end note
+
+' ===================== UI LAYER - BASE =====================
+
+abstract class UIAction <<Abstract>> {
+    # actionName: String
+    # desiredMenu: String
+    # pageTitle: String
+    # authenticatedUser: User
+    # actionWeblog: Weblog
+    # weblog: String
+    + isUserRequired(): boolean
+    + isWeblogRequired(): boolean
+    + requiredWeblogPermissionActions(): List<String>
+    + requiredGlobalPermissionActions(): List<String>
+    + isUserIsAdmin(): boolean
+    + getAuthenticatedUser(): User
+    + setAuthenticatedUser(User): void
+    + getActionWeblog(): Weblog
+    + setActionWeblog(Weblog): void
+    + getWeblog(): String
+    + setWeblog(String): void
+}
+
+interface UISecurityEnforced <<Interface>> {
+    + isUserRequired(): boolean
+    + isWeblogRequired(): boolean
+    + requiredWeblogPermissionActions(): List<String>
+    + requiredGlobalPermissionActions(): List<String>
+}
+
+' ===================== UI LAYER - ADMIN =====================
+
+class UserAdmin <<Controller>> {
+    - bean: CreateUserBean
+    - authMethod: AuthMethod
+    + requiredGlobalPermissionActions(): List<String>
+    + isWeblogRequired(): boolean
+    + execute(): String
+    + edit(): String
+}
+
+class UserEdit <<Controller>> {
+    - bean: CreateUserBean
+    - user: User
+    + requiredGlobalPermissionActions(): List<String>
+    + isWeblogRequired(): boolean
+    + execute(): String
+    + save(): String
+    + firstSave(): String
+    + myValidate(): void
+    + isUserEditingSelf(): boolean
+    + getPermissions(): List<WeblogPermission>
+}
+
+class CreateUserBean <<FormBean>> {
+    - id: String
+    - userName: String
+    - password: String
+    - screenName: String
+    - fullName: String
+    - emailAddress: String
+    - locale: String
+    - timeZone: String
+    - openIdUrl: String
+    - enabled: Boolean
+    - activationCode: String
+    - administrator: boolean
+    + copyTo(User): void
+    + copyFrom(User): void
+}
+
+' ===================== UI LAYER - CORE =====================
+
+class Register <<Controller>> {
+    - activationStatus: String
+    - activationCode: String
+    - bean: ProfileBean
+    - authMethod: AuthMethod
+    + isUserRequired(): boolean
+    + isWeblogRequired(): boolean
+    + execute(): String
+    + save(): String
+    + activate(): String
+    + myValidate(): void
+}
+
+class Profile <<Controller>> {
+    - bean: ProfileBean
+    - authMethod: AuthMethod
+    + isWeblogRequired(): boolean
+    + execute(): String
+    + save(): String
+    + myValidate(): void
+}
+
+class ProfileBean <<FormBean>> {
+    - id: String
+    - userName: String
+    - password: String
+    - screenName: String
+    - fullName: String
+    - emailAddress: String
+    - locale: String
+    - timeZone: String
+    - openIdUrl: String
+    - passwordText: String
+    - passwordConfirm: String
+    + copyTo(User): void
+    + copyFrom(User): void
+}
+
+' ===================== UI LAYER - EDITOR =====================
+
+class Members <<Controller>> {
+    + requiredWeblogPermissionActions(): List<String>
+    + execute(): String
+    + save(): String
+    + getWeblogPermissions(): List<WeblogPermission>
+}
+
+class MembersInvite <<Controller>> {
+    - userName: String
+    - permissionString: String
+    + requiredWeblogPermissionActions(): List<String>
+    + execute(): String
+    + save(): String
+    + cancel(): String
+}
+
+class MemberResign <<Controller>> {
+    + requiredWeblogPermissionActions(): List<String>
+    + execute(): String
+    + resign(): String
+}
+
+' ===================== SECURITY FILTERS & INTERCEPTORS =====================
+
+class RoleAssignmentFilter <<Filter>> {
+    + doFilter(ServletRequest, ServletResponse, FilterChain): void
+    + init(FilterConfig): void
+    + destroy(): void
+}
+
+class RoleAssignmentRequestWrapper <<Wrapper>> {
+    + isUserInRole(String): boolean
+}
+
+class UISecurityInterceptor <<Interceptor>> {
+    + doIntercept(ActionInvocation): String
+}
+
+class UIActionInterceptor <<Interceptor>> {
+    + doIntercept(ActionInvocation): String
+}
+
+' ===================== SUPPORT CLASSES =====================
+
+class RollerSession <<Session>> {
+    - authenticatedUser: User
+    + {static} getRollerSession(HttpServletRequest): RollerSession
+    + getAuthenticatedUser(): User
+}
+
+' ===================== EXTERNAL REFERENCES =====================
+
+class Weblog <<External>> {
+    + hasUserPermission(User, String): boolean
+    + hasUserPermissions(User, List<String>): boolean
+}
+
+enum AuthMethod <<Enum>> {
+    ROLLERDB
+    LDAP
+    CMA
+    OPENID
+}
+
+' ===================== INHERITANCE =====================
+
+RollerPermission <|-- ObjectPermission
+RollerPermission <|-- GlobalPermission
+ObjectPermission <|-- WeblogPermission
+
+UserManager <|.. JPAUserManagerImpl : implements
+
+UISecurityEnforced <|.. UIAction : implements
+UIAction <|-- UserAdmin
+UIAction <|-- UserEdit
+UIAction <|-- Register
+UIAction <|-- Profile
+UIAction <|-- Members
+UIAction <|-- MembersInvite
+UIAction <|-- MemberResign
+
+
+' ===================== COMPOSITION (strong ownership) =====================
+
+UserAdmin *-- "1" CreateUserBean : contains
+UserEdit *-- "1" CreateUserBean : contains
+Register *-- "1" ProfileBean : contains
+Profile *-- "1" ProfileBean : contains
+RoleAssignmentFilter *-- "1" RoleAssignmentRequestWrapper : creates
+
+
+' ===================== AGGREGATION (weak ownership) =====================
+
+JPAUserManagerImpl o-- "0..*" User : manages
+JPAUserManagerImpl o-- "0..*" UserRole : manages
+JPAUserManagerImpl o-- "0..*" WeblogPermission : manages
+JPAUserManagerImpl o-- "1" JPAPersistenceStrategy : uses
+
+
+' ===================== ASSOCIATIONS =====================
+
+User "1" -- "0..*" UserRole : has >
+User "1" -- "0..*" WeblogPermission : has >
+User "0..1" -- "0..1" GlobalPermission : checks >
+
+WeblogPermission "0..*" --> "1" User : for
+WeblogPermission "0..*" --> "1" Weblog : in
+
+UserEdit --> "0..1" User : edits
+UIAction --> "0..1" User : authenticatedUser
+UIAction --> "0..1" Weblog : actionWeblog
+UIAction --> "0..1" GlobalPermission : checks
+
+RollerSession --> "0..1" User : authenticates
+
+
+' ===================== DEPENDENCIES =====================
+
+CreateUserBean ..> User : <<transfers data>>
+ProfileBean ..> User : <<transfers data>>
+
+Register ..> UserManager : <<uses>>
+Register ..> AuthMethod : <<uses>>
+Profile ..> UserManager : <<uses>>
+Profile ..> AuthMethod : <<uses>>
+Members ..> UserManager : <<uses>>
+MembersInvite ..> UserManager : <<uses>>
+MemberResign ..> UserManager : <<uses>>
+UserEdit ..> UserManager : <<uses>>
+UserAdmin ..> UserManager : <<uses>>
+UserAdmin ..> AuthMethod : <<uses>>
+
+RoleAssignmentFilter ..> UserManager : <<uses>>
+RoleAssignmentRequestWrapper ..> UserManager : <<uses>>
+RoleAssignmentRequestWrapper ..> User : <<uses>>
+
+UISecurityInterceptor ..> UserManager : <<uses>>
+UISecurityInterceptor ..> GlobalPermission : <<checks>>
+UISecurityInterceptor ..> WeblogPermission : <<checks>>
+
+UIActionInterceptor ..> RollerSession : <<uses>>
+UIActionInterceptor ..> Weblog : <<resolves>>
+
+Members --> "0..*" WeblogPermission : displays/modifies
+MembersInvite --> "1" WeblogPermission : creates
+MemberResign --> "1" WeblogPermission : revokes
+
+@enduml

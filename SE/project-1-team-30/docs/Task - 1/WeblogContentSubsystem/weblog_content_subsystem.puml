@@ -1,0 +1,584 @@
+@startuml Weblog_Content_Subsystem_Complete
+
+' ===============================================
+' Apache Roller - Weblog and Content Subsystem
+' Complete Class Diagram with All Relationships
+' ===============================================
+
+!define ENTITY_COLOR #E8F5E9
+!define MANAGER_COLOR #E3F2FD
+!define IMPL_COLOR #FFF3E0
+!define UI_COLOR #FCE4EC
+!define UTIL_COLOR #F3E5F5
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+' ===============================================
+' SUBSYSTEM 1: BLOG MANAGEMENT
+' ===============================================
+
+package "Blog Management" <<Rectangle>> {
+    
+    class Weblog <<Entity>> ENTITY_COLOR {
+        - id: String
+        - handle: String
+        - name: String
+        - creatorUserName: String
+        - editorTheme: String
+        - locale: String
+        - timeZone: String
+        --
+        + getId(): String
+        + getHandle(): String
+        + getName(): String
+        + getLocale(): String
+        + getTimeZone(): String
+        + getTheme(): WeblogTheme
+        + getWeblogCategories(): List<WeblogCategory>
+        + getRecentWeblogEntries(): List<WeblogEntry>
+    }
+    
+    interface WeblogManager <<Interface>> MANAGER_COLOR {
+        + saveWeblog(Weblog): void
+        + removeWeblog(Weblog): void
+        + addWeblog(Weblog): void
+        + getWeblog(String): Weblog
+        + getWeblogByHandle(String): Weblog
+        + getUserWeblogs(User, boolean): List<Weblog>
+        + hasUserPermissions(Weblog, User, List<String>): boolean
+    }
+    
+    class JPAWeblogManagerImpl <<Implementation>> IMPL_COLOR {
+        - roller: Weblogger
+        - strategy: JPAPersistenceStrategy
+        --
+        + saveWeblog(Weblog): void
+        + removeWeblog(Weblog): void
+        + getWeblog(String): Weblog
+        + saveTemplate(WeblogTemplate): void
+        + getTheme(Weblog): WeblogTheme
+    }
+    
+    class WeblogCategory <<Entity>> ENTITY_COLOR {
+        - id: String
+        - name: String
+        - position: int
+        --
+        + getId(): String
+        + getName(): String
+        + getPosition(): int
+        + getWeblog(): Weblog
+        + retrieveWeblogEntries(boolean): List<WeblogEntry>
+    }
+    
+    abstract class WeblogTheme <<Abstract>> MANAGER_COLOR {
+        {abstract} + getName(): String
+        {abstract} + getTemplate(String): WeblogTemplate
+        {abstract} + getDefaultTemplate(): WeblogTemplate
+        {abstract} + getTemplateByAction(ComponentType): WeblogTemplate
+    }
+    
+    class User <<Entity>> ENTITY_COLOR {
+        - id: String
+        - userName: String
+        - password: String
+        - emailAddress: String
+        - enabled: Boolean
+        --
+        + getUserName(): String
+        + getPassword(): String
+        + getEmailAddress(): String
+        + getEnabled(): Boolean
+    }
+}
+
+' ===============================================
+' SUBSYSTEM 2: ENTRIES MANAGEMENT
+' ===============================================
+
+package "Entries Management" <<Rectangle>> {
+    
+    class WeblogEntry <<Entity>> ENTITY_COLOR {
+        - id: String
+        - title: String
+        - text: String
+        - status: PubStatus
+        - pubTime: Timestamp
+        --
+        + getTitle(): String
+        + getText(): String
+        + getStatus(): PubStatus
+        + getPubTime(): Timestamp
+        + getWebsite(): Weblog
+    }
+    
+    enum PubStatus {
+        DRAFT
+        PUBLISHED
+        PENDING
+        SCHEDULED
+    }
+    
+    interface WeblogEntryManager <<Interface>> MANAGER_COLOR {
+        + saveWeblogEntry(WeblogEntry): void
+        + removeWeblogEntry(WeblogEntry): void
+        + getWeblogEntry(String): WeblogEntry
+        + saveWeblogCategory(WeblogCategory): void
+        + getWeblogCategory(String): WeblogCategory
+        + saveComment(WeblogEntryComment): void
+        + getComment(String): WeblogEntryComment
+    }
+    
+    class JPAWeblogEntryManagerImpl <<Implementation>> IMPL_COLOR {
+        - roller: Weblogger
+        - strategy: JPAPersistenceStrategy
+        - entryAnchorToIdMap: Map<String, String>
+        --
+        + saveWeblogEntry(WeblogEntry): void
+        + removeWeblogEntry(WeblogEntry): void
+        + getWeblogEntry(String): WeblogEntry
+        + saveWeblogCategory(WeblogCategory): void
+        + saveComment(WeblogEntryComment): void
+        + getPopularTags(Weblog, Date, int, int): List<TagStat>
+    }
+    
+    class EntryEdit <<UI Action>> UI_COLOR {
+        - bean: EntryBean
+        - entry: WeblogEntry
+        --
+        + execute(): String
+        + saveDraft(): String
+        + publish(): String
+        + getPreviewURL(): String
+        + getCategories(): List<WeblogCategory>
+        + getRecentPublishedEntries(): List<WeblogEntry>
+        + getBean(): EntryBean
+        + getEntry(): WeblogEntry
+    }
+    
+    class EntryBean <<DTO>> UTIL_COLOR {
+        - id: String
+        - title: String
+        - text: String
+        - status: String
+        - tagsAsString: String
+        --
+        + getDateString(): String
+        + setDateString(String): void
+        + getPubTime(Locale, TimeZone): Timestamp
+        + isDraft(): boolean
+        + isPublished(): boolean
+        + copyTo(WeblogEntry): void
+        + copyFrom(WeblogEntry, Locale): void
+    }
+    
+    class WeblogEntryTag <<Entity>> ENTITY_COLOR {
+        - id: String
+        - name: String
+        - time: Timestamp
+        --
+        + getId(): String
+        + getName(): String
+        + getEntry(): WeblogEntry
+        + getWeblog(): Weblog
+    }
+    
+    class WeblogEntryAttribute <<Entity>> ENTITY_COLOR {
+        - id: String
+        - name: String
+        - value: String
+        --
+        + getId(): String
+        + getName(): String
+        + getValue(): String
+        + getEntry(): WeblogEntry
+    }
+    
+    class MediaFile <<Entity>> ENTITY_COLOR {
+        - id: String
+        - name: String
+        - contentType: String
+        - length: long
+        --
+        + getId(): String
+        + getName(): String
+        + getContentType(): String
+        + getLength(): long
+        + getDirectory(): MediaFileDirectory
+        + getWeblog(): Weblog
+        + getInputStream(): InputStream
+        + getPermalink(): String
+    }
+    
+    interface MediaFileManager <<Interface>> MANAGER_COLOR {
+        + createMediaFile(Weblog, MediaFile, RollerMessages): void
+        + updateMediaFile(Weblog, MediaFile): void
+        + removeMediaFile(Weblog, MediaFile): void
+        + getMediaFile(String): MediaFile
+        + searchMediaFiles(Weblog, MediaFileFilter): List<MediaFile>
+        + createDefaultMediaFileDirectory(Weblog): MediaFileDirectory
+        + getMediaFileDirectory(String): MediaFileDirectory
+        + getMediaFileDirectories(Weblog): List<MediaFileDirectory>
+    }
+    
+    class JPAMediaFileManagerImpl <<Implementation>> IMPL_COLOR {
+        - roller: Weblogger
+        - strategy: JPAPersistenceStrategy
+        --
+        + createMediaFile(Weblog, MediaFile, RollerMessages): void
+        + updateMediaFile(Weblog, MediaFile): void
+        + removeMediaFile(Weblog, MediaFile): void
+        + getMediaFile(String): MediaFile
+        + searchMediaFiles(Weblog, MediaFileFilter): List<MediaFile>
+        + createDefaultMediaFileDirectory(Weblog): MediaFileDirectory
+        + getMediaFileDirectories(Weblog): List<MediaFileDirectory>
+    }
+    
+    class MediaFileDirectory <<Entity>> ENTITY_COLOR {
+        - id: String
+        - name: String
+        --
+        + getId(): String
+        + getName(): String
+        + getWeblog(): Weblog
+        + getMediaFiles(): Set<MediaFile>
+    }
+    
+    class MediaFileTag <<Entity>> ENTITY_COLOR {
+        - id: String
+        - name: String
+        --
+        + getId(): String
+        + getName(): String
+        + getMediaFile(): MediaFile
+        + getWeblog(): Weblog
+    }
+    
+    class MediaFileAdd <<UI Action>> UI_COLOR {
+        - uploadedFiles: File[]
+        - directory: MediaFileDirectory
+        - newImages: List<MediaFile>
+        --
+        + execute(): String
+        + save(): String
+        + myValidate(): void
+        + getBean(): MediaFileBean
+        + getDirectory(): MediaFileDirectory
+        + getUploadedFiles(): File[]
+        + getNewImages(): List<MediaFile>
+    }
+}
+
+' ===============================================
+' SUBSYSTEM 3: COMMENT MANAGEMENT
+' ===============================================
+
+package "Comment Management" <<Rectangle>> {
+    
+    class WeblogEntryComment <<Entity>> ENTITY_COLOR {
+        - id: String
+        - name: String
+        - email: String
+        - content: String
+        - status: ApprovalStatus
+        --
+        + getId(): String
+        + getName(): String
+        + getEmail(): String
+        + getContent(): String
+        + getStatus(): ApprovalStatus
+        + getWeblogEntry(): WeblogEntry
+    }
+    
+    enum ApprovalStatus {
+        APPROVED
+        PENDING
+        SPAM
+        DISAPPROVED
+    }
+    
+    class CommentSearchCriteria <<Criteria>> UTIL_COLOR {
+        - weblog: Weblog
+        - entry: WeblogEntry
+        - status: ApprovalStatus
+        - offset: int
+        --
+        + getWeblog(): Weblog
+        + setWeblog(Weblog): void
+        + getEntry(): WeblogEntry
+        + setEntry(WeblogEntry): void
+        + getStatus(): ApprovalStatus
+        + setStatus(ApprovalStatus): void
+        + getOffset(): int
+        + setOffset(int): void
+        + getMaxResults(): int
+    }
+    
+    class CommentServlet <<Servlet>> UI_COLOR {
+        - commentValidationManager: CommentValidationManager
+        - commentThrottle: GenericThrottle
+        --
+        + init(ServletConfig): void
+        + doPost(HttpServletRequest, HttpServletResponse): void
+    }
+}
+
+' ===============================================
+' SUBSYSTEM 4: RENDERING ENGINE
+' ===============================================
+
+package "Rendering Engine" <<Rectangle>> {
+    
+    interface Renderer <<Interface>> MANAGER_COLOR {
+        + render(Template, Map<String, Object>): String
+    }
+    
+    class VelocityRenderer <<Implementation>> IMPL_COLOR {
+        --
+        + render(Template, Map<String, Object>): String
+        # createContext(Map<String, Object>): VelocityContext
+    }
+    
+    class RendererManager <<Factory>> MANAGER_COLOR {
+        - rendererFactories: List<RendererFactory>
+        --
+        {static} + getRenderer(Template, DeviceType): Renderer
+    }
+    
+    class PageServlet <<Servlet>> UI_COLOR {
+        --
+        + init(ServletConfig): void
+        + doGet(HttpServletRequest, HttpServletResponse): void
+        # getTemplate(WeblogPageRequest): Template
+        # buildModel(WeblogPageRequest, HttpServletRequest, HttpServletResponse): PageModel
+    }
+    
+    class WeblogPageRequest <<Request>> UTIL_COLOR {
+        - context: String
+        - weblogAnchor: String
+        - weblogPageName: String
+        - tags: List<String>
+        - weblogEntry: WeblogEntry
+        --
+        + WeblogPageRequest(HttpServletRequest)
+        + getContext(): String
+        + getWeblogAnchor(): String
+        + getWeblogPageName(): String
+        + getTags(): List<String>
+        + getWeblogEntry(): WeblogEntry
+        + getWeblogCategory(): WeblogCategory
+    }
+    
+    class PageModel <<Model>> UTIL_COLOR {
+        - weblog: Weblog
+        - pageRequest: WeblogPageRequest
+        - weblogEntryManager: WeblogEntryManager
+        --
+        + getWeblog(): Weblog
+        + getWeblogEntry(): WeblogEntry
+        + getWeblogEntries(): List<WeblogEntry>
+        + getWeblogCategory(): WeblogCategory
+        + getWeblogCategories(): List<WeblogCategory>
+        + getPopularTags(int): List<TagStat>
+        + hasMoreEntries(): boolean
+        + getNextPageUrl(): String
+    }
+    
+    class WeblogPageCache <<Cache>> UTIL_COLOR {
+        - cache: Map<String, CachedPage>
+        --
+        + get(String): CachedPage
+        + put(String, CachedPage): void
+        + clear(): void
+        + invalidate(Weblog): void
+        + invalidate(WeblogEntry): void
+    }
+    
+    interface Template <<Interface>> MANAGER_COLOR {
+        + getId(): String
+        + getName(): String
+        + getContents(): String
+        + setContents(String): void
+        + getLastModified(): Date
+        + getTemplateLanguage(): String
+        + getWeblog(): Weblog
+    }
+}
+
+' ===============================================
+' SUBSYSTEM 5: CONTENT FETCHING & SERVING
+' ===============================================
+
+package "Content Fetching & Serving" <<Rectangle>> {
+    
+    class FeedServlet <<Servlet>> UI_COLOR {
+        --
+        + init(ServletConfig): void
+        + doGet(HttpServletRequest, HttpServletResponse): void
+    }
+    
+    class WeblogFeedRequest <<Request>> UTIL_COLOR {
+        - type: String
+        - format: String
+        - weblogCategoryName: String
+        - tags: List<String>
+        --
+        + WeblogFeedRequest(HttpServletRequest)
+        + getType(): String
+        + getFormat(): String
+        + getWeblogCategoryName(): String
+        + getWeblogCategory(): WeblogCategory
+        + getTags(): List<String>
+    }
+    
+    class WeblogFeedCache <<Cache>> UTIL_COLOR {
+        - cache: Map<String, CachedContent>
+        --
+        + get(String, long): CachedContent
+        + put(String, CachedContent): void
+        + clear(): void
+        + invalidate(Weblog): void
+        + invalidate(WeblogEntry): void
+        + generateKey(WeblogFeedRequest): String
+    }
+    
+    class MediaResourceServlet <<Servlet>> UI_COLOR {
+        --
+        + init(ServletConfig): void
+        + doGet(HttpServletRequest, HttpServletResponse): void
+    }
+    
+    class WeblogMediaResourceRequest <<Request>> UTIL_COLOR {
+        - resourceId: String
+        - thumbnail: boolean
+        --
+        + WeblogMediaResourceRequest(HttpServletRequest)
+        + getResourceId(): String
+        + isThumbnail(): boolean
+    }
+}
+
+' ===============================================
+' CORE RELATIONSHIPS
+' ===============================================
+
+' === BLOG MANAGEMENT SUBSYSTEM ===
+
+' Manager implementations
+WeblogManager <|.. JPAWeblogManagerImpl : implements
+JPAWeblogManagerImpl --> Weblog : manages
+
+' Weblog core relationships
+Weblog "1" *-- "0..*" WeblogCategory : contains
+Weblog "1" --> "1" WeblogTheme : uses
+Weblog "1" --> "1" User : created by
+Weblog "1" *-- "0..*" WeblogEntry : contains
+Weblog "1" *-- "0..*" MediaFileDirectory : contains
+
+' Category
+WeblogCategory "1" --> "0..*" WeblogEntry : organizes
+
+' === ENTRIES MANAGEMENT SUBSYSTEM ===
+
+' Manager implementations
+WeblogEntryManager <|.. JPAWeblogEntryManagerImpl : implements
+JPAWeblogEntryManagerImpl --> WeblogEntry : manages
+JPAWeblogEntryManagerImpl --> WeblogEntryComment : manages
+
+MediaFileManager <|.. JPAMediaFileManagerImpl : implements
+JPAMediaFileManagerImpl --> MediaFile : manages
+
+' Entry core relationships
+WeblogEntry "1" --> "1" Weblog : belongs to
+WeblogEntry "1" --> "1" WeblogCategory : categorized
+WeblogEntry "1" --> "1" User : created by
+WeblogEntry "1" *-- "0..*" WeblogEntryTag : has
+WeblogEntry "1" *-- "0..*" WeblogEntryAttribute : has
+WeblogEntry "1" *-- "0..*" WeblogEntryComment : has
+WeblogEntry --> PubStatus : has
+
+' Tag relationships
+WeblogEntryTag "0..*" --> "1" WeblogEntry : belongs to
+
+' Attribute relationships
+WeblogEntryAttribute "0..*" --> "1" WeblogEntry : belongs to
+
+' Media relationships
+MediaFile "0..*" --> "1" MediaFileDirectory : stored in
+MediaFile "0..*" --> "1" Weblog : belongs to
+MediaFile "1" *-- "0..*" MediaFileTag : has
+
+MediaFileDirectory "0..*" --> "1" Weblog : belongs to
+MediaFileTag "0..*" --> "1" MediaFile : belongs to
+
+' UI Actions (essential only)
+EntryEdit --> EntryBean : uses
+EntryEdit --> WeblogEntry : edits
+EntryEdit --> WeblogEntryManager : uses
+
+MediaFileAdd --> MediaFileManager : uses
+MediaFileAdd --> MediaFileDirectory : targets
+
+' === COMMENT MANAGEMENT SUBSYSTEM ===
+
+' Comment relationships
+WeblogEntryComment "0..*" --> "1" WeblogEntry : posted on
+WeblogEntryComment --> ApprovalStatus : has
+
+' Comment servlet
+CommentServlet --> WeblogEntryComment : creates
+CommentServlet --> WeblogEntryManager : uses
+
+' Search criteria (essential only)
+CommentSearchCriteria --> Weblog : filters by
+CommentSearchCriteria --> ApprovalStatus : filters by
+
+' === RENDERING ENGINE SUBSYSTEM ===
+
+' Renderer implementations
+Renderer <|.. VelocityRenderer : implements
+RendererManager --> Renderer : creates
+
+' PageServlet core
+PageServlet --> WeblogPageRequest : parses
+PageServlet --> RendererManager : uses
+PageServlet --> PageModel : builds
+PageServlet --> Template : loads
+
+' Request parsing
+WeblogPageRequest --> Weblog : identifies
+WeblogPageRequest --> WeblogEntry : loads
+
+' Page model
+PageModel --> Weblog : presents
+PageModel --> WeblogEntryManager : queries
+
+' Cache
+WeblogPageCache --> Weblog : caches per
+
+' Template
+Template --> Weblog : belongs to
+
+' === CONTENT SERVING SUBSYSTEM ===
+
+' Feed servlet
+FeedServlet --> WeblogFeedRequest : parses
+FeedServlet --> Weblog : loads
+FeedServlet --> WeblogFeedCache : uses
+
+' Feed request
+WeblogFeedRequest --> Weblog : identifies
+
+' Feed cache
+WeblogFeedCache --> Weblog : caches per
+
+' Media servlet
+MediaResourceServlet --> WeblogMediaResourceRequest : parses
+MediaResourceServlet --> MediaFileManager : uses
+
+' Media request
+WeblogMediaResourceRequest --> MediaFile : identifies
+
+@enduml

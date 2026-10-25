@@ -1,0 +1,3 @@
+export GMAIL_USER="santhoshiiith@gmail.com"
+export GMAIL_APP_PASSWORD="hqnljjfpnlcceyez"
+export GOOGLE_API_KEY="AIzaSyBogQ6dec87gt1dr2mPej0IO1D9elr8H70"

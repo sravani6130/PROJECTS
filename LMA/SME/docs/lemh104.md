@@ -1,0 +1,1052 @@
+# **DETERMINANTS**
+
+## ❖ All Mathematical truths are relative and conditional. — C.P. STEINMETZ ❖
+
+#### 4.1 Introduction
+
+In the previous chapter, we have studied about matrices and algebra of matrices. We have also learnt that a system of algebraic equations can be expressed in the form of matrices. This means, a system of linear equations like
+
+$$a_1 x + b_1 y = c_1$$
+
+$$a_2 x + b_2 y = c_2$$
+can be represented as 
+$$\begin{bmatrix} a_1 & b_1 \\ a_2 & b_2 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} = \begin{bmatrix} c_1 \\ c_2 \end{bmatrix}$$
+. Now, this
+
+system of equations has a unique solution or not, is determined by the number  $a_1 b_2 - a_2 b_1$ . (Recall that if
+
+![](_page_0_Picture_8.jpeg)
+
+P.S. Laplace (1749-1827)
+
+$$\frac{a_1}{a_2} \neq \frac{b_1}{b_2}$$
+ or,  $a_1 b_2 - a_2 b_1 \neq 0$ , then the system of linear equations has a unique solution). The number  $a_1 b_2 - a_2 b_1$ 
+
+which determines uniqueness of solution is associated with the matrix  $A = \begin{bmatrix} a_1 & b_1 \\ a_2 & b_2 \end{bmatrix}$ 
+
+and is called the determinant of A or det A. Determinants have wide applications in Engineering, Science, Economics, Social Science, etc.
+
+In this chapter, we shall study determinants up to order three only with real entries. Also, we will study various properties of determinants, minors, cofactors and applications of determinants in finding the area of a triangle, adjoint and inverse of a square matrix, consistency and inconsistency of system of linear equations and solution of linear equations in two or three variables using inverse of a matrix.
+
+#### 4.2 Determinant
+
+To every square matrix  $A = [a_{ij}]$  of order n, we can associate a number (real or complex) called determinant of the square matrix A, where  $a_{ii} = (i, j)^{th}$  element of A.
+
+This may be thought of as a function which associates each square matrix with a unique number (real or complex). If M is the set of square matrices, K is the set of numbers (real or complex) and  $f: M \to K$  is defined by f(A) = k, where  $A \in M$  and  $k \in K$ , then f(A) is called the determinant of A. It is also denoted by |A| or det A or  $\Delta$ .
+
+If 
+$$A = \begin{bmatrix} a & b \\ c & d \end{bmatrix}$$
+, then determinant of A is written as  $|A| = \begin{vmatrix} a & b \\ c & d \end{vmatrix} = \det(A)$ 
+
+#### Remarks
+
+- (i) For matrix A, |A| is read as determinant of A and not modulus of A.
+- (ii) Only square matrices have determinants.
+
+## 4.2.1 Determinant of a matrix of order one
+
+Let A = [a] be the matrix of order 1, then determinant of A is defined to be equal to a
+
+## 4.2.2 Determinant of a matrix of order two
+
+Let
+
+$$A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix}$$
+ be a matrix of order 2 × 2,
+
+then the determinant of A is defined as:
+
+$$\det(\mathbf{A}) = |\mathbf{A}| = \Delta = \begin{vmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{vmatrix} = a_{11}a_{22} - a_{21}a_{12}$$
+
+**Example 1** Evaluate 
+$$\begin{bmatrix} 2 & 4 \\ -1 & 2 \end{bmatrix}$$
+.
+
+Solution We have 
+$$\begin{vmatrix} 2 & 4 \\ -1 & 2 \end{vmatrix} = 2(2) - 4(-1) = 4 + 4 = 8.$$
+
+**Example 2** Evaluate 
+$$\begin{vmatrix} x & x+1 \\ x-1 & x \end{vmatrix}$$
+
+**Solution** We have
+
+$$\begin{vmatrix} x & x+1 \\ x-1 & x \end{vmatrix} = x(x) - (x+1)(x-1) = x^2 - (x^2-1) = x^2 - x^2 + 1 = 1$$
+
+## 4.2.3 Determinant of a matrix of order 3 × 3
+
+Determinant of a matrix of order three can be determined by expressing it in terms of second order determinants. This is known as expansion of a determinant along a row (or a column). There are six ways of expanding a determinant of order
+
+3 corresponding to each of three rows ( $R_1$ ,  $R_2$  and  $R_3$ ) and three columns ( $C_1$ ,  $C_2$  and  $C_3$ ) giving the same value as shown below.
+
+Consider the determinant of square matrix  $A = [a_{ij}]_{3 \times 3}$ 
+
+i.e., 
+$$|A| = \begin{vmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{vmatrix}$$
+
+## Expansion along first Row (R,)
+
+**Step 1** Multiply first element  $a_{11}$  of  $R_1$  by  $(-1)^{(1+1)}$  [ $(-1)^{\text{sum of suffixes in } a_{11}}$ ] and with the second order determinant obtained by deleting the elements of first row  $(R_1)$  and first column  $(C_1)$  of |A| as  $a_{11}$  lies in  $R_1$  and  $C_1$ ,
+
+i.e., 
+$$(-1)^{1+1} a_{11} \begin{vmatrix} a_{22} & a_{23} \\ a_{32} & a_{33} \end{vmatrix}$$
+
+**Step 2** Multiply 2nd element  $a_{12}$  of  $R_1$  by  $(-1)^{1+2}$  [ $(-1)^{\text{sum of suffixes in } a_{12}}$ ] and the second order determinant obtained by deleting elements of first row ( $R_1$ ) and 2nd column ( $C_2$ ) of |A| as  $a_{12}$  lies in  $R_1$  and  $C_2$ ,
+
+i.e., 
+$$(-1)^{1+2} a_{12} \begin{vmatrix} a_{21} & a_{23} \\ a_{31} & a_{33} \end{vmatrix}$$
+
+**Step 3** Multiply third element  $a_{13}$  of  $R_1$  by  $(-1)^{1+3}$  [ $(-1)^{\text{sum of suffixes in } a_{13}}$ ] and the second order determinant obtained by deleting elements of first row ( $R_1$ ) and third column ( $C_3$ ) of |A| as  $a_{13}$  lies in  $R_1$  and  $C_3$ ,
+
+i.e., 
+$$(-1)^{1+3} a_{13} \begin{vmatrix} a_{21} & a_{22} \\ a_{31} & a_{32} \end{vmatrix}$$
+
+Step 4 Now the expansion of determinant of A, that is, |A| written as sum of all three terms obtained in steps 1, 2 and 3 above is given by
+
+$$\det A = |A| = (-1)^{1+1} a_{11} \begin{vmatrix} a_{22} & a_{23} \\ a_{32} & a_{33} \end{vmatrix} + (-1)^{1+2} a_{12} \begin{vmatrix} a_{21} & a_{23} \\ a_{31} & a_{33} \end{vmatrix}$$
+
+$$+ (-1)^{1+3} a_{13} \begin{vmatrix} a_{21} & a_{22} \\ a_{31} & a_{32} \end{vmatrix}$$
+or
+$$|A| = a_{11} (a_{22} a_{33} - a_{32} a_{23}) - a_{12} (a_{21} a_{33} - a_{31} a_{23})$$
+
+$$+ a_{13} (a_{21} a_{32} - a_{31} a_{22})$$
+
+$$= a_{11} a_{22} a_{33} - a_{11} a_{32} a_{23} - a_{12} a_{21} a_{33} + a_{12} a_{31} a_{23} + a_{13} a_{21} a_{32} - a_{13} a_{31} a_{22} \qquad \qquad \dots (1)$$
+
+Note We shall apply all four steps together.
+
+## Expansion along second row (R<sub>2</sub>)
+
+$$|\mathbf{A}| = \begin{vmatrix} \mathbf{a}_{11} & \mathbf{a}_{12} & \mathbf{a}_{13} \\ \mathbf{a}_{21} & \mathbf{a}_{22} & \mathbf{a}_{23} \\ \mathbf{a}_{31} & \mathbf{a}_{32} & \mathbf{a}_{33} \end{vmatrix}$$
+
+Expanding along R<sub>2</sub>, we get
+
+$$|A| = (-1)^{2+1} a_{21} \begin{vmatrix} a_{12} & a_{13} \\ a_{32} & a_{33} \end{vmatrix} + (-1)^{2+2} a_{22} \begin{vmatrix} a_{11} & a_{13} \\ a_{31} & a_{33} \end{vmatrix}$$
+
+$$+ (-1)^{2+3} a_{23} \begin{vmatrix} a_{11} & a_{12} \\ a_{31} & a_{32} \end{vmatrix}$$
+
+$$= -a_{21} (a_{12} a_{33} - a_{32} a_{13}) + a_{22} (a_{11} a_{33} - a_{31} a_{13})$$
+
+$$-a_{23} (a_{11} a_{32} - a_{31} a_{12})$$
+
+$$|A| = -a_{21} a_{12} a_{33} + a_{21} a_{32} a_{13} + a_{22} a_{11} a_{33} - a_{22} a_{31} a_{13} - a_{23} a_{11} a_{32}$$
+
+$$+a_{23} a_{31} a_{12}$$
+
+$$= a_{11} a_{22} a_{33} - a_{11} a_{23} a_{32} - a_{12} a_{21} a_{33} + a_{12} a_{23} a_{31} + a_{13} a_{21} a_{32}$$
+
+$$-a_{11} a_{22} a_{33} - a_{11} a_{23} a_{32} - a_{12} a_{21} a_{33} + a_{12} a_{23} a_{31} + a_{13} a_{21} a_{32}$$
+
+# Expansion along first Column (C<sub>1</sub>)
+
+$$|\mathbf{A}| = \begin{vmatrix} \mathbf{a_{11}} & a_{12} & a_{13} \\ \mathbf{a_{21}} & a_{22} & a_{23} \\ \mathbf{a_{31}} & a_{32} & a_{33} \end{vmatrix}$$
+
+By expanding along  $C_1$ , we get
+
+$$|A| = a_{11} (-1)^{1+1} \begin{vmatrix} a_{22} & a_{23} \\ a_{32} & a_{33} \end{vmatrix} + a_{21} (-1)^{2+1} \begin{vmatrix} a_{12} & a_{13} \\ a_{32} & a_{33} \end{vmatrix}$$
+
+$$+ a_{31} (-1)^{3+1} \begin{vmatrix} a_{12} & a_{13} \\ a_{22} & a_{23} \end{vmatrix}$$
+
+$$= a_{11} (a_{22} a_{33} - a_{23} a_{32}) - a_{21} (a_{12} a_{33} - a_{13} a_{32}) + a_{31} (a_{12} a_{23} - a_{13} a_{22})$$
+
+$$|\mathbf{A}| = a_{11} \ a_{22} \ a_{33} - a_{11} \ a_{23} \ a_{32} - a_{21} \ a_{12} \ a_{33} + a_{21} \ a_{13} \ a_{32} + a_{31} \ a_{12} \ a_{23}$$
+
+$$- a_{31} \ a_{13} \ a_{22}$$
+
+$$= a_{11} \ a_{22} \ a_{33} - a_{11} \ a_{23} \ a_{32} - a_{12} \ a_{21} \ a_{33} + a_{12} \ a_{23} \ a_{31} + a_{13} \ a_{21} \ a_{32}$$
+
+$$- a_{13} \ a_{31} \ a_{22} \qquad \qquad \dots (3)$$
+
+Clearly, values of |A| in (1), (2) and (3) are equal. It is left as an exercise to the reader to verify that the values of |A| by expanding along  $R_3$ ,  $C_2$  and  $C_3$  are equal to the value of |A| obtained in (1), (2) or (3).
+
+Hence, expanding a determinant along any row or column gives same value.
+
+#### Remarks
+
+- (i) For easier calculations, we shall expand the determinant along that row or column which contains maximum number of zeros.
+- (ii) While expanding, instead of multiplying by  $(-1)^{i+j}$ , we can multiply by +1 or -1 according as (i+j) is even or odd.
+
+(iii) Let 
+$$A = \begin{bmatrix} 2 & 2 \\ 4 & 0 \end{bmatrix}$$
+ and  $B = \begin{bmatrix} 1 & 1 \\ 2 & 0 \end{bmatrix}$ . Then, it is easy to verify that  $A = 2B$ . Also  $|A| = 0 - 8 = -8$  and  $|B| = 0 - 2 = -2$ .
+
+Observe that,  $|A| = 4(-2) = 2^2|B|$  or  $|A| = 2^n|B|$ , where n = 2 is the order of square matrices A and B.
+
+In general, if A = kB where A and B are square matrices of order n, then  $|A| = k^n$  |B|, where n = 1, 2, 3
+
+Example 3 Evaluate the determinant 
+$$\Delta = \begin{bmatrix} 1 & 2 & 4 \\ -1 & 3 & 0 \\ 4 & 1 & 0 \end{bmatrix}$$
+.
+
+**Solution** Note that in the third column, two entries are zero. So expanding along third column  $(C_3)$ , we get
+
+$$\Delta = 4 \begin{vmatrix} -1 & 3 \\ 4 & 1 \end{vmatrix} - 0 \begin{vmatrix} 1 & 2 \\ 4 & 1 \end{vmatrix} + 0 \begin{vmatrix} 1 & 2 \\ -1 & 3 \end{vmatrix}$$
+$$= 4 (-1 - 12) - 0 + 0 = -52$$
+
+Example 4 Evaluate 
+$$\Delta = \begin{vmatrix} 0 & \sin \alpha & -\cos \alpha \\ -\sin \alpha & 0 & \sin \beta \\ \cos \alpha & -\sin \beta & 0 \end{vmatrix}$$
+.
+
+**Solution** Expanding along R<sub>1</sub>, we get
+
+$$\begin{split} &\Delta = \left. 0 \left| \begin{array}{c} 0 & \sin \beta \\ -\sin \beta & 0 \end{array} \right| - \sin \alpha \left| \begin{array}{c} -\sin \alpha & \sin \beta \\ \cos \alpha & 0 \end{array} \right| - \cos \alpha \left| \begin{array}{c} -\sin \alpha & 0 \\ \cos \alpha & -\sin \beta \end{array} \right| \\ &= 0 - \sin \alpha \left( 0 - \sin \beta \cos \alpha \right) - \cos \alpha \left( \sin \alpha \sin \beta - 0 \right) \\ &= \sin \alpha \sin \beta \cos \alpha - \cos \alpha \sin \alpha \sin \beta = 0 \end{split}$$
+
+**Example 5** Find values of x for which  $\begin{vmatrix} 3 & x \\ x & 1 \end{vmatrix} = \begin{vmatrix} 3 & 2 \\ 4 & 1 \end{vmatrix}$ .
+
+Solution We have 
+$$\begin{vmatrix} 3 & x \\ x & 1 \end{vmatrix} = \begin{vmatrix} 3 & 2 \\ 4 & 1 \end{vmatrix}$$
+  
+i.e.  $3 - x^2 = 3 - 8$   
+i.e.  $x^2 = 8$   
+Hence  $x = \pm 2\sqrt{3}$ 
+
+**EXERCISE 4.1** 
+
+Evaluate the determinants in Exercises 1 and 2.
+
+$$\begin{array}{c|cc} 1. & 2 & 4 \\ -5 & -1 \end{array}$$
+
+2. (i) 
+$$\begin{vmatrix} \cos \theta & -\sin \theta \\ \sin \theta & \cos \theta \end{vmatrix}$$
+ (ii)  $\begin{vmatrix} x^2 - x + 1 & x - 1 \\ x + 1 & x + 1 \end{vmatrix}$ 
+
+3. If 
+$$A = \begin{bmatrix} 1 & 2 \\ 4 & 2 \end{bmatrix}$$
+, then show that  $|2A| = 4 |A|$ 
+
+4. If 
+$$A = \begin{bmatrix} 1 & 0 & 1 \\ 0 & 1 & 2 \\ 0 & 0 & 4 \end{bmatrix}$$
+, then show that  $| 3 A | = 27 | A |$ 
+
+5. Evaluate the determinants
+
+(i) 
+$$\begin{vmatrix} 3 & -1 & -2 \\ 0 & 0 & -1 \\ 3 & -5 & 0 \end{vmatrix}$$
+ (ii)  $\begin{vmatrix} 3 & -4 & 5 \\ 1 & 1 & -2 \\ 2 & 3 & 1 \end{vmatrix}$ 
+
+(iii) 
+$$\begin{vmatrix} 0 & 1 & 2 \\ -1 & 0 & -3 \\ -2 & 3 & 0 \end{vmatrix}$$
+ (iv)  $\begin{vmatrix} 2 & -1 & -2 \\ 0 & 2 & -1 \\ 3 & -5 & 0 \end{vmatrix}$ 
+
+6. If 
+$$A = \begin{bmatrix} 1 & 1 & -2 \\ 2 & 1 & -3 \\ 5 & 4 & -9 \end{bmatrix}$$
+, find  $|A|$ 
+
+7. Find values of x if
+
+(i) 
+$$\begin{vmatrix} 2 & 4 \\ 5 & 1 \end{vmatrix} = \begin{vmatrix} 2x & 4 \\ 6 & x \end{vmatrix}$$
+ (ii)  $\begin{vmatrix} 2 & 3 \\ 4 & 5 \end{vmatrix} = \begin{vmatrix} x & 3 \\ 2x & 5 \end{vmatrix}$ 
+
+8. If 
+$$\begin{vmatrix} x & 2 \\ 18 & x \end{vmatrix} = \begin{vmatrix} 6 & 2 \\ 18 & 6 \end{vmatrix}$$
+, then x is equal to
+(A) 6 (B)  $\pm 6$  (C)  $-6$  (D) 0
+
+## 4.3 Area of a Triangle
+
+In earlier classes, we have studied that the area of a triangle whose vertices are  $(x_1, y_1)$ ,  $(x_2, y_2)$  and  $(x_3, y_3)$ , is given by the expression  $\frac{1}{2}[x_1(y_2-y_3) + x_2(y_3-y_1) + x_3(y_1-y_2)]$ . Now this expression can be written in the form of a determinant as
+
+$$\Delta = \frac{1}{2} \begin{vmatrix} x_1 & y_1 & 1 \\ x_2 & y_2 & 1 \\ x_3 & y_3 & 1 \end{vmatrix} \dots (1)$$
+
+#### Remarks
+
+- (i) Since area is a positive quantity, we always take the absolute value of the determinant in (1).
+- (ii) If area is given, use both positive and negative values of the determinant for calculation.
+- (iii) The area of the triangle formed by three collinear points is zero.
+
+**Example 6** Find the area of the triangle whose vertices are (3, 8), (-4, 2) and (5, 1). **Solution** The area of triangle is given by
+
+$$\Delta = \frac{1}{2} \begin{vmatrix} 3 & 8 & 1 \\ -4 & 2 & 1 \\ 5 & 1 & 1 \end{vmatrix}$$
+
+$$= \frac{1}{2} [3(2-1)-8(-4-5)+1(-4-10)]$$
+$$= \frac{1}{2} (3+72-14) = \frac{61}{2}$$
+
+**Example 7** Find the equation of the line joining A(1,3) and B(0,0) using determinants and find k if D(k, 0) is a point such that area of triangle ABD is 3sq units.
+
+**Solution** Let P(x, y) be any point on AB. Then, area of triangle ABP is zero (Why?). So
+
+$$\frac{1}{2} \begin{vmatrix} 0 & 0 & 1 \\ 1 & 3 & 1 \\ x & y & 1 \end{vmatrix} = 0$$
+
+$$\frac{1}{2} (y - 3x) = 0 \text{ or } y = 3x,$$
+
+This gives
+
+which is the equation of required line AB.
+
+Also, since the area of the triangle ABD is 3 sq. units, we have
+
+$$\begin{array}{c|ccc} 1 & 3 & 1 \\ 0 & 0 & 1 \\ k & 0 & 1 \end{array} = \pm 3$$
+
+This gives,  $\frac{-3k}{2} = \pm 3$ , i.e.,  $k = \mp 2$ .
+
+# **EXERCISE 4.2**
+
+- 1. Find area of the triangle with vertices at the point given in each of the following:
+  - (i) (1,0), (6,0), (4,3)
+- (ii) (2,7),(1,1),(10,8)
+- (iii) (-2, -3), (3, 2), (-1, -8)
+- 2. Show that points
+
+A (a, b + c), B (b, c + a), C (c, a + b) are collinear.
+
+- 3. Find values of k if area of triangle is 4 sq. units and vertices are
+  - (i) (k, 0), (4, 0), (0, 2)
+- (ii) (-2, 0), (0, 4), (0, k)
+- 4. (i) Find equation of line joining (1, 2) and (3, 6) using determinants.
+  - (ii) Find equation of line joining (3, 1) and (9, 3) using determinants.
+- 5. If area of triangle is 35 sq units with vertices (2, -6), (5, 4) and (k, 4). Then k is
+  - (A) 12
+- (B) -2
+- (C) -12, -2 (D) 12, -2
+
+#### 4.4 Minors and Cofactors
+
+In this section, we will learn to write the expansion of a determinant in compact form using minors and cofactors.
+
+**Definition 1** Minor of an element  $a_{ij}$  of a determinant is the determinant obtained by deleting its *i*th row and *j*th column in which element  $a_{ij}$  lies. Minor of an element  $a_{ij}$  is denoted by  $M_{ij}$ .
+
+**Remark** Minor of an element of a determinant of order  $n(n \ge 2)$  is a determinant of order n - 1.
+
+**Example 8** Find the minor of element 6 in the determinant 
+$$\Delta = \begin{vmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{vmatrix}$$
+
+**Solution** Since 6 lies in the second row and third column, its minor  $M_{23}$  is given by
+
+$$M_{23} = \begin{vmatrix} 1 & 2 \\ 7 & 8 \end{vmatrix} = 8 - 14 = -6$$
+ (obtained by deleting  $R_2$  and  $C_3$  in  $\Delta$ ).
+
+**Definition 2** Cofactor of an element  $a_{ij}$ , denoted by  $A_{ij}$  is defined by  $A_{ij} = (-1)^{i+j} M_{ij}$ , where  $M_{ij}$  is minor of  $a_{ij}$ .
+
+**Example 9** Find minors and cofactors of all the elements of the determinant  $\begin{bmatrix} 1 & -2 \\ 4 & 3 \end{bmatrix}$ 
+
+**Solution** Minor of the element 
+$$a_{ij}$$
+ is  $M_{ij}$   
+Here  $a_{11} = 1$ . So  $M_{11} = Minor$  of  $a_{11} = 3$   
+ $M_{12} = Minor$  of the element  $a_{12} = 4$   
+ $M_{21} = Minor$  of the element  $a_{21} = -2$   
+ $M_{22} = Minor$  of the element  $a_{22} = 1$   
+Now, cofactor of  $a_{ij}$  is  $A_{ij}$ . So  
+ $A_{11} = (-1)^{1+1} M_{11} = (-1)^2 (3) = 3$   
+ $A_{12} = (-1)^{1+2} M_{12} = (-1)^3 (4) = -4$   
+ $A_{21} = (-1)^{2+1} M_{21} = (-1)^3 (-2) = 2$ 
+
+ $A_{22} = (-1)^{2+2}$   $M_{22} = (-1)^4 (1) = 1$ 
+
+**Example 10** Find minors and cofactors of the elements  $a_{11}$ ,  $a_{21}$  in the determinant
+
+$$\Delta = \begin{vmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{vmatrix}$$
+
+Solution By definition of minors and cofactors, we have
+
+Minor of 
+$$a_{11} = M_{11} = \begin{vmatrix} a_{22} & a_{23} \\ a_{32} & a_{33} \end{vmatrix} = a_{22} a_{33} - a_{23} a_{32}$$
+  
+Cofactor of  $a_{11} = A_{11} = (-1)^{1+1} M_{11} = a_{22} a_{33} - a_{23} a_{32}$ 
+
+Minor of 
+$$a_{21} = M_{21} = \begin{vmatrix} a_{12} & a_{13} \\ a_{32} & a_{33} \end{vmatrix} = a_{12} a_{33} - a_{13} a_{32}$$
+
+Cofactor of 
+$$a_{21} = A_{21} = (-1)^{2+1}$$
+  $M_{21} = (-1) (a_{12} a_{33} - a_{13} a_{32}) = -a_{12} a_{33} + a_{13} a_{32}$ 
+
+**Remark** Expanding the determinant  $\Delta$ , in Example 21, along R<sub>1</sub>, we have
+
+$$\Delta = (-1)^{1+1} a_{11} \begin{vmatrix} a_{22} & a_{23} \\ a_{32} & a_{33} \end{vmatrix} + (-1)^{1+2} a_{12} \begin{vmatrix} a_{21} & a_{23} \\ a_{31} & a_{33} \end{vmatrix} + (-1)^{1+3} a_{13} \begin{vmatrix} a_{21} & a_{22} \\ a_{31} & a_{32} \end{vmatrix}$$
+
+= 
+$$a_{11} A_{11} + a_{12} A_{12} + a_{13} A_{13}$$
+, where  $A_{ij}$  is cofactor of  $a_{ij}$ 
+
+= sum of product of elements of R<sub>1</sub> with their corresponding cofactors
+
+Similarly,  $\Delta$  can be calculated by other five ways of expansion that is along  $R_2$ ,  $R_3$ ,  $C_1$ ,  $C_2$  and  $C_3$ .
+
+Hence  $\Delta$  = sum of the product of elements of any row (or column) with their corresponding cofactors.
+
+Note If elements of a row (or column) are multiplied with cofactors of any other row (or column), then their sum is zero. For example,
+
+$$\Delta = a_{11} A_{21} + a_{12} A_{22} + a_{13} A_{23}$$
+
+$$= a_{11} (-1)^{1+1} \begin{vmatrix} a_{12} & a_{13} \\ a_{32} & a_{33} \end{vmatrix} + a_{12} (-1)^{1+2} \begin{vmatrix} a_{11} & a_{13} \\ a_{31} & a_{33} \end{vmatrix} + a_{13} (-1)^{1+3} \begin{vmatrix} a_{11} & a_{12} \\ a_{31} & a_{32} \end{vmatrix}$$
+
+$$= \begin{vmatrix} a_{11} & a_{12} & a_{13} \\ a_{11} & a_{12} & a_{13} \\ a_{31} & a_{32} & a_{33} \end{vmatrix} = 0 \text{ (since } R_1 \text{ and } R_2 \text{ are identical)}$$
+
+Similarly, we can try for other rows and columns.
+
+**Example 11** Find minors and cofactors of the elements of the determinant
+
+$$\begin{vmatrix} 2 & -3 & 5 \\ 6 & 0 & 4 \\ 1 & 5 & -7 \end{vmatrix}$$
+ and verify that  $a_{11} A_{31} + a_{12} A_{32} + a_{13} A_{33} = 0$ 
+
+Solution We have 
+$$M_{11} = \begin{vmatrix} 0 & 4 \\ 5 & -7 \end{vmatrix} = 0$$
+  $-20 = -20$ ;  $A_{11} = (-1)^{1+1}(-20) = -20$ 
+
+$$M_{12} = \begin{vmatrix} 6 & 4 \\ 1 & -7 \end{vmatrix} = -42 - 4 = -46; \qquad A_{12} = (-1)^{1+2}(-46) = 46$$
+
+$$M_{13} = \begin{vmatrix} 6 & 0 \\ 1 & 5 \end{vmatrix} = 30 - 0 = 30; \qquad A_{13} = (-1)^{1+3}(30) = 30$$
+
+$$M_{21} = \begin{vmatrix} -3 & 5 \\ 5 & -7 \end{vmatrix} = 21 - 25 = -4; \qquad A_{21} = (-1)^{2+1}(-4) = 4$$
+
+$$M_{22} = \begin{vmatrix} 2 & 5 \\ 1 & -7 \end{vmatrix} = -14 - 5 = -19; \qquad A_{22} = (-1)^{2+2}(-19) = -19$$
+
+$$M_{23} = \begin{vmatrix} 2 & -3 \\ 1 & 5 \end{vmatrix} = 10 + 3 = 13; \qquad A_{23} = (-1)^{2+3}(13) = -13$$
+
+$$M_{31} = \begin{vmatrix} -3 & 5 \\ 0 & 4 \end{vmatrix} = -12 - 0 = -12; \qquad A_{31} = (-1)^{3+1}(-12) = -12$$
+
+$$M_{32} = \begin{vmatrix} 2 & 5 \\ 6 & 4 \end{vmatrix} = 8 - 30 = -22; \qquad A_{32} = (-1)^{3+2}(-22) = 22$$
+and 
+$$M_{33} = \begin{vmatrix} 2 & -3 \\ 6 & 0 \end{vmatrix} = 0 + 18 = 18; \qquad A_{33} = (-1)^{3+3}(18) = 18$$
+Now  $a_1 = 2$ ,  $a_2 = -3$ ,  $a_3 = 5$ ;  $A_4 = -12$ ,  $A_4 = 22$ ,  $A_5 = 18$ 
+
+Now 
+$$a_{11} = 2$$
+,  $a_{12} = -3$ ,  $a_{13} = 5$ ;  $A_{31} = -12$ ,  $A_{32} = 22$ ,  $A_{33} = 18$   
+So  $a_{11} A_{31} + a_{12} A_{32} + a_{13} A_{33}$   
+ $= 2(-12) + (-3)(22) + 5(18) = -24 - 66 + 90 = 0$ 
+
+# **EXERCISE 4.3**
+
+Write Minors and Cofactors of the elements of following determinants:
+
+- 1. (i)  $\begin{vmatrix} 2 & -4 \\ 0 & 3 \end{vmatrix}$  (ii)  $\begin{vmatrix} a & c \\ b & d \end{vmatrix}$
+- 2. (i)  $\begin{vmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{vmatrix}$  (ii)  $\begin{vmatrix} 1 & 0 & 4 \\ 3 & 5 & -1 \\ 0 & 1 & 2 \end{vmatrix}$
+- 3. Using Cofactors of elements of second row, evaluate  $\Delta = \begin{bmatrix} 5 & 3 & 8 \\ 2 & 0 & 1 \\ 1 & 2 & 3 \end{bmatrix}$ .
+- 4. Using Cofactors of elements of third column, evaluate  $\Delta = \begin{vmatrix} 1 & x & yz \\ 1 & y & zx \\ 1 & z & xy \end{vmatrix}$ .
+- 5. If  $\Delta = \begin{vmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{vmatrix}$  and  $A_{ij}$  is Cofactors of  $a_{ij}$ , then value of  $\Delta$  is given by
+  - (A)  $a_{11} A_{31} + a_{12} A_{32} + a_{13} A_{33}$  (B)  $a_{11} A_{11} + a_{12} A_{21} + a_{13} A_{31}$
+  - (C)  $a_{21} A_{11} + a_{22} A_{12} + a_{23} A_{13}$  (D)  $a_{11} A_{11} + a_{21} A_{21} + a_{31} A_{31}$
+
+# 4.5 Adjoint and Inverse of a Matrix
+
+In the previous chapter, we have studied inverse of a matrix. In this section, we shall discuss the condition for existence of inverse of a matrix.
+
+To find inverse of a matrix A, i.e., A-1 we shall first define adjoint of a matrix.
+
+# 4.5.1 Adjoint of a matrix
+
+**Definition 3** The adjoint of a square matrix  $A = [a_{ij}]_{n \times n}$  is defined as the transpose of the matrix  $[A_{ij}]_{n \times n}$ , where  $A_{ij}$  is the cofactor of the element  $a_{ij}$ . Adjoint of the matrix A is denoted by adj A.
+
+Let 
+$$A = \begin{bmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{bmatrix}$$
+
+Then 
+$$adj A = Transpose of \begin{bmatrix} A_{11} & A_{12} & A_{13} \\ A_{21} & A_{22} & A_{23} \\ A_{31} & A_{32} & A_{33} \end{bmatrix} = \begin{bmatrix} A_{11} & A_{21} & A_{31} \\ A_{12} & A_{22} & A_{32} \\ A_{13} & A_{23} & A_{33} \end{bmatrix}$$
+
+**Example 12** Find *adj* A for A = 
+$$\begin{bmatrix} 2 & 3 \\ 1 & 4 \end{bmatrix}$$
+
+**Solution** We have  $A_{11} = 4$ ,  $A_{12} = -1$ ,  $A_{21} = -3$ ,  $A_{22} = 2$ 
+
+Hence
+
+$$adj A = \begin{bmatrix} A_{11} & A_{21} \\ A_{12} & A_{22} \end{bmatrix} = \begin{bmatrix} 4 & -3 \\ -1 & 2 \end{bmatrix}$$
+
+**Remark** For a square matrix of order 2, given by
+
+$$A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix}$$
+
+The adj A can also be obtained by interchanging  $a_{11}$  and  $a_{22}$  and by changing signs of  $a_{12}$  and  $a_{21}$ , i.e.,
+
+$$adj A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix} = \begin{bmatrix} a_{22} & -a_{12} \\ -a_{21} & a_{11} \end{bmatrix}$$
+
+Change sign Interchange
+
+We state the following theorem without proof.
+
+**Theorem 1** If A be any given square matrix of order n, then
+
+$$A(adj A) = (adj A) A = |A|I$$
+
+where I is the identity matrix of order n
+
+#### Verification
+
+Let
+
+$$\mathbf{A} = \begin{bmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{bmatrix}, \text{ then } adj \ \mathbf{A} = \begin{bmatrix} \mathbf{A}_{11} & \mathbf{A}_{21} & \mathbf{A}_{31} \\ \mathbf{A}_{12} & \mathbf{A}_{22} & \mathbf{A}_{32} \\ \mathbf{A}_{13} & \mathbf{A}_{23} & \mathbf{A}_{33} \end{bmatrix}$$
+
+Since sum of product of elements of a row (or a column) with corresponding cofactors is equal to |A| and otherwise zero, we have
+
+$$A (adj A) = \begin{bmatrix} |A| & 0 & 0 \\ 0 & |A| & 0 \\ 0 & 0 & |A| \end{bmatrix} = |A| \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} = |A| I$$
+
+Similarly, we can show (adj A) A = |A| I
+
+Hence A 
+$$(adj A) = (adj A) A = |A| I$$
+
+**Definition 4** A square matrix A is said to be singular if |A| = 0.
+
+For example, the determinant of matrix  $A = \begin{bmatrix} 1 & 2 \\ 4 & 8 \end{bmatrix}$  is zero
+
+Hence A is a singular matrix.
+
+**Definition 5** A square matrix A is said to be non-singular if  $|A| \neq 0$ 
+
+Let 
+$$A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$$
+. Then  $|A| = \begin{vmatrix} 1 & 2 \\ 3 & 4 \end{vmatrix} = 4 - 6 = -2 \neq 0$ .
+
+Hence A is a nonsingular matrix
+
+We state the following theorems without proof.
+
+**Theorem 2** If A and B are nonsingular matrices of the same order, then AB and BA are also nonsingular matrices of the same order.
+
+**Theorem 3** The determinant of the product of matrices is equal to product of their respective determinants, that is, |AB| = |A| |B|, where A and B are square matrices of the same order
+
+**Remark** We know that 
+$$(adj \ A) \ A = |A| \ I = \begin{bmatrix} |A| & 0 & 0 \\ 0 & |A| & 0 \\ 0 & 0 & |A| \end{bmatrix}, |A| \neq 0$$
+
+Writing determinants of matrices on both sides, we have
+
+$$\begin{vmatrix} (adj A) A \end{vmatrix} = \begin{vmatrix} |A| & 0 & 0 \\ 0 & |A| & 0 \\ 0 & 0 & |A| \end{vmatrix}$$
+
+i.e. 
+$$|(adj A)| |A| = |A|^{3} \begin{vmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{vmatrix}$$
+ (Why?)
+
+i.e. 
+$$|(adj A)| |A| = |A|^3 (1)$$
+  
+i.e.  $|(adj A)| = |A|^2$ 
+
+In general, if A is a square matrix of order n, then  $|adj(A)| = |A|^{n-1}$ .
+
+**Theorem 4** A square matrix A is invertible if and only if A is nonsingular matrix.
+
+**Proof** Let A be invertible matrix of order n and I be the identity matrix of order n.
+
+Then, there exists a square matrix B of order n such that AB = BA = I
+
+Now 
+$$AB = I$$
+. So  $|AB| = |I|$  or  $|A| |B| = 1$  (since  $|I| = 1, |AB| = |A| |B|$ )
+
+This gives  $|A| \neq 0$ . Hence A is nonsingular.
+
+Conversely, let A be nonsingular. Then  $|A| \neq 0$ 
+
+Now 
+$$A (adj A) = (adj A) A = |A| I$$
+ (Theorem 1)
+
+or 
+$$A\left(\frac{1}{|A|}adjA\right) = \left(\frac{1}{|A|}adjA\right)A = I$$
+
+or 
+$$AB = BA = I$$
+, where  $B = \frac{1}{|A|} adj A$ 
+
+Thus A is invertible and 
+$$A^{-1} = \frac{1}{|A|} adj A$$
+
+Example 13 If  $A = \begin{bmatrix} 1 & 3 & 3 \\ 1 & 4 & 3 \\ 1 & 3 & 4 \end{bmatrix}$ , then verify that  $A \text{ adj } A = |A| \text{ I. Also find } A^{-1}$ .
+
+Solution We have 
+$$|A| = 1 (16 - 9) - 3 (4 - 3) + 3 (3 - 4) = 1 \neq 0$$
+  
+Now  $A_{11} = 7$ ,  $A_{12} = -1$ ,  $A_{13} = -1$ ,  $A_{21} = -3$ ,  $A_{22} = 1$ ,  $A_{23} = 0$ ,  $A_{31} = -3$ ,  $A_{32} = 0$ ,  $A_{33} = 1$ 
+
+Therefore 
+$$adj A = \begin{bmatrix} 7 & -3 & -3 \\ -1 & 1 & 0 \\ -1 & 0 & 1 \end{bmatrix}$$
+
+$$A (adj A) = \begin{bmatrix} 1 & 3 & 3 \\ 1 & 4 & 3 \\ 1 & 3 & 4 \end{bmatrix} \begin{bmatrix} 7 & -3 & -3 \\ -1 & 1 & 0 \\ -1 & 0 & 1 \end{bmatrix}$$
+
+$$= \begin{bmatrix} 7 - 3 - 3 & -3 + 3 + 0 & -3 + 0 + 3 \\ 7 - 4 - 3 & -3 + 4 + 0 & -3 + 0 + 3 \\ 7 - 3 - 4 & -3 + 3 + 0 & -3 + 0 + 4 \end{bmatrix}$$
+
+$$= \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} = (1) \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} = |A| \cdot I$$
+
+$$1 = \begin{bmatrix} 7 & -3 & -3 \\ -1 & 1 & 0 \end{bmatrix} = \begin{bmatrix} 7 & -3 & -3 \\ -1 & 1 & 0 \end{bmatrix}$$
+
+Also
+
+$$A^{-1} = \frac{1}{|A|} a dj A = \frac{1}{1} \begin{bmatrix} 7 & -3 & -3 \\ -1 & 1 & 0 \\ -1 & 0 & 1 \end{bmatrix} = \begin{bmatrix} 7 & -3 & -3 \\ -1 & 1 & 0 \\ -1 & 0 & 1 \end{bmatrix}$$
+
+Example 14 If  $A = \begin{bmatrix} 2 & 3 \\ 1 & -4 \end{bmatrix}$  and  $B = \begin{bmatrix} 1 & -2 \\ -1 & 3 \end{bmatrix}$ , then verify that  $(AB)^{-1} = B^{-1}A^{-1}$ .
+
+**Solution** We have AB = 
+$$\begin{bmatrix} 2 & 3 \\ 1 & -4 \end{bmatrix} \begin{bmatrix} 1 & -2 \\ -1 & 3 \end{bmatrix} = \begin{bmatrix} -1 & 5 \\ 5 & -14 \end{bmatrix}$$
+
+Since,  $|AB| = -11 \neq 0$ ,  $(AB)^{-1}$  exists and is given by
+
+$$(AB)^{-1} = \frac{1}{|AB|} adj (AB) = -\frac{1}{11} \begin{bmatrix} -14 & -5 \\ -5 & -1 \end{bmatrix} = \frac{1}{11} \begin{bmatrix} 14 & 5 \\ 5 & 1 \end{bmatrix}$$
+
+Further,  $|A| = -11 \neq 0$  and  $|B| = 1 \neq 0$ . Therefore,  $A^{-1}$  and  $B^{-1}$  both exist and are given by
+
+$$A^{-1} = -\frac{1}{11} \begin{bmatrix} -4 & -3 \\ -1 & 2 \end{bmatrix}, B^{-1} = \begin{bmatrix} 3 & 2 \\ 1 & 1 \end{bmatrix}$$
+
+Therefore  $B^{-1}A^{-1} = -\frac{1}{11}\begin{bmatrix} 3 & 2 \\ 1 & 1 \end{bmatrix}\begin{bmatrix} -4 & -3 \\ -1 & 2 \end{bmatrix} = -\frac{1}{11}\begin{bmatrix} -14 & -5 \\ -5 & -1 \end{bmatrix} = \frac{1}{11}\begin{bmatrix} 14 & 5 \\ 5 & 1 \end{bmatrix}$ 
+
+Hence  $(AB)^{-1} = B^{-1} A^{-1}$ 
+
+**Example 15** Show that the matrix  $A = \begin{bmatrix} 2 & 3 \\ 1 & 2 \end{bmatrix}$  satisfies the equation  $A^2 - 4A + I = O$ , where I is  $2 \times 2$  identity matrix and O is  $2 \times 2$  zero matrix. Using this equation, find  $A^{-1}$ .
+
+Solution We have 
+$$A^2 = A \cdot A = \begin{bmatrix} 2 & 3 \\ 1 & 2 \end{bmatrix} \begin{bmatrix} 2 & 3 \\ 1 & 2 \end{bmatrix} = \begin{bmatrix} 7 & 12 \\ 4 & 7 \end{bmatrix}$$
+
+Hence 
+$$A^{2} - 4A + I = \begin{bmatrix} 7 & 12 \\ 4 & 7 \end{bmatrix} - \begin{bmatrix} 8 & 12 \\ 4 & 8 \end{bmatrix} + \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} = O$$
+
+Now 
+$$A^2 - 4A + I = O$$
+
+Therefore 
+$$AA - 4A = -I$$
+
+or A A 
+$$(A^{-1}) - 4$$
+ A  $A^{-1} = -I$  A  $A^{-1}$  (Post multiplying by  $A^{-1}$  because  $|A| \neq 0$ )
+
+or 
+$$A(AA^{-1}) - 4I = -A^{-1}$$
+
+or 
+$$AI - 4I = -A^{-1}$$
+
+or 
+$$A^{-1} = 4I - A = \begin{bmatrix} 4 & 0 \\ 0 & 4 \end{bmatrix} - \begin{bmatrix} 2 & 3 \\ 1 & 2 \end{bmatrix} = \begin{bmatrix} 2 & -3 \\ -1 & 2 \end{bmatrix}$$
+
+Hence 
+$$A^{-1} = \begin{bmatrix} 2 & -3 \\ -1 & 2 \end{bmatrix}$$
+
+## **EXERCISE 4.4**
+
+Find adjoint of each of the matrices in Exercises 1 and 2.
+
+1. 
+$$\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$$
+ 2.  $\begin{bmatrix} 1 & -1 & 2 \\ 2 & 3 & 5 \\ -2 & 0 & 1 \end{bmatrix}$ 
+
+Verify A (adj A) = (adj A) A = |A| I in Exercises 3 and 4
+
+3. 
+$$\begin{bmatrix} 2 & 3 \\ -4 & -6 \end{bmatrix}$$
+ 4. 
+$$\begin{bmatrix} 1 & -1 & 2 \\ 3 & 0 & -2 \\ 1 & 0 & 3 \end{bmatrix}$$
+
+Find the inverse of each of the matrices (if it exists) given in Exercises 5 to 11.
+
+5. 
+$$\begin{bmatrix} 2 & -2 \\ 4 & 3 \end{bmatrix}$$
+ 6.  $\begin{bmatrix} -1 & 5 \\ -3 & 2 \end{bmatrix}$  7.  $\begin{bmatrix} 1 & 2 & 3 \\ 0 & 2 & 4 \\ 0 & 0 & 5 \end{bmatrix}$ 
+
+8. 
+$$\begin{bmatrix} 1 & 0 & 0 \\ 3 & 3 & 0 \\ 5 & 2 & -1 \end{bmatrix}$$
+
+8. 
+$$\begin{bmatrix} 1 & 0 & 0 \\ 3 & 3 & 0 \\ 5 & 2 & -1 \end{bmatrix}$$
+ 9. 
+$$\begin{bmatrix} 2 & 1 & 3 \\ 4 & -1 & 0 \\ -7 & 2 & 1 \end{bmatrix}$$
+ 10. 
+$$\begin{bmatrix} 1 & -1 & 2 \\ 0 & 2 & -3 \\ 3 & -2 & 4 \end{bmatrix}$$
+
+$$\begin{array}{cccccccccccccccccccccccccccccccccccc$$
+
+- 11.  $\begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos \alpha & \sin \alpha \\ 0 & \sin \alpha & -\cos \alpha \end{bmatrix}$
+- 12. Let  $A = \begin{bmatrix} 3 & 7 \\ 2 & 5 \end{bmatrix}$  and  $B = \begin{bmatrix} 6 & 8 \\ 7 & 9 \end{bmatrix}$ . Verify that  $(AB)^{-1} = B^{-1} A^{-1}$ .
+- 13. If  $A = \begin{bmatrix} 3 & 1 \\ -1 & 2 \end{bmatrix}$ , show that  $A^2 5A + 7I = O$ . Hence find  $A^{-1}$ .
+
+  14. For the matrix  $A = \begin{bmatrix} 3 & 2 \\ 1 & 1 \end{bmatrix}$ , find the numbers a and b such that  $A^2 + aA + bI = O$ .
+- **15.** For the matrix  $A = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 2 & -3 \\ 2 & -1 & 3 \end{bmatrix}$
+
+Show that  $A^3 - 6A^2 + 5A + 11 I = 0$ . Hence, find  $A^{-1}$ .
+
+**16.** If 
+$$A = \begin{bmatrix} 2 & -1 & 1 \\ -1 & 2 & -1 \\ 1 & -1 & 2 \end{bmatrix}$$
+
+Verify that  $A^3 - 6A^2 + 9A - 4I = O$  and hence find  $A^{-1}$ 
+
+- 17. Let A be a nonsingular square matrix of order  $3 \times 3$ . Then | adj A | is equal to (A) |A| (B)  $|A|^2$ (D) 3|A|
+- **18.** If A is an invertible matrix of order 2, then  $\det(A^{-1})$  is equal to
+  - (A)  $\det$  (A) (B)  $\frac{1}{\det(A)}$  (C) 1 (D) 0
+
+# 4.6 Applications of Determinants and Matrices
+
+In this section, we shall discuss application of determinants and matrices for solving the system of linear equations in two or three variables and for checking the consistency of the system of linear equations.
+
+**Consistent system** A system of equations is said to be *consistent* if its solution (one or more) exists.
+
+**Inconsistent system** A system of equations is said to be *inconsistent* if its solution does not exist.
+
+Note In this chapter, we restrict ourselves to the system of linear equations having unique solutions only.
+
+### 4.6.1 Solution of system of linear equations using inverse of a matrix
+
+Let us express the system of linear equations as matrix equations and solve them using inverse of the coefficient matrix.
+
+Consider the system of equations
+
+$$a_{1} x + b_{1} y + c_{1} z = d_{1}$$
+
+$$a_{2} x + b_{2} y + c_{2} z = d_{2}$$
+
+$$a_{3} x + b_{3} y + c_{3} z = d_{3}$$
+Let
+$$A = \begin{bmatrix} a_{1} & b_{1} & c_{1} \\ a_{2} & b_{2} & c_{2} \\ a_{3} & b_{3} & c_{3} \end{bmatrix}, X = \begin{bmatrix} x \\ y \\ z \end{bmatrix} \text{ and } B = \begin{bmatrix} d_{1} \\ d_{2} \\ d_{3} \end{bmatrix}$$
+
+Then, the system of equations can be written as, AX = B, i.e.,
+
+$$\begin{bmatrix} a_1 & b_1 & c_1 \\ a_2 & b_2 & c_2 \\ a_3 & b_3 & c_3 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix} d_1 \\ d_2 \\ d_3 \end{bmatrix}$$
+
+Case I If A is a nonsingular matrix, then its inverse exists. Now
+
+$$AX = B$$
+ or 
+$$A^{-1} (AX) = A^{-1} B$$
+ (premultiplying by  $A^{-1}$ ) or 
+$$(A^{-1}A) X = A^{-1} B$$
+ (by associative property) or 
+$$I X = A^{-1} B$$
+ or 
+$$X = A^{-1} B$$
+
+This matrix equation provides unique solution for the given system of equations as inverse of a matrix is unique. This method of solving system of equations is known as Matrix Method.
+
+Case II If A is a singular matrix, then |A| = 0.
+
+In this case, we calculate (adj A) B.
+
+If  $(adj \ A) \ B \neq O$ , (O being zero matrix), then solution does not exist and the system of equations is called inconsistent.
+
+If (adj A) B = O, then system may be either consistent or inconsistent according as the system have either infinitely many solutions or no solution.
+
+**Example 16** Solve the system of equations
+
+$$2x + 5y = 1$$
+$$3x + 2y = 7$$
+
+**Solution** The system of equations can be written in the form AX = B, where
+
+$$A = \begin{bmatrix} 2 & 5 \\ 3 & 2 \end{bmatrix}, X = \begin{bmatrix} x \\ y \end{bmatrix} \text{ and } B = \begin{bmatrix} 1 \\ 7 \end{bmatrix}$$
+
+Now,  $|A| = -11 \neq 0$ , Hence, A is nonsingular matrix and so has a unique solution.
+
+Note that
+
+$$A^{-1} = -\frac{1}{11} \begin{bmatrix} 2 & -5 \\ -3 & 2 \end{bmatrix}$$
+
+Therefore
+
+$$X = A^{-1}B = -\frac{1}{11} \begin{bmatrix} 2 & -5 \\ -3 & 2 \end{bmatrix} \begin{bmatrix} 1 \\ 7 \end{bmatrix}$$
+
+i.e.
+
+$$\begin{bmatrix} x \\ y \end{bmatrix} = -\frac{1}{11} \begin{bmatrix} -33 \\ 11 \end{bmatrix} = \begin{bmatrix} 3 \\ -1 \end{bmatrix}$$
+$$x = 3, y = -1$$
+
+Hence
+
+**Example 17** Solve the following system of equations by matrix method.
+
+$$3x - 2y + 3z = 8$$
+$$2x + y - z = 1$$
+$$4x - 3y + 2z = 4$$
+
+**Solution** The system of equations can be written in the form AX = B, where
+
+$$A = \begin{bmatrix} 3 & -2 & 3 \\ 2 & 1 & -1 \\ 4 & -3 & 2 \end{bmatrix}, X = \begin{bmatrix} x \\ y \\ z \end{bmatrix} \text{ and } B = \begin{bmatrix} 8 \\ 1 \\ 4 \end{bmatrix}$$
+
+We see that
+
+$$|A| = 3(2-3) + 2(4+4) + 3(-6-4) = -17 \neq 0$$
+
+Hence, A is nonsingular and so its inverse exists. Now
+
+$$A_{11} = -1,$$
+  $A_{12} = -8,$   $A_{13} = -10$   
+ $A_{21} = -5,$   $A_{22} = -6,$   $A_{23} = 1$   
+ $A_{31} = -1,$   $A_{32} = 9,$   $A_{33} = 7$ 
+
+Hence
+
+Therefore 
+$$A^{-1} = -\frac{1}{17} \begin{bmatrix} -1 & -5 & -1 \\ -8 & -6 & 9 \\ -10 & 1 & 7 \end{bmatrix}$$
+So 
+$$X = A^{-1}B = -\frac{1}{17} \begin{bmatrix} -1 & -5 & -1 \\ -8 & -6 & 9 \\ -10 & 1 & 7 \end{bmatrix} \begin{bmatrix} 8 \\ 1 \\ 4 \end{bmatrix}$$
+i.e. 
+$$\begin{bmatrix} x \\ y \\ -1 \end{bmatrix} = -\frac{1}{17} \begin{bmatrix} -17 \\ -34 \\ 51 \end{bmatrix} = \begin{bmatrix} 1 \\ 2 \\ 2 \end{bmatrix}$$
+
+**Example 18** The sum of three numbers is 6. If we multiply third number by 3 and add second number to it, we get 11. By adding first and third numbers, we get double of the second number. Represent it algebraically and find the numbers using matrix method.
+
+x = 1, y = 2 and z = 3.
+
+**Solution** Let first, second and third numbers be denoted by x, y and z, respectively. Then, according to given conditions, we have
+
+$$x + y + z = 6$$
+
+$$y + 3z = 11$$
+
+$$x + z = 2y \text{ or } x - 2y + z = 0$$
+
+This system can be written as AX = B, where
+
+$$A = \begin{bmatrix} 1 & 1 & 1 \\ 0 & 1 & 3 \\ 1 & 2 & 1 \end{bmatrix}, X = \begin{bmatrix} x \\ y \\ z \end{bmatrix} \text{ and } B = \begin{bmatrix} 6 \\ 11 \\ 0 \end{bmatrix}$$
+
+Here 
+$$|A| = 1(1+6) - (0-3) + (0-1) = 9 \neq 0$$
+. Now we find  $adj A$ 
+
+$$A_{11} = 1(1+6) = 7, \qquad A_{12} = -(0-3) = 3, \qquad A_{13} = -1$$
+
+$$A_{21} = -(1+2) = -3, \qquad A_{22} = 0, \qquad A_{23} = -(-2-1) = 3$$
+
+$$A_{31} = (3-1) = 2, \qquad A_{32} = -(3-0) = -3, \qquad A_{33} = (1-0) = 1$$
+Hence
+$$adj A = \begin{bmatrix} 7 & -3 & 2 \\ 3 & 0 & -3 \\ -1 & 3 & 1 \end{bmatrix}$$
+
+$$A^{-1} = \frac{1}{|A|} \ adj \ (A) = \frac{1}{9} \begin{bmatrix} 7 & -3 & 2 \\ 3 & 0 & -3 \\ -1 & 3 & 1 \end{bmatrix}$$
+
+Since
+
+$$X = A^{-1} B$$
+
+$$X = \frac{1}{9} \begin{bmatrix} 7 & -3 & 2 \\ 3 & 0 & -3 \\ -1 & 3 & 1 \end{bmatrix} \begin{bmatrix} 6 \\ 11 \\ 0 \end{bmatrix}$$
+
+or
+
+$$\begin{bmatrix} x \\ y \\ z \end{bmatrix} = \frac{1}{9} \begin{bmatrix} 42 - 33 + 0 \\ 18 + 0 + 0 \\ -6 + 33 + 0 \end{bmatrix} = \frac{1}{9} \begin{bmatrix} 9 \\ 18 \\ 27 \end{bmatrix} = \begin{bmatrix} 1 \\ 2 \\ 3 \end{bmatrix}$$
+
+Thus
+
+# EXERCISE 4.5
+
+Examine the consistency of the system of equations in Exercises 1 to 6.
+
+1. 
+$$x + 2y = 2$$
+
+2. 
+$$2x - y = 5$$
+
+3. 
+$$x + 3y = 5$$
+
+$$2x + 3y = 3$$
+
+$$x + y = 4$$
+
+$$2x + 6y = 8$$
+
+4. 
+$$x + y + z = 1$$
+  
+  $2x + 3y + 2z = 2$ 
+
+$$x + y = 4$$
+  
+5.  $3x-y-2z = 2$   
+ $2y-z = -1$ 
+
+**6.** 
+$$5x - y + 4z = 5$$
+
+$$2x + 3y + 2z = 2$$
+$$ax + ay + 2az = 4$$
+
+$$2y - z = -1$$
+$$3x - 5y = 3$$
+
+$$2x + 3y + 5z = 2$$
+$$5x - 2y + 6z = -1$$
+
+Solve system of linear equations, using matrix method, in Exercises 7 to 14.
+
+7. 
+$$5x + 2y = 4$$
+
+8. 
+$$2x - y = -2$$
+
+9. 
+$$4x - 3y = 3$$
+
+$$7x + 3y = 5$$
+
+$$3x + 4y = 3$$
+
+$$2x + y + z = 1$$
+
+$$3x - 5y = 7$$
+
+$$3x + 2y = 5$$
+
+**10.** 
+$$5x + 2y = 3$$
+  $3x + 2y = 5$  **11.**  $2x + y + z = 1$   $x - 2y - z = \frac{3}{2}$  **12.**  $x - y + z = 4$   $2x + y - 3z = 0$ 
+
+$$2x + y - 3z = 0$$
+$$x + y + z = 2$$
+
+13. 
+$$2x + 3y + 3z = 5$$
+  
+ $x - 2y + z = -4$   
+14.  $x - y + 2z = 7$   
+ $3x + 4y - 5z = 7$ 
+
+4. 
+$$x - y + 2z = 7$$
+
+$$x - 2y + z = -4$$
+$$3x - y - 2z = 3$$
+
+$$3x + 4y - 5z = -5$$
+$$2x - y + 3z = 12$$
+
+3v - 5z = 9
+
+15. If 
+$$A = \begin{bmatrix} 2 & -3 & 5 \\ 3 & 2 & -4 \\ 1 & 1 & -2 \end{bmatrix}$$
+, find  $A^{-1}$ . Using  $A^{-1}$  solve the system of equations
+
+$$2x - 3y + 5z = 11$$
+$$3x + 2y - 4z = -5$$
+$$x + y - 2z = -3$$
+
+The cost of 4 kg onion, 3 kg wheat and 2 kg rice is ₹60. The cost of 2 kg onion, 4 kg wheat and 6 kg rice is ₹90. The cost of 6 kg onion 2 kg wheat and 3 kg rice is ₹70. Find cost of each item per kg by matrix method.
+
+### Miscellaneous Examples
+
+Example 19 Use product  $\begin{bmatrix} 1 & 1 & 2 \\ 0 & 2 & 3 \\ 3 & 2 & 4 \end{bmatrix} \begin{bmatrix} 2 & 0 & 1 \\ 9 & 2 & 3 \\ 6 & 1 & 2 \end{bmatrix}$  to solve the system of equations
+
+$$x-y+2z=1$$
+
+$$2y-3z=1$$
+
+$$3x-2y+4z=2$$
+
+x - y + 2z = 1 2y - 3z = 1 3x - 2y + 4z = 2Solution Consider the product  $\begin{bmatrix} 1 & -1 & 2 \\ 0 & 2 & -3 \\ 3 & -2 & 4 \end{bmatrix} \begin{bmatrix} -2 & 0 & 1 \\ 9 & 2 & -3 \\ 6 & 1 & -2 \end{bmatrix}$ 
+
+$$= \begin{bmatrix} -2 - 9 + 12 & 0 - 2 + 2 & 1 + 3 - 4 \\ 0 + 18 - 18 & 0 + 4 - 3 & 0 - 6 + 6 \\ -6 - 18 + 24 & 0 - 4 + 4 & 3 + 6 - 8 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+Hence
+
+$$\begin{bmatrix} 1 & -1 & 2 \\ 0 & 2 & -3 \\ 3 & -2 & 4 \end{bmatrix}^{-1} = \begin{bmatrix} -2 & 0 & 1 \\ 9 & 2 & -3 \\ 6 & 1 & -2 \end{bmatrix}$$
+
+Now, given system of equations can be written, in matrix form, as follows
+
+$$\begin{bmatrix} 1 & -1 & 2 \\ 0 & 2 & -3 \\ 3 & -2 & 4 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix} 1 \\ 1 \\ 2 \end{bmatrix}$$
+
+$$x \\ y = \begin{bmatrix} 1 & -1 & 2 \\ 0 & 2 & -3 \\ 3 & -2 & 4 \end{bmatrix}^{-1} \begin{bmatrix} 1 \\ 1 \\ 2 \end{bmatrix} = \begin{bmatrix} 2 & 0 & 1 \\ 9 & 2 & 3 \\ 6 & 1 & 2 \end{bmatrix} \begin{bmatrix} 1 \\ 1 \\ 2 \end{bmatrix}$$
+$$= \begin{bmatrix} -2+0+2 \\ 9+2-6 \\ 6+1-4 \end{bmatrix} = \begin{bmatrix} 0 \\ 5 \\ 3 \end{bmatrix}$$
+$$x = 0, y = 5 \text{ and } z = 3$$
+
+Hence
+
+## Miscellaneous Exercises on Chapter 4
+
+- $x \sin \theta \cos \theta$ 1. Prove that the determinant  $\begin{vmatrix} -\sin\theta & -x & 1\\ \cos\theta & 1 & x \end{vmatrix}$  is independent of  $\theta$ .
+- 2. Evaluate  $\begin{vmatrix} \cos\alpha \cos\beta & \cos\alpha \sin\beta & -\sin\alpha \\ -\sin\beta & \cos\beta & 0 \\ \sin\alpha \cos\beta & \sin\alpha \sin\beta & \cos\alpha \end{vmatrix}.$
+- 3. If  $A^{-1} = \begin{bmatrix} 3 & -1 & 1 \\ -15 & 6 & -5 \\ 5 & -2 & 2 \end{bmatrix}$  and  $B = \begin{bmatrix} 1 & 2 & -2 \\ -1 & 3 & 0 \\ 0 & -2 & 1 \end{bmatrix}$ , find  $(AB)^{-1}$
+- 4. Let  $A = \begin{bmatrix} 1 & 2 & 1 \\ 2 & 3 & 1 \\ 1 & 1 & 5 \end{bmatrix}$ . Verify that
+  - (i)  $[adj A]^{-1} = adj (A^{-1})$  (ii)  $(A^{-1})^{-1} = A$
+- 5. Evaluate  $\begin{vmatrix} x & y & x+y \\ y & x+y & x \\ x+y & x & y \end{vmatrix}$
+- 6. Evaluate  $\begin{vmatrix} 1 & x & y \\ 1 & x+y & y \\ 1 & x & x+y \end{vmatrix}$
+
+Using properties of determinants in Exercises 11 to 15, prove that:
+
+7. Solve the system of equations
+
+$$\frac{2}{x} + \frac{3}{y} + \frac{10}{z} = 4$$
+
+$$\frac{4}{x} - \frac{6}{y} + \frac{5}{z} = 1$$
+
+$$\frac{6}{x} + \frac{9}{y} - \frac{20}{z} = 2$$
+
+Choose the correct answer in Exercise 17 to 19.
+
+8. If x, y, z are nonzero real numbers, then the inverse of matrix  $A = \begin{bmatrix} x & 0 & 0 \\ 0 & y & 0 \\ 0 & 0 & z \end{bmatrix}$  is
+
+(A) 
+$$\begin{bmatrix} x^{-1} & 0 & 0 \\ 0 & y^{-1} & 0 \\ 0 & 0 & z^{-1} \end{bmatrix}$$
+
+(B) 
+$$xyz\begin{bmatrix} x^{-1} & 0 & 0 \\ 0 & y^{-1} & 0 \\ 0 & 0 & z^{-1} \end{bmatrix}$$
+
+(C) 
+$$\frac{1}{xyz} \begin{bmatrix} x & 0 & 0 \\ 0 & y & 0 \\ 0 & 0 & z \end{bmatrix}$$
+
+(D) 
+$$\frac{1}{xyz} \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}$$
+
+9. Let  $A = \begin{bmatrix} 1 & \sin \theta & 1 \\ -\sin \theta & 1 & \sin \theta \\ -1 & -\sin \theta & 1 \end{bmatrix}$ , where  $0 \le \theta \le 2\pi$ . Then
+
+(A) 
+$$\operatorname{Det}(A) = 0$$
+
+(B) 
+$$Det(A) \in (2, \infty)$$
+
+(C) 
+$$Det(A) \in (2, 4)$$
+
+(D) 
+$$Det(A) \in [2, 4]$$
+
+## Summary
+
+- Determinant of a matrix  $A = [a_{11}]_{1 \times 1}$  is given by  $|a_{11}| = a_{11}$
+- Determinant of a matrix  $A = \begin{bmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{bmatrix}$  is given by
+
+$$|\mathbf{A}| = \begin{vmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{vmatrix} = a_{11} a_{22} - a_{12} a_{21}$$
+
+◆ Determinant of a matrix  $A = \begin{bmatrix} a_1 & b_1 & c_1 \\ a_2 & b_2 & c_2 \\ a_3 & b_3 & c_3 \end{bmatrix}$  is given by (expanding along  $R_1$ )
+
+$$|\mathbf{A}| = \begin{vmatrix} a_1 & b_1 & c_1 \\ a_2 & b_2 & c_2 \\ a_3 & b_3 & c_3 \end{vmatrix} = a_1 \begin{vmatrix} b_2 & c_2 \\ b_3 & c_3 \end{vmatrix} - b_1 \begin{vmatrix} a_2 & c_2 \\ a_3 & c_3 \end{vmatrix} + c_1 \begin{vmatrix} a_2 & b_2 \\ a_3 & b_3 \end{vmatrix}$$
+
+For any square matrix A, the |A| satisfy following properties.
+
+• Area of a triangle with vertices  $(x_1, y_1)$ ,  $(x_2, y_2)$  and  $(x_3, y_3)$  is given by
+
+$$\Delta = \frac{1}{2} \begin{vmatrix} x_1 & y_1 & 1 \\ x_2 & y_2 & 1 \\ x_3 & y_3 & 1 \end{vmatrix}$$
+
+- Minor of an element  $a_{ij}$  of the determinant of matrix A is the determinant obtained by deleting  $i^{th}$  row and  $j^{th}$  column and denoted by  $M_{ii}$ .
+- Cofactor of  $a_{ii}$  of given by  $A_{ii} = (-1)^{i+j} M_{ii}$
+- Value of determinant of a matrix A is obtained by sum of product of elements of a row (or a column) with corresponding cofactors. For example,
+
+$$|\mathbf{A}| = a_{11} \mathbf{A}_{11} + a_{12} \mathbf{A}_{12} + a_{13} \mathbf{A}_{13}.$$
+
+• If elements of one row (or column) are multiplied with cofactors of elements of any other row (or column), then their sum is zero. For example,  $a_{11} A_{21} + a_{12} A_{22} + a_{13} A_{23} = 0$ 
+
+• If 
+$$A = \begin{bmatrix} a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33} \end{bmatrix}$$
+, then  $adj \ A = \begin{bmatrix} A_{11} & A_{21} & A_{31} \\ A_{12} & A_{22} & A_{32} \\ A_{13} & A_{23} & A_{33} \end{bmatrix}$ , where  $A_{ij}$  is cofactor of  $a_{ij}$ 
+
+- A (adj A) = (adj A) A = |A| I, where A is square matrix of order n.
+- A square matrix A is said to be singular or non-singular according as |A| = 0 or  $|A| \neq 0$ .
+- ◆ If AB = BA = I, where B is square matrix, then B is called inverse of A. Also  $A^{-1} = B$  or  $B^{-1} = A$  and hence  $(A^{-1})^{-1} = A$ .
+- A square matrix A has inverse if and only if A is non-singular.
+
+• If 
+$$a_1x + b_1y + c_1z = d_1$$
+  
+ $a_2x + b_2y + c_2z = d_2$   
+ $a_3x + b_3y + c_3z = d_3$ ,
+
+then these equations can be written as AX = B, where
+
+$$A = \begin{bmatrix} a_1 & b_1 & c_1 \\ a_2 & b_2 & c_2 \\ a_3 & b_3 & c_3 \end{bmatrix}, X = \begin{bmatrix} x \\ y \\ z \end{bmatrix} \text{ and } B = \begin{bmatrix} d_1 \\ d_2 \\ d_3 \end{bmatrix}$$
+
+- Unique solution of equation AX = B is given by  $X = A^{-1} B$ , where  $|A| \neq 0$ .
+- A system of equation is consistent or inconsistent according as its solution exists or not.
+- For a square matrix A in matrix equation AX = B
+  - (i)  $|A| \neq 0$ , there exists unique solution
+  - (ii) |A| = 0 and  $(adj A) B \neq 0$ , then there exists no solution
+  - (iii) |A| = 0 and (adj A) B = 0, then system may or may not be consistent.
+
+## *Historical Note*
+
+The Chinese method of representing the coefficients of the unknowns of several linear equations by using rods on a calculating board naturally led to the discovery of simple method of elimination. The arrangement of rods was precisely that of the numbers in a determinant. The Chinese, therefore, early developed the idea of subtracting columns and rows as in simplification of a determinant *Mikami, China*, *pp* 30, 93.
+
+Seki Kowa, the greatest of the Japanese Mathematicians of seventeenth century in his work '*Kai Fukudai no Ho*' in 1683 showed that he had the idea of determinants and of their expansion. But he used this device only in eliminating a quantity from two equations and not directly in the solution of a set of simultaneous linear equations. T. Hayashi, "*The Fakudoi and Determinants in Japanese Mathematics*," in the proc. of the Tokyo Math. Soc., V.
+
+Vendermonde was the first to recognise determinants as independent functions. He may be called the formal founder. Laplace (1772), gave general method of expanding a determinant in terms of its complementary minors. In 1773 Lagrange treated determinants of the second and third orders and used them for purpose other than the solution of equations. In 1801, Gauss used determinants in his theory of numbers.
+
+The next great contributor was Jacques - Philippe - Marie Binet, (1812) who stated the theorem relating to the product of two matrices of *m*-columns and *n*rows, which for the special case of *m* = *n* reduces to the multiplication theorem.
+
+Also on the same day, Cauchy (1812) presented one on the same subject. He used the word 'determinant' in its present sense. He gave the proof of multiplication theorem more satisfactory than Binet's.
+
+The greatest contributor to the theory was Carl Gustav Jacob Jacobi, after this the word determinant received its final acceptance.

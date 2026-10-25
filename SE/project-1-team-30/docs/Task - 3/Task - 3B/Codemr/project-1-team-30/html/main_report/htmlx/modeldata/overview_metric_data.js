@@ -1,0 +1,1 @@
+var CodeMR_ProjectMetrics = {"Project Name":"project-1-team-30", "Number of Highly Problematic Classes":0, "Number of Entities":573, "Number of Problematic Classes":14, "Class Lines of Code":34144, "Number of External Packages":91, "Number of Packages":66, "Number of External Entities":278};var EQ_COLOR_OF_LEVELS = ["#1F77B4","#007F24","#62BF18","#FFC800","#FF5B13","#E50000"];

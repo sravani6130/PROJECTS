@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package pubsub;
+option go_package = "proto/pubsub;pubsub"; 
+
+service BrokerService {
+  rpc Publish(PublishRequest) returns (PublishResponse);
+  rpc Subscribe(SubscribeRequest) returns (stream Message);
+  rpc Acknowledge(AckRequest) returns (AckResponse);
+
+  // Heartbeat to check leader status (used in failover logic)
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+
+  // Replication support: replicate messages from leader to follower
+  rpc Replicate(ReplicateRequest) returns (ReplicateResponse);
+}
+
+message PublishRequest {
+  string topic = 1;
+  string message = 2;
+}
+
+message PublishResponse {
+  bool success = 1;
+}
+
+message SubscribeRequest {
+  string topic = 1;
+  string consumer_id = 2;
+  string subscription_id = 3; // Logical group of consumers
+  int64 offset = 4;           // Durable offset tracking
+  string mode = 5;            // "Exclusive", "Shared", or "Failover"
+  bool is_slow=6;
+}
+
+message Message {
+  string id = 1;
+  string topic = 2;
+  string data = 3;
+  int64 offset = 4;
+}
+
+message AckRequest {
+  string message_id = 1;
+  string consumer_id = 2;
+  string ack_type = 3;
+  string topic = 4;
+  int64 offset = 5;
+}
+
+message AckResponse {
+  bool success = 1;
+}
+
+// Heartbeat for failover
+message HeartbeatRequest {
+  string broker_id = 1;
+}
+
+message HeartbeatResponse {
+  bool alive = 1;
+}
+
+// Message replication support
+message ReplicateRequest {
+  string topic = 1;
+  string message = 2;
+  int64 offset = 3;
+  string id = 4;
+}
+
+message ReplicateResponse {
+  bool success = 1;
+}

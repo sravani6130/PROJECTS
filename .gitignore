@@ -1,0 +1,8 @@
+
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Generated logs and search indexes
+**/logs/
+**/bm25_index/
