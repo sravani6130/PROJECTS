@@ -1,0 +1,28 @@
+{
+  "os": "Windows-10-10.0.26200-SP0",
+  "python": "CPython 3.11.7",
+  "startedAt": "2025-10-13T13:25:36.835573Z",
+  "program": "c:\\Users\\Ritama\\OneDrive - International Institute of Information Technology\\Documents\\IIITH 3_1\\SMAI\\assignment-3-LittleJoeHarp\\1.ipynb",
+  "codePath": "1.ipynb",
+  "codePathLocal": "1.ipynb",
+  "git": {
+    "remote": "https://github.com/SMAI-M25/assignment-3-LittleJoeHarp.git",
+    "commit": "153172a0bca9109e6e887845f8d3cfd2cfe6d864"
+  },
+  "email": "ritama.sanyal@research.iiit.ac.in",
+  "root": "c:\\Users\\Ritama\\OneDrive - International Institute of Information Technology\\Documents\\IIITH 3_1\\SMAI\\assignment-3-LittleJoeHarp",
+  "host": "RITAMA",
+  "executable": "c:\\Users\\Ritama\\anaconda3\\python.exe",
+  "cpu_count": 12,
+  "cpu_count_logical": 16,
+  "disk": {
+    "/": {
+      "total": "916962930688",
+      "used": "268430462976"
+    }
+  },
+  "memory": {
+    "total": "14743887872"
+  },
+  "writerId": "crbu0byxbixqkwjqb5mjl6nmbn4x17z6"
+}

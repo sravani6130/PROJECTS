@@ -1,0 +1,14 @@
+{"time":"2025-10-13T18:55:36.8517403+05:30","level":"INFO","msg":"stream: starting","core version":"0.22.1"}
+{"time":"2025-10-13T18:55:37.34455+05:30","level":"INFO","msg":"stream: created new stream","id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:37.3451284+05:30","level":"INFO","msg":"handler: started","stream_id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:37.3835725+05:30","level":"INFO","msg":"writer: started","stream_id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:37.3845395+05:30","level":"INFO","msg":"sender: started","stream_id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:37.3845395+05:30","level":"INFO","msg":"stream: started","id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:38.9442548+05:30","level":"INFO","msg":"flowcontrol: backed up, offloading to disk","recordNumber":38}
+{"time":"2025-10-13T18:55:39.2610881+05:30","level":"INFO","msg":"flowcontrol: unblocked","totalOffloaded":929}
+{"time":"2025-10-13T18:55:51.0460111+05:30","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading artifact model","runtime_seconds":2.3786593,"subtasks":[{"desc":"final_model.npz","runtime_seconds":1.0416019,"progress":"36.1KB/36.1KB"}]},{"desc":"updating run metadata","runtime_seconds":0.0107328}],"total_operations":2}}
+{"time":"2025-10-13T18:55:53.2423665+05:30","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-10-13T18:55:54.6105618+05:30","level":"INFO","msg":"stream: closing","id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:54.6105618+05:30","level":"INFO","msg":"handler: closed","stream_id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:54.6110792+05:30","level":"INFO","msg":"sender: closed","stream_id":"sgm1yioy"}
+{"time":"2025-10-13T18:55:54.6116644+05:30","level":"INFO","msg":"stream: closed","id":"sgm1yioy"}

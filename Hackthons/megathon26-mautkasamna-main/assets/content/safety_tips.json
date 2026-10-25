@@ -1,0 +1,44 @@
+{
+  "tips": [
+    {
+      "icon": "lock",
+      "title": { "en": "Never share a PIN or OTP", "te": "PIN లేదా OTP ఎప్పుడూ చెప్పకండి" },
+      "body": {
+        "en": "A real bank, school or helper will never ask for your PIN or OTP. Anyone who asks is a warning sign.",
+        "te": "నిజమైన బ్యాంక్, స్కూల్ లేదా సహాయకులు మీ PIN లేదా OTP ఎప్పుడూ అడగరు. ఎవరైనా అడిగితే అది హెచ్చరిక సంకేతం."
+      }
+    },
+    {
+      "icon": "timer",
+      "title": { "en": "Urgency is a red flag", "te": "తొందర పెట్టడం ప్రమాద సంకేతం" },
+      "body": {
+        "en": "\"Act in 10 minutes or lose it!\" is a pressure trick. Slow down before you do anything.",
+        "te": "\"10 నిమిషాల్లో చేయండి, లేకపోతే పోతుంది!\" అనేది ఒత్తిడి పెట్టే ఉపాయం. ఏదైనా చేసే ముందు ఆగండి."
+      }
+    },
+    {
+      "icon": "link_off",
+      "title": { "en": "Don't tap links in surprise messages", "te": "అనుకోని మెసేజ్‌లలో లింక్‌లు నొక్కకండి" },
+      "body": {
+        "en": "Links in unexpected prize or reward messages can lead to fake pages that steal details.",
+        "te": "అనుకోని బహుమతి మెసేజ్‌లలోని లింక్‌లు వివరాలు దొంగిలించే నకిలీ పేజీలకు తీసుకెళ్లవచ్చు."
+      }
+    },
+    {
+      "icon": "verified",
+      "title": { "en": "Verify independently", "te": "స్వయంగా నిర్ధారించుకోండి" },
+      "body": {
+        "en": "Check using a number or website you already trust—not the one in the message. Ask a trusted adult.",
+        "te": "మీకు ముందే నమ్మకమున్న నంబర్ లేదా వెబ్‌సైట్ ద్వారా తనిఖీ చేయండి—మెసేజ్‌లో ఉన్నది కాదు. నమ్మకమైన పెద్దవారిని అడగండి."
+      }
+    },
+    {
+      "icon": "report",
+      "title": { "en": "Report and block", "te": "రిపోర్ట్ చేసి, బ్లాక్ చేయండి" },
+      "body": {
+        "en": "In India, cyber fraud can be reported on the national helpline 1930. Block the sender.",
+        "te": "భారతదేశంలో సైబర్ మోసాన్ని జాతీయ హెల్ప్‌లైన్ 1930 కి రిపోర్ట్ చేయవచ్చు. పంపినవారిని బ్లాక్ చేయండి."
+      }
+    }
+  ]
+}

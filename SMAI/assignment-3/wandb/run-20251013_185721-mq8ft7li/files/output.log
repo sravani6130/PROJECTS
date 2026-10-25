@@ -1,0 +1,42 @@
+Created run folder: runs/border_model_20251013_185721
+Results will be saved in local folder: runs/border_model_20251013_185721
+
+--- Starting Training on Border Data ---
+Epoch 10/100: Loss = 0.486220 | Accuracy = 79.44%
+  Sample predictions at corners: [0.41017558 0.13535489 0.24595493]
+Epoch 20/100: Loss = 0.465617 | Accuracy = 79.44%
+  Sample predictions at corners: [0.33976239 0.157085   0.23841931]
+Epoch 30/100: Loss = 0.453096 | Accuracy = 79.04%
+  Sample predictions at corners: [0.28893231 0.26634227 0.28863339]
+Epoch 40/100: Loss = 0.444408 | Accuracy = 79.44%
+  Sample predictions at corners: [0.24158713 0.19038546 0.23540222]
+Epoch 50/100: Loss = 0.437399 | Accuracy = 79.16%
+  Sample predictions at corners: [0.21022057 0.2289265  0.25437193]
+Epoch 60/100: Loss = 0.431754 | Accuracy = 79.24%
+  Sample predictions at corners: [0.18214752 0.21891709 0.24963371]
+Epoch 70/100: Loss = 0.426290 | Accuracy = 82.16%
+  Sample predictions at corners: [0.16244476 0.31877549 0.30871452]
+Epoch 80/100: Loss = 0.420931 | Accuracy = 81.28%
+  Sample predictions at corners: [0.13920946 0.25330932 0.28161602]
+Epoch 90/100: Loss = 0.416906 | Accuracy = 81.24%
+  Sample predictions at corners: [0.11991674 0.20690558 0.2647678 ]
+Epoch 100/100: Loss = 0.411921 | Accuracy = 82.40%
+  Sample predictions at corners: [0.10621552 0.22297146 0.28682548]
+
+--- Training Complete in 5.91 seconds ---
+Training finished. Saving artifacts...
+Model saved to runs/border_model_20251013_185721\final_model.npz
+
+--- Generating Full Map Prediction for Evaluation ---
+Final Prediction Accuracy: 82.40%
+Total Samples Seen: 250000
+  Debug - Predictions shape: (2500, 1)
+  Debug - Predictions min: 0.0190, max: 0.6651
+  Debug - Predictions mean: 0.2213
+  Debug - Predictions > 0.5: 198/2500
+  Debug - Predicted map shape: (50, 50)
+  Debug - Unique values in predicted map: [0 1]
+  Debug - Count of 0s: 2302, Count of 1s: 198
+  Saved comparison maps to runs/border_model_20251013_185721\comparison_maps.png
+Map comparison saved. Final accuracy: 82.40%
+WandB run finished and artifacts saved.

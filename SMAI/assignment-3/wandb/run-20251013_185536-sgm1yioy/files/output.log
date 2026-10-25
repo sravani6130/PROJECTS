@@ -1,0 +1,42 @@
+Created run folder: runs/border_model_20251013_185536
+Results will be saved in local folder: runs/border_model_20251013_185536
+
+--- Starting Training on Border Data ---
+Epoch 10/100: Loss = 0.491337
+  Sample predictions at corners: [0.403727   0.13705816 0.2525231 ]
+Epoch 20/100: Loss = 0.467972
+  Sample predictions at corners: [0.33992864 0.18102246 0.26651563]
+Epoch 30/100: Loss = 0.452245
+  Sample predictions at corners: [0.28876663 0.18580892 0.25462112]
+Epoch 40/100: Loss = 0.440679
+  Sample predictions at corners: [0.24889105 0.22350448 0.27121823]
+Epoch 50/100: Loss = 0.431131
+  Sample predictions at corners: [0.21217206 0.23076634 0.27202419]
+Epoch 60/100: Loss = 0.423877
+  Sample predictions at corners: [0.18103725 0.20633394 0.25592381]
+Epoch 70/100: Loss = 0.417434
+  Sample predictions at corners: [0.15275374 0.18444762 0.24315432]
+Epoch 80/100: Loss = 0.411046
+  Sample predictions at corners: [0.12968944 0.17245778 0.2399075 ]
+Epoch 90/100: Loss = 0.405239
+  Sample predictions at corners: [0.11032809 0.18647413 0.25902595]
+Epoch 100/100: Loss = 0.399233
+  Sample predictions at corners: [0.09158564 0.18173904 0.26710261]
+
+--- Training Complete in 8.62 seconds ---
+Training finished. Saving artifacts...
+Model saved to runs/border_model_20251013_185536\final_model.npz
+
+--- Generating Full Map Prediction for Evaluation ---
+Final Prediction Accuracy: 82.84%
+Total Samples Seen: 250000
+  Debug - Predictions shape: (2500, 1)
+  Debug - Predictions min: 0.0126, max: 0.6963
+  Debug - Predictions mean: 0.2104
+  Debug - Predictions > 0.5: 199/2500
+  Debug - Predicted map shape: (50, 50)
+  Debug - Unique values in predicted map: [0 1]
+  Debug - Count of 0s: 2301, Count of 1s: 199
+  Saved comparison maps to runs/border_model_20251013_185536\comparison_maps.png
+Map comparison saved. Final accuracy: 82.84%
+WandB run finished and artifacts saved.

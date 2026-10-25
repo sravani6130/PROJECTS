@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package taskqueue;
+
+option go_package = "./taskqueue";
+
+enum TaskType {
+  CPU = 0;
+  IO  = 1;
+}
+
+enum WorkerType {
+  WORKER_CPU  = 0;
+  WORKER_IO   = 1;
+  WORKER_BOTH = 2;
+}
+
+// ─── Job Client messages ───────────────────────────────────────────────────
+
+message TaskRequest {
+  TaskType type    = 1;
+  string   payload = 2;
+}
+
+message TaskResponse {
+  string task_id = 1;
+}
+
+message TaskStatusRequest {
+  string task_id = 1;
+}
+
+message TaskStatusResponse {
+  string task_id   = 1;
+  string status    = 2; // "Queued" | "Processing" | "Completed" | "Failed"
+  string worker_id = 3;
+}
+
+// ─── Worker messages ───────────────────────────────────────────────────────
+
+message WorkerConfig {
+  WorkerType type = 1;
+}
+
+message WorkerId {
+  string worker_id = 1;
+}
+
+message Task {
+  string   task_id = 1;
+  TaskType type    = 2;
+  string   payload = 3;
+}
+
+message Heartbeat {
+  string worker_id = 1;
+  int64  timestamp = 2;
+}
+
+message Acknowledge {
+  bool   success = 1;
+  string message = 2;
+}
+
+message TaskStatusUpdate {
+  string task_id   = 1;
+  string worker_id = 2;
+  string status    = 3; // "Processing" | "Completed" | "Failed"
+}
+
+// ─── Service ───────────────────────────────────────────────────────────────
+
+service TaskQueueService {
+  // Job Client RPCs
+  rpc SubmitTask(TaskRequest)           returns (TaskResponse);
+  rpc GetTaskStatus(TaskStatusRequest)  returns (TaskStatusResponse);
+
+  // Worker RPCs
+  rpc RegisterWorker(WorkerConfig)          returns (WorkerId);
+  rpc RequestTask(WorkerId)                 returns (stream Task);
+  rpc SendHeartbeat(Heartbeat)              returns (Acknowledge);
+  rpc UpdateTaskStatus(TaskStatusUpdate)    returns (Acknowledge);
+}

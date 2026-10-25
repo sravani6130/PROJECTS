@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; connect-src 'self' http://localhost:8787 http://127.0.0.1:8787 https:; style-src 'self'; script-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Gullak NGO Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='17' r='12' fill='%23c8642e'/%3E%3Crect x='12' y='5' width='8' height='3' rx='1.5' fill='%233b2a20'/%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><span>Gullak <b>NGO Dashboard</b></span></div>
+    <nav id="nav" class="nav" hidden>
+      <a href="#/overview" data-route="overview">Overview</a>
+      <a href="#/students" data-route="students">Students</a>
+      <a href="#/centres" data-route="centres">Centres</a>
+    </nav>
+    <div id="account" class="account" hidden></div>
+  </header>
+  <div class="demo-banner" role="note">
+    Prototype with <b>fictional</b> organisations and demo sign-in. Not for real student data without the NGO's approval,
+    a consent process, secure hosting and a privacy review.
+  </div>
+  <main id="app" class="wrap" aria-live="polite"></main>
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

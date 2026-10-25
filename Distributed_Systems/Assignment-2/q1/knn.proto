@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package knn;
+
+option go_package = "./knn";
+
+// Data point representation
+message DataPoint {
+  repeated double features = 1;
+}
+
+// Upload data to server
+message UploadRequest {
+  repeated DataPoint data_points = 1;
+}
+
+message UploadResponse {
+  bool success = 1;
+  int32 points_stored = 2;
+}
+
+// Query KNN
+message KNNRequest {
+  DataPoint query_point = 1;
+  int32 k = 2;
+}
+
+message Neighbor {
+  DataPoint point = 1;
+  double distance = 2;
+}
+
+message KNNResponse {
+  repeated Neighbor neighbors = 1;
+}
+
+service KNNService {
+  rpc UploadData(UploadRequest) returns (UploadResponse);
+  rpc QueryKNN(KNNRequest) returns (KNNResponse);
+}

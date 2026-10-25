@@ -1,0 +1,59 @@
+_wandb:
+    value:
+        cli_version: 0.22.1
+        e:
+            y7o9xr3160h77y4zqm4qgltcysq3m8ff:
+                codePath: 1.ipynb
+                codePathLocal: 1.ipynb
+                cpu_count: 12
+                cpu_count_logical: 16
+                disk:
+                    /:
+                        total: "916962930688"
+                        used: "268436070400"
+                email: ritama.sanyal@research.iiit.ac.in
+                executable: c:\Users\Ritama\anaconda3\python.exe
+                git:
+                    commit: 153172a0bca9109e6e887845f8d3cfd2cfe6d864
+                    remote: https://github.com/SMAI-M25/assignment-3-LittleJoeHarp.git
+                host: RITAMA
+                memory:
+                    total: "14743887872"
+                os: Windows-10-10.0.26200-SP0
+                program: c:\Users\Ritama\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp\1.ipynb
+                python: CPython 3.11.7
+                root: c:\Users\Ritama\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp
+                startedAt: "2025-10-13T13:27:21.737599Z"
+                writerId: y7o9xr3160h77y4zqm4qgltcysq3m8ff
+        m: []
+        python_version: 3.11.7
+        t:
+            "1":
+                - 105
+            "2":
+                - 105
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.11.7
+            "5": 0.22.1
+            "8":
+                - 1
+                - 3
+            "12": 0.22.1
+            "13": windows-amd64
+activation:
+    value: ReLU
+architecture:
+    value: 2-64-64-1
+batch_size:
+    value: 64
+dataset_size:
+    value: 2500
+epochs:
+    value: 100
+learning_rate:
+    value: 0.01
+optimizer:
+    value: SGD

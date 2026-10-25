@@ -1,0 +1,102 @@
+{
+  "badges": [
+    {
+      "id": "budget_planner",
+      "icon": "wallet",
+      "name": {
+        "en": "Budget Planner",
+        "te": "బడ్జెట్ ప్లానర్"
+      },
+      "description": {
+        "en": "Planned Asha's first ₹1,000.",
+        "te": "ఆశ మొదటి ₹1,000ను ప్లాన్ చేశారు."
+      },
+      "rule": {
+        "type": "complete_all",
+        "missions": [
+          "C1"
+        ]
+      }
+    },
+    {
+      "id": "smart_saver",
+      "icon": "savings",
+      "name": {
+        "en": "Smart Saver",
+        "te": "తెలివైన పొదుపరి"
+      },
+      "description": {
+        "en": "Saved towards a target and compared ways to keep savings.",
+        "te": "లక్ష్యం కోసం పొదుపు చేసి, పొదుపు ఉంచే మార్గాలను పోల్చారు."
+      },
+      "rule": {
+        "type": "complete_all",
+        "missions": [
+          "C2",
+          "C6"
+        ]
+      }
+    },
+    {
+      "id": "digital_ready",
+      "icon": "growth",
+      "name": {
+        "en": "Digital Money Ready",
+        "te": "డిజిటల్ డబ్బుకు సిద్ధం"
+      },
+      "description": {
+        "en": "Used the pretend bank and understood borrowing.",
+        "te": "ఊహాత్మక బ్యాంక్ వాడి, అప్పు గురించి అర్థం చేసుకున్నారు."
+      },
+      "rule": {
+        "type": "complete_all",
+        "missions": [
+          "C3",
+          "C5"
+        ]
+      }
+    },
+    {
+      "id": "scam_spotter",
+      "icon": "shield",
+      "name": {
+        "en": "Scam Spotter",
+        "te": "మోసం గుర్తింపుదారు"
+      },
+      "description": {
+        "en": "Investigated the suspicious messages.",
+        "te": "అనుమానాస్పద మెసేజ్‌లను పరిశీలించారు."
+      },
+      "rule": {
+        "type": "complete_all",
+        "missions": [
+          "C4"
+        ]
+      }
+    },
+    {
+      "id": "diary_complete",
+      "icon": "star",
+      "name": {
+        "en": "Diary Complete",
+        "te": "డైరీ పూర్తి"
+      },
+      "description": {
+        "en": "Finished all seven chapters of The Money Diaries.",
+        "te": "మనీ డైరీస్ ఏడు అధ్యాయాలూ పూర్తి చేశారు."
+      },
+      "rule": {
+        "type": "complete_all",
+        "missions": [
+          "C1",
+          "C2",
+          "C3",
+          "C4",
+          "C5",
+          "C6",
+          "C7"
+        ]
+      }
+    }
+  ]
+}
