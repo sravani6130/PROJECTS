@@ -35,7 +35,7 @@ Answer: I'm sorry, but I can only assist with questions related to K12 Algebra.
 
 gemini_model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash-lite",
-    api_key="AIzaSyBogQ6dec87gt1dr2mPej0IO1D9elr8H70",
+    api_key="dummy",
     max_output_tokens=4096
 )
 
