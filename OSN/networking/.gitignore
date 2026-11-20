@@ -1,0 +1,5 @@
+*.o
+server
+client
+server_log.txt
+client_log.txt
