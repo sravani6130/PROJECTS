@@ -2,14 +2,14 @@ import sys, json, numpy as np
 from pathlib import Path
 
 # Fix paths
-ROOT = Path("/home/shravanikalmali/Desktop/inlp_final/Hallucinating_llamas_end_submission")
+ROOT = Path("/home/user/Desktop/inlp_final/Hallucinating_llamas_end_submission")
 sys.path.insert(0, str(ROOT))
 
 from src.retrieval.pipeline import retrieve_and_answer
 from src.retrieval.hybrid_search import load_book_index, get_model
 import src.retrieval.hybrid_search as hs
 
-DATA_DIR = Path("/home/shravanikalmali/Desktop/inlp_final/drive-download-20260408T131838Z-3-001")
+DATA_DIR = Path("/home/user/Desktop/inlp_final/drive-download-20260408T131838Z-3-001")
 BOOK_ID = "598ad8540bb3851e7347cda52466e566cda0cccf"
 TEST_CASES = [
     ("Who frees Conan?", "Tascela"),

@@ -61,7 +61,7 @@ def send_email(recipient: str, subject: str, body: str, attachments: list[str] =
         return f"❌ Failed to send email: {e}"
 
 # print(send_email(
-#     recipient="sdivyar11@gmail.com",
+#     recipient="recipient@example.com",
 #     subject="Here are your files",
 #     body="Please check the attached documents.",
 #     attachments=["outputs/p.md", "exp.txt"]

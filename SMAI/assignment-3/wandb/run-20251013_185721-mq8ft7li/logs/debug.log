@@ -1,5 +1,5 @@
-2025-10-13 18:57:21,757 INFO    MainThread:11492 [wandb_init.py:setup_run_log_directory():705] Logging user logs to c:\Users\Ritama\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp\wandb\run-20251013_185721-mq8ft7li\logs\debug.log
-2025-10-13 18:57:21,757 INFO    MainThread:11492 [wandb_init.py:setup_run_log_directory():706] Logging internal logs to c:\Users\Ritama\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp\wandb\run-20251013_185721-mq8ft7li\logs\debug-internal.log
+2025-10-13 18:57:21,757 INFO    MainThread:11492 [wandb_init.py:setup_run_log_directory():705] Logging user logs to c:\Users\user\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp\wandb\run-20251013_185721-mq8ft7li\logs\debug.log
+2025-10-13 18:57:21,757 INFO    MainThread:11492 [wandb_init.py:setup_run_log_directory():706] Logging internal logs to c:\Users\user\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp\wandb\run-20251013_185721-mq8ft7li\logs\debug-internal.log
 2025-10-13 18:57:21,759 INFO    MainThread:11492 [wandb_init.py:monkeypatch_ipython():624] configuring jupyter hooks <wandb.sdk.wandb_init._WandbInit object at 0x00000215D3095150>
 2025-10-13 18:57:21,759 INFO    MainThread:11492 [wandb_init.py:init():832] calling init triggers
 2025-10-13 18:57:21,759 INFO    MainThread:11492 [wandb_init.py:init():837] wandb.init called with sweep_config: {}
@@ -16,7 +16,7 @@ config: {'epochs': 100, 'learning_rate': 0.01, 'batch_size': 64, 'optimizer': 'S
 2025-10-13 18:57:23,884 INFO    MainThread:11492 [wandb_run.py:_redirect():2423] Wrapping output streams.
 2025-10-13 18:57:23,885 INFO    MainThread:11492 [wandb_run.py:_redirect():2446] Redirects installed.
 2025-10-13 18:57:23,887 INFO    MainThread:11492 [wandb_init.py:init():1076] run started, returning control to user process
-2025-10-13 18:57:32,186 INFO    MainThread:11492 [wandb_run.py:_finish():2272] finishing run ritama-sanyal-international-institute-of-information-tec/sma-assignment-3-border/mq8ft7li
+2025-10-13 18:57:32,186 INFO    MainThread:11492 [wandb_run.py:_finish():2272] finishing run user-team/sma-assignment-3-border/mq8ft7li
 2025-10-13 18:57:32,186 INFO    MainThread:11492 [jupyter.py:save_history():480] not saving jupyter history
 2025-10-13 18:57:32,186 INFO    MainThread:11492 [jupyter.py:save_ipynb():404] not saving jupyter notebook
 2025-10-13 18:57:32,186 INFO    MainThread:11492 [wandb_init.py:_jupyter_teardown():609] cleaning up jupyter logic

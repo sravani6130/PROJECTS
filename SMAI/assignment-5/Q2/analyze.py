@@ -31,7 +31,7 @@ BEST_DL_MODEL_NAME = 'MLP' # Example: 'RNN' or 'MLP'
 BEST_DL_MODEL_CLASS = MLP  # Example: SimpleRNN or MLP
 
 # [cite_start]3. Fill in your email username for plots [cite: 26]
-EMAIL_USERNAME = "ritama.sanyal"
+EMAIL_USERNAME = "user"
 # ----------------------------------------------------------------------
 
 # --- PyTorch Training Configuration ---

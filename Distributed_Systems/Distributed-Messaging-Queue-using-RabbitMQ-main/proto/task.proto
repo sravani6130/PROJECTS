@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package task;
+
+option go_package = "distributed-broker/proto";
+
+service TaskService {
+  rpc SubmitTask (TaskRequest) returns (TaskResponse) {}
+}
+
+message TaskRequest {
+  string task_type = 1;   // "A" (direct), "B" (direct), "AB" (fanout), "TOPIC" (topic)
+  int32 duration = 2;     // in seconds
+  string routing_key = 3; // only used for task_type="TOPIC" (e.g., "task.A.urgent", "task.all.broadcast")
+}
+
+message TaskResponse {
+  bool success = 1;
+  string message = 2;
+}

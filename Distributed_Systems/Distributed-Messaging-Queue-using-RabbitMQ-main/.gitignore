@@ -1,0 +1,7 @@
+erlang.cookie
+bin/
+*.exe
+*.test
+.env
+__debug_bin
+.DS_Store

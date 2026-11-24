@@ -48,6 +48,6 @@ def plot_graph(book_id, processed_dir, output_file):
 
 if __name__ == "__main__":
     book_id = "c8e25c068b7c8a00ba00096e73ce7ea893c69aba"
-    pdir = "/home/shravanikalmali/Desktop/inlp_final/drive-download-20260408T131838Z-3-001"
+    pdir = "/home/user/Desktop/inlp_final/drive-download-20260408T131838Z-3-001"
     output = "static_graph_visualization.png"
     plot_graph(book_id, pdir, output)

@@ -66,7 +66,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -111,7 +111,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -156,7 +156,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -201,7 +201,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -246,7 +246,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -291,7 +291,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -336,7 +336,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -381,7 +381,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -426,7 +426,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -471,7 +471,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -516,7 +516,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -561,7 +561,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -606,7 +606,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -651,7 +651,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -696,7 +696,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -741,7 +741,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -786,7 +786,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -831,7 +831,7 @@
       "message": "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "akash.sigullapalli@students.iiit.ac.in",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -875,7 +875,7 @@
       "message": "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "akash.sigullapalli@students.iiit.ac.in",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -935,7 +935,7 @@
       "message": "Extract this nested try block into a separate method.",
       "effort": "20min",
       "debt": "20min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "error-handling",
         "confusing"
@@ -1018,7 +1018,7 @@
       "message": "Remove this expression which always evaluates to \"true\"",
       "effort": "10min",
       "debt": "10min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "cwe",
         "symbolic-execution",
@@ -1081,7 +1081,7 @@
       "message": "Extract this nested try block into a separate method.",
       "effort": "20min",
       "debt": "20min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "error-handling",
         "confusing"
@@ -1126,7 +1126,7 @@
       "message": "Remove this commented out code.",
       "effort": "5min",
       "debt": "5min",
-      "author": "alokamvarun@gmail.com",
+      "author": "redacted",
       "tags": [
         "unused"
       ],
@@ -1216,7 +1216,7 @@
       "message": "Define a constant instead of duplicating this literal \"WeblogHitCount.getByWeblog\" 3 times.",
       "effort": "8min",
       "debt": "8min",
-      "author": "akash.sigullapalli@students.iiit.ac.in",
+      "author": "redacted",
       "tags": [
         "design"
       ],
@@ -1260,7 +1260,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -1304,7 +1304,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -1348,7 +1348,7 @@
       "message": "Remove this unused \"roleManager\" private field.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "unused"
       ],
@@ -1392,7 +1392,7 @@
       "message": "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -1436,7 +1436,7 @@
       "message": "Remove this block of code, fill it in, or add a comment explaining why it is empty.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -1571,7 +1571,7 @@
       "message": "Define a constant instead of duplicating this literal \"WeblogPermission.getByUserName&WeblogIdIncludingPending\" 6 times.",
       "effort": "14min",
       "debt": "14min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "design"
       ],
@@ -1615,7 +1615,7 @@
       "message": "Remove this block of code, fill it in, or add a comment explaining why it is empty.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -1659,7 +1659,7 @@
       "message": "Remove this block of code, fill it in, or add a comment explaining why it is empty.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -1703,7 +1703,7 @@
       "message": "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -1747,7 +1747,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -1791,7 +1791,7 @@
       "message": "Add the missing @deprecated Javadoc tag.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "obsolete",
         "bad-practice"
@@ -1836,7 +1836,7 @@
       "message": "Add 'since' and/or 'forRemoval' arguments to the @Deprecated annotation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "java9"
       ],
@@ -1880,7 +1880,7 @@
       "message": "Add the missing @deprecated Javadoc tag.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "obsolete",
         "bad-practice"
@@ -1925,7 +1925,7 @@
       "message": "Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.",
       "effort": "5min",
       "debt": "5min",
-      "author": "jaswanthreddykonapalli@pop-os.localdomain",
+      "author": "redacted",
       "tags": [
         "suspicious"
       ],
@@ -2105,7 +2105,7 @@
       "message": "Refactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.",
       "effort": "11min",
       "debt": "11min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "brain-overload"
       ],
@@ -2195,7 +2195,7 @@
       "message": "Define a constant instead of duplicating this literal \"Problem accessing index directory\" 3 times.",
       "effort": "8min",
       "debt": "8min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "design"
       ],
@@ -2239,7 +2239,7 @@
       "message": "Use \"java.nio.file.Files#delete\" here for better messages on error conditions.",
       "effort": "10min",
       "debt": "10min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "error-handling",
         "api-design"
@@ -2315,7 +2315,7 @@
       "message": "Change this \"try\" to a try-with-resources.",
       "effort": "15min",
       "debt": "15min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "java8",
         "cert",
@@ -2407,7 +2407,7 @@
       "message": "Define a constant instead of duplicating this literal \"Error getting weblogentry object\" 3 times.",
       "effort": "8min",
       "debt": "8min",
-      "author": "nikhilrepala8074@gmail.com",
+      "author": "redacted",
       "tags": [
         "design"
       ],

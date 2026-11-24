@@ -1,0 +1,637 @@
+﻿go : 2026/05/04 23:54:26 --- Setting up exchanges and queues ---
+At line:1 char:1
++ go run producer/main.go -port 50051 > producer1.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026/05/04 23:5... and queues ---:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026/05/04 23:54:27   Γ£ô DLX and DLQ setup complete
+2026/05/04 23:54:27   Γ£ô Queue declared: queue_A
+2026/05/04 23:54:27   Γ£ô Queue declared: queue_B
+2026/05/04 23:54:27   Γ£ô Direct exchange 'task_direct_exchange': queue_AΓåÉ'A',  queue_BΓåÉ'B'
+2026/05/04 23:54:27   Γ£ô Fanout exchange 'task_fanout_exchange': queue_A and queue_B both bound (all messages go to 
+both)
+2026/05/04 23:54:27   Γ£ô Topic exchange 'task_topic_exchange':
+2026/05/04 23:54:27       queue_A ΓåÉ 'task.A.#'   (e.g., task.A.urgent)
+2026/05/04 23:54:27       queue_B ΓåÉ 'task.B.#'   (e.g., task.B.normal)
+2026/05/04 23:54:27       BOTH    ΓåÉ 'task.all.#' (e.g., task.all.broadcast)
+2026/05/04 23:54:27   Γ£ô Header exchange 'task_header_exchange' with bindings for queue_A (type=A) and queue_B 
+(type=B)
+2026/05/04 23:54:27 --- Setup complete ---
+2026/05/04 23:54:27 Producer gRPC server listening on :50051
+2026/05/04 23:55:27 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919127603161200, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:27.6031965+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_SEND: task_id=task-1777919127603161200, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:27.6031965+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919127683208000, type="AB", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:27.683208+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_SEND: task_id=task-1777919127683208000, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:27.683208+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919127984202000, type="TOPIC", duration=2s, 
+routing_key="task.all.broadcast", timestamp=2026-05-04T23:55:27.984202+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_SEND: task_id=task-1777919127984202000, exchange=task_topic_exchange, 
+routing_key=task.all.broadcast, timestamp=2026-05-04T23:55:27.984202+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128185877600, type="TOPIC", duration=3s, 
+routing_key="task.A.urgent", timestamp=2026-05-04T23:55:28.1858776+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128185877600, exchange=task_topic_exchange, 
+routing_key=task.A.urgent, timestamp=2026-05-04T23:55:28.1858776+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128285972200, type="A", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:28.2859722+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128285972200, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:28.2859722+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128386423300, type="AB", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:28.3864233+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128386423300, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:28.3864233+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128787467100, type="AB", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:28.7874671+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128787467100, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:28.7874671+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128989077000, type="TOPIC", duration=1s, 
+routing_key="task.A.urgent", timestamp=2026-05-04T23:55:28.989077+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128989077000, exchange=task_topic_exchange, 
+routing_key=task.A.urgent, timestamp=2026-05-04T23:55:28.989077+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129089226300, type="B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:29.0892263+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129089226300, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:29.0892263+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129390775200, type="A", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:29.3907752+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129390775200, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:29.3907752+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129491587800, type="B", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:29.4915878+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129491587800, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:29.4925885+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129693076400, type="HEADER_A", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:29.6930764+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129693076400, exchange=task_header_exchange, 
+headers=map[type:A], timestamp=2026-05-04T23:55:29.6930764+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129794548400, type="A", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:29.7945484+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129794548400, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:29.7945484+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129894597400, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:29.8945974+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129894597400, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:29.8945974+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130196038800, type="B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:30.1960388+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130196038800, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:30.1960388+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130396643800, type="B", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:30.3966438+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130396643800, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:30.3966438+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130496940600, type="HEADER_A", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:30.4969406+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130496940600, exchange=task_header_exchange, 
+headers=map[type:A], timestamp=2026-05-04T23:55:30.4969406+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130597506800, type="HEADER_A", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:30.5975068+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130597506800, exchange=task_header_exchange, 
+headers=map[type:A], timestamp=2026-05-04T23:55:30.5975068+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130698950800, type="AB", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:30.6989508+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130698950800, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:30.6989508+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130898900200, type="TOPIC", duration=3s, 
+routing_key="task.A.urgent", timestamp=2026-05-04T23:55:30.8989002+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130898900200, exchange=task_topic_exchange, 
+routing_key=task.A.urgent, timestamp=2026-05-04T23:55:30.8989002+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130999591900, type="B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:30.9995919+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130999591900, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:30.9995919+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131100519100, type="HEADER_B", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:31.1005191+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131100519100, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:31.1005191+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131201287800, type="A", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:31.2012878+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131201287800, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:31.2012878+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131301876400, type="HEADER_B", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:31.3018764+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131301876400, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:31.3018764+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131804258800, type="HEADER_B", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:31.8042588+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131804258800, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:31.8042588+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131905181700, type="TOPIC", duration=1s, 
+routing_key="task.all.broadcast", timestamp=2026-05-04T23:55:31.9051817+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131905181700, exchange=task_topic_exchange, 
+routing_key=task.all.broadcast, timestamp=2026-05-04T23:55:31.9051817+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132005016600, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:32.0050166+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132005016600, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:32.0050166+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132104903700, type="HEADER_A", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:32.1049037+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132104903700, exchange=task_header_exchange, 
+headers=map[type:A], timestamp=2026-05-04T23:55:32.1049037+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132305600300, type="A", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:32.3056003+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132305600300, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:32.3056003+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132405867100, type="A", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:32.4058671+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132405867100, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:32.4058671+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132825412800, type="HEADER_B", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:32.8254128+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132825412800, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:32.8254128+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919133027904900, type="HEADER_A", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:33.0279049+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_SEND: task_id=task-1777919133027904900, exchange=task_header_exchange, 
+headers=map[type:A], timestamp=2026-05-04T23:55:33.0279352+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919133128410100, type="HEADER_B", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:33.1284101+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_SEND: task_id=task-1777919133128410100, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:33.1284101+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919133228397000, type="HEADER_B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:33.228397+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_SEND: task_id=task-1777919133228397000, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:33.228397+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919133430124800, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:33.4301248+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_SEND: task_id=task-1777919133430124800, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:33.4301248+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919133530429200, type="HEADER_A", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:33.5304292+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_SEND: task_id=task-1777919133530429200, exchange=task_header_exchange, 
+headers=map[type:A], timestamp=2026-05-04T23:55:33.5304292+05:30
+go : 2026/05/04 23:54:35 --- Setting up exchanges and queues ---
+At line:1 char:1
++ go run producer/main.go -port 50052 > producer2.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026/05/04 23:5... and queues ---:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026/05/04 23:54:35   Γ£ô DLX and DLQ setup complete
+2026/05/04 23:54:35   Γ£ô Queue declared: queue_A
+2026/05/04 23:54:35   Γ£ô Queue declared: queue_B
+2026/05/04 23:54:35   Γ£ô Direct exchange 'task_direct_exchange': queue_AΓåÉ'A',  queue_BΓåÉ'B'
+2026/05/04 23:54:35   Γ£ô Fanout exchange 'task_fanout_exchange': queue_A and queue_B both bound (all messages go to 
+both)
+2026/05/04 23:54:35   Γ£ô Topic exchange 'task_topic_exchange':
+2026/05/04 23:54:35       queue_A ΓåÉ 'task.A.#'   (e.g., task.A.urgent)
+2026/05/04 23:54:35       queue_B ΓåÉ 'task.B.#'   (e.g., task.B.normal)
+2026/05/04 23:54:35       BOTH    ΓåÉ 'task.all.#' (e.g., task.all.broadcast)
+2026/05/04 23:54:35   Γ£ô Header exchange 'task_header_exchange' with bindings for queue_A (type=A) and queue_B 
+(type=B)
+2026/05/04 23:54:35 --- Setup complete ---
+2026/05/04 23:54:35 Producer gRPC server listening on :50052
+2026/05/04 23:55:27 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919127784336000, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:27.784336+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_SEND: task_id=task-1777919127784336000, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:27.784336+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919127883178200, type="A", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:27.8831782+05:30
+2026/05/04 23:55:27 [METRIC] PRODUCER_SEND: task_id=task-1777919127883178200, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:27.8831782+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128085202800, type="HEADER_B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:28.0852028+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128085202800, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:28.0852028+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128486746200, type="HEADER_B", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:28.4867462+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128486746200, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:28.4867462+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128586915500, type="B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:28.5869155+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128586915500, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:28.5869155+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128687826400, type="B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:28.6878264+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128687826400, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:28.6878264+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919128887983900, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:28.8879839+05:30
+2026/05/04 23:55:28 [METRIC] PRODUCER_SEND: task_id=task-1777919128887983900, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:28.8879839+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129189353800, type="AB", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:29.1893538+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129189353800, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:29.1893538+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129290004300, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:29.2900043+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129290004300, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:29.2900043+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129592908700, type="HEADER_B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:29.5929087+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129592908700, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:29.593416+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919129995895800, type="HEADER_B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:29.9958958+05:30
+2026/05/04 23:55:29 [METRIC] PRODUCER_SEND: task_id=task-1777919129995895800, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:29.9958958+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130095847900, type="A", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:30.0958479+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130095847900, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:30.0963735+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130296267300, type="B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:30.2962673+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130296267300, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:30.2962673+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919130798420500, type="TOPIC", duration=1s, 
+routing_key="task.B.normal", timestamp=2026-05-04T23:55:30.7984205+05:30
+2026/05/04 23:55:30 [METRIC] PRODUCER_SEND: task_id=task-1777919130798420500, exchange=task_topic_exchange, 
+routing_key=task.B.normal, timestamp=2026-05-04T23:55:30.7984205+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131401926600, type="B", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:31.4019266+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131401926600, exchange=task_direct_exchange, 
+routing_key=B, timestamp=2026-05-04T23:55:31.4019266+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131502746600, type="TOPIC", duration=2s, 
+routing_key="task.A.urgent", timestamp=2026-05-04T23:55:31.5027466+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131502746600, exchange=task_topic_exchange, 
+routing_key=task.A.urgent, timestamp=2026-05-04T23:55:31.5027466+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131603037800, type="AB", duration=1s, 
+routing_key="", timestamp=2026-05-04T23:55:31.6030378+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131603037800, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:31.6030378+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919131704512200, type="HEADER_B", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:31.7045122+05:30
+2026/05/04 23:55:31 [METRIC] PRODUCER_SEND: task_id=task-1777919131704512200, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:31.7045435+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132205242900, type="HEADER_B", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:32.2052429+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132205242900, exchange=task_header_exchange, 
+headers=map[type:B], timestamp=2026-05-04T23:55:32.2052429+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132506042600, type="A", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:32.5060426+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132506042600, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:32.5060426+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132657889900, type="A", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:32.6578899+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132657889900, exchange=task_direct_exchange, 
+routing_key=A, timestamp=2026-05-04T23:55:32.6578899+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132725686700, type="HEADER_A", duration=3s, 
+routing_key="", timestamp=2026-05-04T23:55:32.7256867+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132725686700, exchange=task_header_exchange, 
+headers=map[type:A], timestamp=2026-05-04T23:55:32.7256867+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919132927115500, type="AB", duration=2s, 
+routing_key="", timestamp=2026-05-04T23:55:32.9271155+05:30
+2026/05/04 23:55:32 [METRIC] PRODUCER_SEND: task_id=task-1777919132927115500, exchange=task_fanout_exchange, 
+routing_key=, timestamp=2026-05-04T23:55:32.9271155+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_RECEIVE: task_id=task-1777919133329875700, type="TOPIC", duration=3s, 
+routing_key="task.all.broadcast", timestamp=2026-05-04T23:55:33.3298757+05:30
+2026/05/04 23:55:33 [METRIC] PRODUCER_SEND: task_id=task-1777919133329875700, exchange=task_topic_exchange, 
+routing_key=task.all.broadcast, timestamp=2026-05-04T23:55:33.3298757+05:30
+go : 2026/05/04 23:55:09  [*] Consumer waiting for messages on queue_A. To exit press CTRL+C
+At line:1 char:1
++ go run consumer/main.go -queue queue_A > consumerA.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026/05/04 23:5...it press CTRL+C:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026/05/04 23:55:27 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127603161200, queue=queue_A, 
+timestamp=2026-05-04T23:55:27.798356+05:30
+2026/05/04 23:55:27 Processing task task-1777919127603161200 (duration 1s)...
+2026/05/04 23:55:28 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127603161200, queue=queue_A, 
+timestamp=2026-05-04T23:55:28.7993698+05:30
+2026/05/04 23:55:28 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127683208000, queue=queue_A, 
+timestamp=2026-05-04T23:55:28.9170236+05:30
+2026/05/04 23:55:28 Processing task task-1777919127683208000 (duration 3s)...
+2026/05/04 23:55:31 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127683208000, queue=queue_A, 
+timestamp=2026-05-04T23:55:31.9172875+05:30
+2026/05/04 23:55:32 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127784336000, queue=queue_A, 
+timestamp=2026-05-04T23:55:32.0070179+05:30
+2026/05/04 23:55:32 Processing task task-1777919127784336000 (duration 1s)...
+2026/05/04 23:55:33 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127784336000, queue=queue_A, 
+timestamp=2026-05-04T23:55:33.0077869+05:30
+2026/05/04 23:55:33 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127883178200, queue=queue_A, 
+timestamp=2026-05-04T23:55:33.0295304+05:30
+2026/05/04 23:55:33 Processing task task-1777919127883178200 (duration 1s)...
+2026/05/04 23:55:34 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127883178200, queue=queue_A, 
+timestamp=2026-05-04T23:55:34.0304808+05:30
+2026/05/04 23:55:34 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127984202000, queue=queue_A, 
+timestamp=2026-05-04T23:55:34.0394803+05:30
+2026/05/04 23:55:34 Processing task task-1777919127984202000 (duration 2s)...
+2026/05/04 23:55:36 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127984202000, queue=queue_A, 
+timestamp=2026-05-04T23:55:36.0401881+05:30
+2026/05/04 23:55:36 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128185877600, queue=queue_A, 
+timestamp=2026-05-04T23:55:36.052439+05:30
+2026/05/04 23:55:36 Processing task task-1777919128185877600 (duration 3s)...
+2026/05/04 23:55:39 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128185877600, queue=queue_A, 
+timestamp=2026-05-04T23:55:39.0533376+05:30
+2026/05/04 23:55:39 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128285972200, queue=queue_A, 
+timestamp=2026-05-04T23:55:39.0852598+05:30
+2026/05/04 23:55:39 Processing task task-1777919128285972200 (duration 3s)...
+2026/05/04 23:55:42 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128285972200, queue=queue_A, 
+timestamp=2026-05-04T23:55:42.0862127+05:30
+2026/05/04 23:55:42 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128386423300, queue=queue_A, 
+timestamp=2026-05-04T23:55:42.173458+05:30
+2026/05/04 23:55:42 Processing task task-1777919128386423300 (duration 2s)...
+2026/05/04 23:55:44 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128386423300, queue=queue_A, 
+timestamp=2026-05-04T23:55:44.1736018+05:30
+2026/05/04 23:55:44 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128787467100, queue=queue_A, 
+timestamp=2026-05-04T23:55:44.1796063+05:30
+2026/05/04 23:55:44 Processing task task-1777919128787467100 (duration 2s)...
+2026/05/04 23:55:46 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128787467100, queue=queue_A, 
+timestamp=2026-05-04T23:55:46.1807044+05:30
+2026/05/04 23:55:46 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128887983900, queue=queue_A, 
+timestamp=2026-05-04T23:55:46.1867065+05:30
+2026/05/04 23:55:46 Processing task task-1777919128887983900 (duration 1s)...
+2026/05/04 23:55:47 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128887983900, queue=queue_A, 
+timestamp=2026-05-04T23:55:47.1884213+05:30
+2026/05/04 23:55:47 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128989077000, queue=queue_A, 
+timestamp=2026-05-04T23:55:47.1965002+05:30
+2026/05/04 23:55:47 Processing task task-1777919128989077000 (duration 1s)...
+2026/05/04 23:55:48 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128989077000, queue=queue_A, 
+timestamp=2026-05-04T23:55:48.1969097+05:30
+2026/05/04 23:55:48 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129189353800, queue=queue_A, 
+timestamp=2026-05-04T23:55:48.2041395+05:30
+2026/05/04 23:55:48 Processing task task-1777919129189353800 (duration 3s)...
+2026/05/04 23:55:51 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129189353800, queue=queue_A, 
+timestamp=2026-05-04T23:55:51.204795+05:30
+2026/05/04 23:55:51 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129290004300, queue=queue_A, 
+timestamp=2026-05-04T23:55:51.2122875+05:30
+2026/05/04 23:55:51 Processing task task-1777919129290004300 (duration 1s)...
+2026/05/04 23:55:52 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129290004300, queue=queue_A, 
+timestamp=2026-05-04T23:55:52.2125262+05:30
+2026/05/04 23:55:52 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129390775200, queue=queue_A, 
+timestamp=2026-05-04T23:55:52.2202876+05:30
+2026/05/04 23:55:52 Processing task task-1777919129390775200 (duration 1s)...
+2026/05/04 23:55:53 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129390775200, queue=queue_A, 
+timestamp=2026-05-04T23:55:53.2205989+05:30
+2026/05/04 23:55:53 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129693076400, queue=queue_A, 
+timestamp=2026-05-04T23:55:53.2256005+05:30
+2026/05/04 23:55:53 Processing task task-1777919129693076400 (duration 3s)...
+2026/05/04 23:55:56 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129693076400, queue=queue_A, 
+timestamp=2026-05-04T23:55:56.2269584+05:30
+2026/05/04 23:55:56 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129794548400, queue=queue_A, 
+timestamp=2026-05-04T23:55:56.2335091+05:30
+2026/05/04 23:55:56 Processing task task-1777919129794548400 (duration 2s)...
+2026/05/04 23:55:58 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129794548400, queue=queue_A, 
+timestamp=2026-05-04T23:55:58.2337713+05:30
+2026/05/04 23:55:58 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129894597400, queue=queue_A, 
+timestamp=2026-05-04T23:55:58.2407713+05:30
+2026/05/04 23:55:58 Processing task task-1777919129894597400 (duration 1s)...
+2026/05/04 23:55:59 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129894597400, queue=queue_A, 
+timestamp=2026-05-04T23:55:59.2409091+05:30
+2026/05/04 23:55:59 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130095847900, queue=queue_A, 
+timestamp=2026-05-04T23:55:59.2470463+05:30
+2026/05/04 23:55:59 Processing task task-1777919130095847900 (duration 1s)...
+2026/05/04 23:56:00 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130095847900, queue=queue_A, 
+timestamp=2026-05-04T23:56:00.253073+05:30
+2026/05/04 23:56:00 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130496940600, queue=queue_A, 
+timestamp=2026-05-04T23:56:00.2647006+05:30
+2026/05/04 23:56:00 Processing task task-1777919130496940600 (duration 2s)...
+2026/05/04 23:56:02 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130496940600, queue=queue_A, 
+timestamp=2026-05-04T23:56:02.2657393+05:30
+2026/05/04 23:56:02 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130597506800, queue=queue_A, 
+timestamp=2026-05-04T23:56:02.3036476+05:30
+2026/05/04 23:56:02 Processing task task-1777919130597506800 (duration 1s)...
+2026/05/04 23:56:03 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130597506800, queue=queue_A, 
+timestamp=2026-05-04T23:56:03.3047788+05:30
+2026/05/04 23:56:03 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130698950800, queue=queue_A, 
+timestamp=2026-05-04T23:56:03.3104815+05:30
+2026/05/04 23:56:03 Processing task task-1777919130698950800 (duration 3s)...
+2026/05/04 23:56:06 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130698950800, queue=queue_A, 
+timestamp=2026-05-04T23:56:06.3110107+05:30
+2026/05/04 23:56:06 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130898900200, queue=queue_A, 
+timestamp=2026-05-04T23:56:06.3250246+05:30
+2026/05/04 23:56:06 Processing task task-1777919130898900200 (duration 3s)...
+2026/05/04 23:56:09 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130898900200, queue=queue_A, 
+timestamp=2026-05-04T23:56:09.3297465+05:30
+2026/05/04 23:56:09 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131201287800, queue=queue_A, 
+timestamp=2026-05-04T23:56:09.3567926+05:30
+2026/05/04 23:56:09 Processing task task-1777919131201287800 (duration 2s)...
+2026/05/04 23:56:11 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131201287800, queue=queue_A, 
+timestamp=2026-05-04T23:56:11.357306+05:30
+2026/05/04 23:56:11 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131502746600, queue=queue_A, 
+timestamp=2026-05-04T23:56:11.3673061+05:30
+2026/05/04 23:56:11 Processing task task-1777919131502746600 (duration 2s)...
+2026/05/04 23:56:13 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131502746600, queue=queue_A, 
+timestamp=2026-05-04T23:56:13.3682349+05:30
+2026/05/04 23:56:13 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131603037800, queue=queue_A, 
+timestamp=2026-05-04T23:56:13.3852228+05:30
+2026/05/04 23:56:13 Processing task task-1777919131603037800 (duration 1s)...
+2026/05/04 23:56:14 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131603037800, queue=queue_A, 
+timestamp=2026-05-04T23:56:14.3854951+05:30
+2026/05/04 23:56:14 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131905181700, queue=queue_A, 
+timestamp=2026-05-04T23:56:14.4012067+05:30
+2026/05/04 23:56:14 Processing task task-1777919131905181700 (duration 1s)...
+2026/05/04 23:56:15 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131905181700, queue=queue_A, 
+timestamp=2026-05-04T23:56:15.4019763+05:30
+2026/05/04 23:56:15 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132005016600, queue=queue_A, 
+timestamp=2026-05-04T23:56:15.4079908+05:30
+2026/05/04 23:56:15 Processing task task-1777919132005016600 (duration 1s)...
+2026/05/04 23:56:16 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132005016600, queue=queue_A, 
+timestamp=2026-05-04T23:56:16.4082441+05:30
+2026/05/04 23:56:16 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132104903700, queue=queue_A, 
+timestamp=2026-05-04T23:56:16.4133432+05:30
+2026/05/04 23:56:16 Processing task task-1777919132104903700 (duration 2s)...
+2026/05/04 23:56:18 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132104903700, queue=queue_A, 
+timestamp=2026-05-04T23:56:18.4146054+05:30
+2026/05/04 23:56:18 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132305600300, queue=queue_A, 
+timestamp=2026-05-04T23:56:18.4332065+05:30
+2026/05/04 23:56:18 Processing task task-1777919132305600300 (duration 1s)...
+2026/05/04 23:56:19 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132305600300, queue=queue_A, 
+timestamp=2026-05-04T23:56:19.434+05:30
+2026/05/04 23:56:19 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132405867100, queue=queue_A, 
+timestamp=2026-05-04T23:56:19.4552197+05:30
+2026/05/04 23:56:19 Processing task task-1777919132405867100 (duration 1s)...
+2026/05/04 23:56:20 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132405867100, queue=queue_A, 
+timestamp=2026-05-04T23:56:20.4559019+05:30
+2026/05/04 23:56:20 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132506042600, queue=queue_A, 
+timestamp=2026-05-04T23:56:20.4719311+05:30
+2026/05/04 23:56:20 Processing task task-1777919132506042600 (duration 2s)...
+2026/05/04 23:56:22 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132506042600, queue=queue_A, 
+timestamp=2026-05-04T23:56:22.4733646+05:30
+2026/05/04 23:56:22 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132657889900, queue=queue_A, 
+timestamp=2026-05-04T23:56:22.4969667+05:30
+2026/05/04 23:56:22 Processing task task-1777919132657889900 (duration 3s)...
+2026/05/04 23:56:25 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132657889900, queue=queue_A, 
+timestamp=2026-05-04T23:56:25.4980492+05:30
+2026/05/04 23:56:25 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132725686700, queue=queue_A, 
+timestamp=2026-05-04T23:56:25.5041736+05:30
+2026/05/04 23:56:25 Processing task task-1777919132725686700 (duration 3s)...
+2026/05/04 23:56:28 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132725686700, queue=queue_A, 
+timestamp=2026-05-04T23:56:28.5047973+05:30
+2026/05/04 23:56:28 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132927115500, queue=queue_A, 
+timestamp=2026-05-04T23:56:28.5276944+05:30
+2026/05/04 23:56:28 Processing task task-1777919132927115500 (duration 2s)...
+2026/05/04 23:56:30 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132927115500, queue=queue_A, 
+timestamp=2026-05-04T23:56:30.5280401+05:30
+2026/05/04 23:56:30 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919133027904900, queue=queue_A, 
+timestamp=2026-05-04T23:56:30.5424138+05:30
+2026/05/04 23:56:30 Processing task task-1777919133027904900 (duration 1s)...
+2026/05/04 23:56:31 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919133027904900, queue=queue_A, 
+timestamp=2026-05-04T23:56:31.546932+05:30
+2026/05/04 23:56:31 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919133329875700, queue=queue_A, 
+timestamp=2026-05-04T23:56:31.5937866+05:30
+2026/05/04 23:56:31 Processing task task-1777919133329875700 (duration 3s)...
+go : 2026/05/04 23:55:09  [*] Consumer waiting for messages on queue_B. To exit press CTRL+C
+At line:1 char:1
++ go run consumer/main.go -queue queue_B > consumerB.log 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026/05/04 23:5...it press CTRL+C:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026/05/04 23:55:27 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127603161200, queue=queue_B, 
+timestamp=2026-05-04T23:55:27.8708456+05:30
+2026/05/04 23:55:27 Processing task task-1777919127603161200 (duration 1s)...
+2026/05/04 23:55:28 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127603161200, queue=queue_B, 
+timestamp=2026-05-04T23:55:28.8714672+05:30
+2026/05/04 23:55:28 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127683208000, queue=queue_B, 
+timestamp=2026-05-04T23:55:28.9310236+05:30
+2026/05/04 23:55:28 Processing task task-1777919127683208000 (duration 3s)...
+2026/05/04 23:55:31 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127683208000, queue=queue_B, 
+timestamp=2026-05-04T23:55:31.9317189+05:30
+2026/05/04 23:55:32 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127784336000, queue=queue_B, 
+timestamp=2026-05-04T23:55:32.0050166+05:30
+2026/05/04 23:55:32 Processing task task-1777919127784336000 (duration 1s)...
+2026/05/04 23:55:33 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127784336000, queue=queue_B, 
+timestamp=2026-05-04T23:55:33.0055302+05:30
+2026/05/04 23:55:33 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919127984202000, queue=queue_B, 
+timestamp=2026-05-04T23:55:33.0115543+05:30
+2026/05/04 23:55:33 Processing task task-1777919127984202000 (duration 2s)...
+2026/05/04 23:55:35 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919127984202000, queue=queue_B, 
+timestamp=2026-05-04T23:55:35.0123745+05:30
+2026/05/04 23:55:35 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128085202800, queue=queue_B, 
+timestamp=2026-05-04T23:55:35.0277038+05:30
+2026/05/04 23:55:35 Processing task task-1777919128085202800 (duration 2s)...
+2026/05/04 23:55:37 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128085202800, queue=queue_B, 
+timestamp=2026-05-04T23:55:37.0277164+05:30
+2026/05/04 23:55:37 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128386423300, queue=queue_B, 
+timestamp=2026-05-04T23:55:37.0402042+05:30
+2026/05/04 23:55:37 Processing task task-1777919128386423300 (duration 2s)...
+2026/05/04 23:55:39 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128386423300, queue=queue_B, 
+timestamp=2026-05-04T23:55:39.0409403+05:30
+2026/05/04 23:55:39 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128486746200, queue=queue_B, 
+timestamp=2026-05-04T23:55:39.0722838+05:30
+2026/05/04 23:55:39 Processing task task-1777919128486746200 (duration 3s)...
+2026/05/04 23:55:42 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128486746200, queue=queue_B, 
+timestamp=2026-05-04T23:55:42.0724498+05:30
+2026/05/04 23:55:42 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128586915500, queue=queue_B, 
+timestamp=2026-05-04T23:55:42.1694559+05:30
+2026/05/04 23:55:42 Processing task task-1777919128586915500 (duration 2s)...
+2026/05/04 23:55:44 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128586915500, queue=queue_B, 
+timestamp=2026-05-04T23:55:44.1696001+05:30
+2026/05/04 23:55:44 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128687826400, queue=queue_B, 
+timestamp=2026-05-04T23:55:44.1746061+05:30
+2026/05/04 23:55:44 Processing task task-1777919128687826400 (duration 2s)...
+2026/05/04 23:55:46 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128687826400, queue=queue_B, 
+timestamp=2026-05-04T23:55:46.1747047+05:30
+2026/05/04 23:55:46 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128787467100, queue=queue_B, 
+timestamp=2026-05-04T23:55:46.1817045+05:30
+2026/05/04 23:55:46 Processing task task-1777919128787467100 (duration 2s)...
+2026/05/04 23:55:48 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128787467100, queue=queue_B, 
+timestamp=2026-05-04T23:55:48.1822391+05:30
+2026/05/04 23:55:48 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919128887983900, queue=queue_B, 
+timestamp=2026-05-04T23:55:48.1873856+05:30
+2026/05/04 23:55:48 Processing task task-1777919128887983900 (duration 1s)...
+2026/05/04 23:55:49 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919128887983900, queue=queue_B, 
+timestamp=2026-05-04T23:55:49.1879253+05:30
+2026/05/04 23:55:49 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129089226300, queue=queue_B, 
+timestamp=2026-05-04T23:55:49.1931603+05:30
+2026/05/04 23:55:49 Processing task task-1777919129089226300 (duration 2s)...
+2026/05/04 23:55:51 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129089226300, queue=queue_B, 
+timestamp=2026-05-04T23:55:51.193465+05:30
+2026/05/04 23:55:51 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129189353800, queue=queue_B, 
+timestamp=2026-05-04T23:55:51.2012549+05:30
+2026/05/04 23:55:51 Processing task task-1777919129189353800 (duration 3s)...
+2026/05/04 23:55:54 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129189353800, queue=queue_B, 
+timestamp=2026-05-04T23:55:54.2015062+05:30
+2026/05/04 23:55:54 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129290004300, queue=queue_B, 
+timestamp=2026-05-04T23:55:54.2089412+05:30
+2026/05/04 23:55:54 Processing task task-1777919129290004300 (duration 1s)...
+2026/05/04 23:55:55 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129290004300, queue=queue_B, 
+timestamp=2026-05-04T23:55:55.209324+05:30
+2026/05/04 23:55:55 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129491587800, queue=queue_B, 
+timestamp=2026-05-04T23:55:55.2165079+05:30
+2026/05/04 23:55:55 Processing task task-1777919129491587800 (duration 3s)...
+2026/05/04 23:55:58 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129491587800, queue=queue_B, 
+timestamp=2026-05-04T23:55:58.2173295+05:30
+2026/05/04 23:55:58 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129592908700, queue=queue_B, 
+timestamp=2026-05-04T23:55:58.2236521+05:30
+2026/05/04 23:55:58 Processing task task-1777919129592908700 (duration 2s)...
+2026/05/04 23:56:00 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129592908700, queue=queue_B, 
+timestamp=2026-05-04T23:56:00.2271834+05:30
+2026/05/04 23:56:00 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129894597400, queue=queue_B, 
+timestamp=2026-05-04T23:56:00.2340693+05:30
+2026/05/04 23:56:00 Processing task task-1777919129894597400 (duration 1s)...
+2026/05/04 23:56:01 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129894597400, queue=queue_B, 
+timestamp=2026-05-04T23:56:01.2350355+05:30
+2026/05/04 23:56:01 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919129995895800, queue=queue_B, 
+timestamp=2026-05-04T23:56:01.2436035+05:30
+2026/05/04 23:56:01 Processing task task-1777919129995895800 (duration 2s)...
+2026/05/04 23:56:03 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919129995895800, queue=queue_B, 
+timestamp=2026-05-04T23:56:03.2454181+05:30
+2026/05/04 23:56:03 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130196038800, queue=queue_B, 
+timestamp=2026-05-04T23:56:03.2517412+05:30
+2026/05/04 23:56:03 Processing task task-1777919130196038800 (duration 2s)...
+2026/05/04 23:56:05 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130196038800, queue=queue_B, 
+timestamp=2026-05-04T23:56:05.2547742+05:30
+2026/05/04 23:56:05 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130296267300, queue=queue_B, 
+timestamp=2026-05-04T23:56:05.2733236+05:30
+2026/05/04 23:56:05 Processing task task-1777919130296267300 (duration 2s)...
+2026/05/04 23:56:07 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130296267300, queue=queue_B, 
+timestamp=2026-05-04T23:56:07.2783761+05:30
+2026/05/04 23:56:07 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130396643800, queue=queue_B, 
+timestamp=2026-05-04T23:56:07.3309814+05:30
+2026/05/04 23:56:07 Processing task task-1777919130396643800 (duration 3s)...
+2026/05/04 23:56:10 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130396643800, queue=queue_B, 
+timestamp=2026-05-04T23:56:10.3316094+05:30
+2026/05/04 23:56:10 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130698950800, queue=queue_B, 
+timestamp=2026-05-04T23:56:10.3397322+05:30
+2026/05/04 23:56:10 Processing task task-1777919130698950800 (duration 3s)...
+2026/05/04 23:56:13 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130698950800, queue=queue_B, 
+timestamp=2026-05-04T23:56:13.3406393+05:30
+2026/05/04 23:56:13 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130798420500, queue=queue_B, 
+timestamp=2026-05-04T23:56:13.3712241+05:30
+2026/05/04 23:56:13 Processing task task-1777919130798420500 (duration 1s)...
+2026/05/04 23:56:14 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130798420500, queue=queue_B, 
+timestamp=2026-05-04T23:56:14.3724946+05:30
+2026/05/04 23:56:14 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919130999591900, queue=queue_B, 
+timestamp=2026-05-04T23:56:14.3854951+05:30
+2026/05/04 23:56:14 Processing task task-1777919130999591900 (duration 2s)...
+2026/05/04 23:56:16 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919130999591900, queue=queue_B, 
+timestamp=2026-05-04T23:56:16.3856252+05:30
+2026/05/04 23:56:16 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131100519100, queue=queue_B, 
+timestamp=2026-05-04T23:56:16.400495+05:30
+2026/05/04 23:56:16 Processing task task-1777919131100519100 (duration 1s)...
+2026/05/04 23:56:17 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131100519100, queue=queue_B, 
+timestamp=2026-05-04T23:56:17.4013924+05:30
+2026/05/04 23:56:17 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131301876400, queue=queue_B, 
+timestamp=2026-05-04T23:56:17.4095082+05:30
+2026/05/04 23:56:17 Processing task task-1777919131301876400 (duration 3s)...
+2026/05/04 23:56:20 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131301876400, queue=queue_B, 
+timestamp=2026-05-04T23:56:20.4103801+05:30
+2026/05/04 23:56:20 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131401926600, queue=queue_B, 
+timestamp=2026-05-04T23:56:20.4282312+05:30
+2026/05/04 23:56:20 Processing task task-1777919131401926600 (duration 3s)...
+2026/05/04 23:56:23 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131401926600, queue=queue_B, 
+timestamp=2026-05-04T23:56:23.4284869+05:30
+2026/05/04 23:56:23 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131603037800, queue=queue_B, 
+timestamp=2026-05-04T23:56:23.5486877+05:30
+2026/05/04 23:56:23 Processing task task-1777919131603037800 (duration 1s)...
+2026/05/04 23:56:24 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131603037800, queue=queue_B, 
+timestamp=2026-05-04T23:56:24.5489892+05:30
+2026/05/04 23:56:24 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131704512200, queue=queue_B, 
+timestamp=2026-05-04T23:56:24.556112+05:30
+2026/05/04 23:56:24 Processing task task-1777919131704512200 (duration 2s)...
+2026/05/04 23:56:26 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131704512200, queue=queue_B, 
+timestamp=2026-05-04T23:56:26.5576086+05:30
+2026/05/04 23:56:26 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131804258800, queue=queue_B, 
+timestamp=2026-05-04T23:56:26.6476766+05:30
+2026/05/04 23:56:26 Processing task task-1777919131804258800 (duration 3s)...
+2026/05/04 23:56:29 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131804258800, queue=queue_B, 
+timestamp=2026-05-04T23:56:29.6481194+05:30
+2026/05/04 23:56:29 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919131905181700, queue=queue_B, 
+timestamp=2026-05-04T23:56:29.7489925+05:30
+2026/05/04 23:56:29 Processing task task-1777919131905181700 (duration 1s)...
+2026/05/04 23:56:30 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919131905181700, queue=queue_B, 
+timestamp=2026-05-04T23:56:30.7492783+05:30
+2026/05/04 23:56:30 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132005016600, queue=queue_B, 
+timestamp=2026-05-04T23:56:30.7592013+05:30
+2026/05/04 23:56:30 Processing task task-1777919132005016600 (duration 1s)...
+2026/05/04 23:56:31 [METRIC] CONSUMER_COMPLETE: task_id=task-1777919132005016600, queue=queue_B, 
+timestamp=2026-05-04T23:56:31.7596635+05:30
+2026/05/04 23:56:31 [METRIC] CONSUMER_RECEIVE: task_id=task-1777919132205242900, queue=queue_B, 
+timestamp=2026-05-04T23:56:31.7732448+05:30
+2026/05/04 23:56:31 Processing task task-1777919132205242900 (duration 3s)...

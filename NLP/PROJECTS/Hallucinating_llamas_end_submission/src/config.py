@@ -18,7 +18,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent   # repo root
 # Preferred processed-data location in this workspace.
 # This is checked first so downstream stages (faiss/index/query) use it by default.
 WORKSPACE_PROCESSED_DIR = Path(
-    "/home/shravanikalmali/Desktop/inlp_final/drive-download-20260408T131838Z-3-001"
+    "/home/user/Desktop/inlp_final/drive-download-20260408T131838Z-3-001"
 )
 
 DATA_DIR_CANDIDATES = [

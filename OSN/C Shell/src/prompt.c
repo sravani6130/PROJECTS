@@ -76,7 +76,7 @@ void format_display_path(const char *cwd, const char *home, char *out, size_t ou
 
     /*
      * Inside home: cwd must start with home AND the next character must be '/'.
-     * The '/' check stops "/home/rudy2" from being treated as inside "/home/rudy".
+     * The '/' check stops "/home/user2" from being treated as inside "/home/user".
      */
     if (strncmp(cwd, home, home_len) == 0 && cwd[home_len] == '/') {
         snprintf(out, out_size, "~%s", cwd + home_len);

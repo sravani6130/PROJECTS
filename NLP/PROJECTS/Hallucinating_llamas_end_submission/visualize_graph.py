@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 def generate_mermaid():
-    path = "/home/shravanikalmali/Desktop/inlp_final/drive-download-20260408T131838Z-3-001/c8e25c068b7c8a00ba00096e73ce7ea893c69aba/graph.graphml"
+    path = "/home/user/Desktop/inlp_final/drive-download-20260408T131838Z-3-001/c8e25c068b7c8a00ba00096e73ce7ea893c69aba/graph.graphml"
     G = nx.read_graphml(path)
     
     # Top 15 nodes by degree

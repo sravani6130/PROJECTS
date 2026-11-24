@@ -11,18 +11,18 @@ _wandb:
                     /:
                         total: "916962930688"
                         used: "268430462976"
-                email: ritama.sanyal@research.iiit.ac.in
-                executable: c:\Users\Ritama\anaconda3\python.exe
+                email: user@example.com
+                executable: c:\Users\user\anaconda3\python.exe
                 git:
                     commit: 153172a0bca9109e6e887845f8d3cfd2cfe6d864
                     remote: https://github.com/SMAI-M25/assignment-3-LittleJoeHarp.git
-                host: RITAMA
+                host: user
                 memory:
                     total: "14743887872"
                 os: Windows-10-10.0.26200-SP0
-                program: c:\Users\Ritama\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp\1.ipynb
+                program: c:\Users\user\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp\1.ipynb
                 python: CPython 3.11.7
-                root: c:\Users\Ritama\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp
+                root: c:\Users\user\OneDrive - International Institute of Information Technology\Documents\IIITH 3_1\SMAI\assignment-3-LittleJoeHarp
                 startedAt: "2025-10-13T13:25:36.835573Z"
                 writerId: crbu0byxbixqkwjqb5mjl6nmbn4x17z6
         m: []
