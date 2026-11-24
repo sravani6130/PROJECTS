@@ -1,0 +1,3622 @@
+diff --git a/Makefile b/Makefile
+index a26f3db..494f493 100644
+--- a/Makefile
++++ b/Makefile
+@@ -25,6 +25,7 @@ OBJS = \
+   $K/file.o \
+   $K/pipe.o \
+   $K/exec.o \
++  $K/paging.o \
+   $K/sysfile.o \
+   $K/kernelvec.o \
+   $K/plic.o \
+@@ -79,6 +80,36 @@ CFLAGS += -fno-builtin-free
+ CFLAGS += -fno-builtin-memcpy -Wno-main
+ CFLAGS += -fno-builtin-printf -fno-builtin-fprintf -fno-builtin-vprintf
+ CFLAGS += -I.
++
++# Scheduling policy: make qemu SCHEDULER=FCFS | CFS   (default: round robin)
++# Run "make clean" when switching, so every file is rebuilt with the new flag.
++SCHEDULER ?= RR
++ifeq ($(filter $(SCHEDULER),RR FCFS CFS MLFQ),)
++$(error SCHEDULER must be one of RR, FCFS, CFS, MLFQ (got '$(SCHEDULER)'))
++endif
++CFLAGS += -D$(SCHEDULER)
++# CFS decision log ([Scheduler Tick] ...). On by default; CFSLOG=0 turns it off.
++CFSLOG ?= 1
++ifeq ($(SCHEDULER)$(CFSLOG),CFS1)
++CFLAGS += -DCFS_LOG
++endif
++# MLFQ event log (demotions, preemptions, boosts). Off by default; MLFQLOG=1 turns it on.
++MLFQLOG ?= 0
++ifeq ($(SCHEDULER)$(MLFQLOG),MLFQ1)
++CFLAGS += -DMLFQ_LOG
++endif
++# Physical memory used by the kernel, in MB (default 128 = all of QEMU's RAM).
++# A small value (e.g. PHYSMEM=4) makes memory fill up quickly for testing.
++PHYSMEM ?= 128
++CFLAGS += -DPHYSMEM_MB=$(PHYSMEM)
++# Page replacement policy: make qemu PAGEREPL=FIFO (default) | CLEANFIFO (bonus)
++PAGEREPL ?= FIFO
++ifeq ($(filter $(PAGEREPL),FIFO CLEANFIFO),)
++$(error PAGEREPL must be FIFO or CLEANFIFO (got '$(PAGEREPL)'))
++endif
++ifeq ($(PAGEREPL),CLEANFIFO)
++CFLAGS += -DCLEANFIFO
++endif
+ CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
+ 
+ # Disable PIE when possible (for Ubuntu 16.10 toolchain)
+@@ -147,10 +178,17 @@ UPROGS=\
+ 	$U/_grind\
+ 	$U/_wc\
+ 	$U/_zombie\
++	$U/_readcount\
++	$U/_fcfstest\
++	$U/_cfstest\
++	$U/_schedulertest\
++	$U/_mlfqtest\
+ 	$U/_logstress\
+ 	$U/_forphan\
+ 	$U/_dorphan\
+ 	$U/_sync\
++	$U/_lazytest\
++	$U/_swaptest\
+ 
+ fs.img: mkfs/mkfs README $(UPROGS)
+ 	mkfs/mkfs fs.img README $(UPROGS)
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..eb00f22
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,418 @@
++# xv6: demand paging + swap (Mini Project 2, Part A) and schedulers (Mini Project 1)
++
++## Mini Project 2, Part A: PagedOut Inc.
++
++Demand paging, FIFO page replacement and per-process swap files for xv6-riscv. This is built on the
++Mini Project 1 kernel below, so the schedulers still work. The two features are independent.
++
++| Feature | Status |
++|---|---|
++| Demand paging: lazy `exec`, lazy `sbrk`, LOADEXEC / ALLOC on fault, invalid access kills | Done |
++| Page replacement: per-process resident set, FIFO by sequence number, own pages only | Done |
++| Swapping: `/pgswpXXXXX` per process, clean→DISCARD, dirty→SWAPOUT, SWAPIN, SWAPFULL, SWAPCLEANUP | Done |
++| `memstat()` system call | Done |
++| Bonus: alternative replacement policy (`PAGEREPL=CLEANFIFO`) | Done |
++
++### Building and running
++
++```bash
++make clean; make qemu                          # default: 128 MB, FIFO
++make clean; make qemu PHYSMEM=4 CPUS=1         # 4 MB of RAM: memory fills up fast (for testing)
++make clean; make qemu PAGEREPL=CLEANFIFO       # bonus replacement policy
++```
++
++| Option | Values | Default | Effect |
++|---|---|---|---|
++| `PHYSMEM` | MB | `128` | RAM the kernel uses (`PHYSTOP`). Small values make replacement easy to test. |
++| `PAGEREPL` | `FIFO`, `CLEANFIFO` | `FIFO` | Page replacement policy. |
++
++The scheduler options (`SCHEDULER=...`) work as before.
++
++Test programs:
++
++```
++$ lazytest            # lazy sbrk, ALLOC, dirty bits, memstat, 3 invalid accesses (killed children)
++$ swaptest 1200 1     # with PHYSMEM=4: FIFO eviction, SWAPOUT/SWAPIN, all 1200 pages verified
++$ swaptest 700 3      # 3 processes at once, each evicting only its own pages
++$ swaptest 2500 1     # more than memory + 1024 slots: SWAPFULL, KILL swap-exhausted
++```
++
++### Design
++
++**Address space.** It keeps the xv6 layout: `[text][data] [guard page] [stack] [heap → sz]`.
++`exec()` records the ELF loadable segments, keeps a reference to the executable's inode, and maps **nothing**.
++`stack_top` is the top of the one-page user stack. The heap starts there, so `heap_start = stack_top`.
++`sbrk(n)` only changes `p->sz`. `sbrk(-n)` frees the removed pages and their swap slots.
++
++**Page faults** (`vm_fault()` in `kernel/paging.c`) come from `usertrap()` (scause 12/13/15 → exec/read/write).
++They also come from `copyin()`/`copyout()` when the kernel touches a non-resident user page.
++The handler classifies the page in this order:
++
++1. PTE marked swapped → `cause=swap` → read from the swap file → `SWAPIN`.
++2. Inside an ELF segment → `cause=exec` → read the file part and zero the rest (bss) → `LOADEXEC`.
++3. Inside the stack page and within one page below `sp` → `cause=stack` → zero-fill → `ALLOC`.
++4. Between `stack_top` and `sz` → `cause=heap` → zero-fill → `ALLOC`.
++5. Anything else is `KILL invalid-access`. That covers beyond `sz`, the guard page, kernel addresses,
++   a write to text, and executing heap or stack.
++
++A user process with an invalid access is killed. For the same bad pointer passed to a system call,
++the call returns -1 as in stock xv6.
++
++**Dirty bits** are tracked in software. Writable pages are mapped without `PTE_W`; a software bit `PTE_SWW`
++marks them as writable. The first write traps, and the kernel sets `PTE_W` and marks the page dirty. No log
++line is printed, because the page is already resident. A write fault on a new page maps it dirty at once.
++
++**Frame table.** `frames[]` has one entry per physical frame: owner process, va, FIFO `seq`, dirty, and
++"backed" (whether the page can be rebuilt from the executable or as zeros). A process's resident set is the
++frames it owns. `kfree()` clears the entry, so frames freed anywhere leave the set.
++
++**Replacement** happens only when `kalloc()` returns 0 inside a fault (`getframe()`/`walk_alloc()`).
++The faulting process evicts **its own** page with the lowest sequence number.
++Each process has a `next_seq` counter that wraps at 2^31. Victims are compared by
++`(next_seq - seq) mod 2^31` (age), so wraparound does not break FIFO order.
++
++**Eviction.**
++- A clean page that is backed is dropped (`DISCARD`). The next fault rebuilds it with LOADEXEC (text/data) or ALLOC (zero heap/stack).
++- A dirty page, or one with no other copy, is written to swap (`SWAPOUT`). Example: a page swapped in earlier, whose slot was then freed.
++- The swapped PTE keeps `PTE_V=0`, `PTE_SWAP=1`, the slot number in the PPN field, and the original permissions.
++
++**Swap file.**
++- `/pgswpXXXXX` (5-digit PID) in the root directory, made of ordinary file blocks.
++- It is created in `exec()` (emptied if the process already had one) and by `fork()` for the child.
++- It is deleted in `exit()`, which prints `SWAPCLEANUP freed_slots=K` with the slots still in use.
++- A 1024-bit bitmap tracks free slots. Each slot is 4096 bytes at offset `slot*4096`, allocated lowest-free first. A slot is freed on SWAPIN.
++- If no slot is free when a dirty page must be evicted, the kernel prints `SWAPFULL`, then `KILL swap-exhausted`, and kills the process.
++
++**fork()** (not specified by the project). The child gets its own swap file. Resident pages are copied
++with their sequence numbers, or written to the child's swap if memory is full. Swapped pages are copied
++slot to slot. The child inherits the parent's executable reference.
++
++**File system changes needed for 4 MB swap files.**
++- Stock xv6 files are at most 268 KB, so the inode now has 11 direct blocks, 1 indirect and 1 doubly-indirect block.
++  Only 16 entries of the doubly-indirect block are used, so `MAXFILE` is 4363 blocks (≈4.3 MB): enough for a full swap file (4096 blocks), small enough for usertests' `writebig`.
++- `FSSIZE` is 40000 blocks (40 MB) so several swap files fit.
++- Each swap write uses two half-page log transactions, to stay under `MAXOPBLOCKS`.
++
++**Locking.** Loading a page may sleep for disk I/O. The fault path therefore turns interrupts on, as for system calls.
++Some `copyin`/`copyout` calls run with a spinlock held (pipes, console, `wait`). For these,
++`read()`, `write()`, `wait()` and `waitx()` fault the user buffer in first (`vm_prefault()`).
++If a copy still needs I/O with a spinlock held, it fails instead of sleeping.
++
++### Log lines
++
++Printed with `printk` exactly in the required formats. Addresses are page-aligned lowercase hex.
++
++```
++[pid X] INIT-LAZYMAP text=[0xA,0xB) data=[0xC,0xD) heap_start=0xE stack_top=0xF
++[pid X] PAGEFAULT va=0xV access=<read|write|exec> cause=<heap|stack|exec|swap>
++[pid X] ALLOC va=0xV | LOADEXEC va=0xV | SWAPIN va=0xV slot=N
++[pid X] RESIDENT va=0xV seq=S
++[pid X] MEMFULL
++[pid X] VICTIM va=0xV seq=S algo=FIFO
++[pid X] EVICT  va=0xV state=<clean|dirty>        (two spaces, as in the spec)
++[pid X] DISCARD va=0xV | SWAPOUT va=0xV slot=N
++[pid X] KILL invalid-access va=0xV access=<...>
++[pid X] SWAPFULL / [pid X] KILL swap-exhausted
++[pid X] SWAPCLEANUP freed_slots=K
++```
++
++Orderings follow the spec, e.g. `PAGEFAULT → MEMFULL → VICTIM → EVICT → SWAPOUT → ALLOC → RESIDENT`.
++`exec` copies the arguments onto the new stack, so a process's first fault after `INIT-LAZYMAP`
++is its stack page, followed by the faults on text and data.
++
++### `memstat()`
++
++```c
++#include "kernel/memstat.h"
++int memstat(struct proc_mem_stat *info);   // 0 on success, -1 on a bad pointer
++```
++
++- It reports every page in `[0, sz)`: `num_pages_total`, resident and swapped counts, `next_fifo_seq`.
++- It lists the lowest 128 pages in `pages[]`. Unused entries are zeroed.
++- Unmapped pages have `seq=-1`, `swap_slot=-1`.
++- A swapped page's `is_dirty` says whether it was dirty when evicted.
++
++### Bonus: `CLEANFIFO` replacement (`make PAGEREPL=CLEANFIFO`)
++
++**Algorithm.** Among the faulting process's resident pages, evict the **oldest clean, backed page**
++(lowest seq among pages that can be discarded without disk I/O), but only one in the **older half** of the FIFO queue.
++That means its age is at least half the age of the oldest page. If there is no such page, evict the oldest page (plain FIFO).
++The log reads `VICTIM va=... seq=S algo=CLEANFIFO`.
++
++**Rationale.**
++- Under FIFO, every dirty victim costs a disk write, and anonymous pages always need a swap slot.
++- CLEANFIFO first drops pages that are free to drop: text pages and untouched zero pages. That saves disk writes and keeps swap slots for data that needs them.
++- Within each class it is still FIFO, so it is simple and predictable.
++- Why "older half": without that rule, a program whose only clean page is its text page thrashed.
++  Every swap-in evicted the text page, and the next instruction fetch reloaded it at once.
++  With `swaptest 1200` at 4 MB, that run did not finish in 500 s.
++  With the rule, a page that was just reloaded is young and safe, and the same run takes about a minute with 15 LOADEXECs.
++- Trade-off: hot text pages can still be dropped once they reach the older half, so a program that cycles through
++  a large clean working set can take more LOADEXEC faults than under FIFO.
++- It also cannot tell hot pages from cold ones (no reference bits), like FIFO.
++
++**Implementation.**
++- `pick_victim()` makes two passes over the frame table, using the same wraparound-safe age.
++- The first pass finds the process's oldest frame. The second finds the oldest frame with `dirty==0 && backed==1` and age ≥ half of that.
++- It returns the clean one if one exists.
++- Everything else is shared with FIFO: only the faulting process's frames are scanned, clean pages are discarded, dirty pages are swapped, and swap-full handling is unchanged.
++- Edge cases:
++  - A page swapped back in is clean but not backed, so CLEANFIFO does not treat it as free to drop.
++  - Forked children inherit the parent's dirty and backed flags.
++
++### Files changed for Part A
++
++| File | Changes |
++|---|---|
++| `kernel/paging.c` (new) | Frame table, fault handler, FIFO/CLEANFIFO eviction, swap file create/delete/read/write, `vm_exec`, `vm_fork`, `vm_free`, `vm_shrink`, `vm_prefault`, `vm_memstat`. |
++| `kernel/memstat.h` (new) | `struct page_stat`, `struct proc_mem_stat`. |
++| `kernel/exec.c` | Lazy exec: records segments, maps nothing, keeps the inode; arguments copied after commit. |
++| `kernel/trap.c` | Page faults go to `vm_fault()`. |
++| `kernel/vm.c` | `vmfault()` → `vm_fault()`; `copyout()` handles clean writable pages. |
++| `kernel/proc.c`, `proc.h` | Paging fields in `struct proc`; lazy `growproc()`; `kfork()` uses `vm_fork()`; `kexit()` calls `vm_free()`. |
++| `kernel/kalloc.c` | `kfree()` clears the frame-table entry. |
++| `kernel/sysproc.c`, `sysfile.c` | Lazy `sbrk`; `sys_memstat`; prefaulting in `read`/`write`/`wait`/`waitx`. |
++| `kernel/fs.c`, `fs.h`, `file.h`, `param.h` | Doubly-indirect blocks; `FSSIZE` 40000. |
++| `kernel/riscv.h`, `memlayout.h`, `defs.h` | `PTE_SWW`, `PTE_SWAP`; `PHYSMEM_MB`; prototypes. |
++| `kernel/syscall.[ch]`, `user/user.h`, `user/usys.pl` | Syscall 26 `memstat`. |
++| `user/lazytest.c`, `user/swaptest.c` (new), `Makefile` | Tests; `PHYSMEM` and `PAGEREPL` options. |
++
++### Assumptions
++
++- The INIT-LAZYMAP ranges are page-rounded segment bounds. `heap_start` equals `stack_top` because the heap starts right above the stack.
++- The `cause` for an invalid address is the region it falls in: `heap` above `stack_top`, `stack` for the stack and guard page, `exec` below.
++- The `MEMFULL` line is printed before each eviction.
++- If a process has nothing of its own to evict, it is killed without a special log line. No format exists for that case.
++- Forked children get their own swap file (the spec only mentions exec).
++- `sbrk()` is always lazy, as the spec requires. Stock `usertests` assumes an eager `sbrk()`: its `countfree()` grows the heap until `sbrk` fails, which never happens with a lazy `sbrk`.
++  So `usertests` can only be run with `sbrk` temporarily made eager again.
++
++---
++
++# Mini Project 1: `getreadcount` syscall and FCFS / CFS / MLFQ schedulers
++
++Changes to xv6-riscv for Mini Project 1 (CS3301 Operating Systems and Networks):
++
++| Part | Feature | Status |
++|---|---|---|
++| A | `getreadcount()` system call + `readcount` user program | Done |
++| B | FCFS scheduler (non-preemptive) | Done |
++| B | CFS scheduler: nice/weight, vruntime, lowest-vruntime selection, time slices, logging | Done |
++| Report | RR vs FCFS vs CFS (vs MLFQ) comparison, using `waitx` + `schedulertest` | Done, see [report.md](report.md) |
++| Bonus | Preemptive MLFQ (4 queues, demotion, priority boost) | Done |
++
++The original xv6 README is kept unchanged in [README](README).
++
++---
++
++## Requirements
++
++Ubuntu 24.04 (or similar):
++
++```bash
++sudo apt install build-essential gcc-riscv64-linux-gnu binutils-riscv64-linux-gnu qemu-system-misc
++```
++
++---
++
++## Building and running
++
++The scheduler is chosen **at compile time** with `SCHEDULER`. Round Robin is the default.
++Run `make clean` every time you switch, so that every file is rebuilt with the new setting.
++
++```bash
++make clean; make qemu                        # Round Robin (default xv6 scheduler)
++make clean; make qemu SCHEDULER=FCFS         # First Come First Serve
++make clean; make qemu SCHEDULER=CFS          # Completely Fair Scheduler (vruntime log ON)
++make clean; make qemu SCHEDULER=MLFQ         # Multi-Level Feedback Queue (bonus)
++```
++
++| Option | Values | Default | Effect |
++|---|---|---|---|
++| `SCHEDULER` | `RR`, `FCFS`, `CFS`, `MLFQ` | `RR` | Selects the scheduling policy. Any other value stops the build with an error. |
++| `CFSLOG` | `1`, `0` | `1` | CFS only: prints the `[Scheduler Tick]` vruntime log before every decision. |
++| `MLFQLOG` | `0`, `1` | `0` | MLFQ only: prints queue events (demotions, preemptions, boosts). |
++| `CPUS` | number | `3` | Number of CPUs. Use `CPUS=1` to compare schedulers. |
++
++Examples:
++
++```bash
++make clean; make qemu CPUS=1 SCHEDULER=CFS CFSLOG=0     # CFS without the log
++make clean; make qemu CPUS=1 SCHEDULER=MLFQ MLFQLOG=1   # MLFQ with the event log
++```
++
++Exit QEMU with `Ctrl-A` then `X`. Press `Ctrl-P` inside xv6 for a process listing, which shows
++the new scheduling fields (`ctime rtime nice vruntime slice q`).
++
++---
++
++## Part A: `getreadcount`
++
++```c
++int getreadcount(void);   // total bytes returned by read() across all processes since boot
++```
++
++- A global counter in `kernel/sysfile.c` is increased inside `sys_read()` by the number of bytes
++  `fileread()` actually returned (errors and EOF add nothing).
++- The increase is atomic (`__sync_fetch_and_add`), so reads on several CPUs at once are all counted.
++- The counter is a 32-bit `uint`, so it wraps back to 0 on overflow.
++
++**User program:** `readcount [file]` (the default file is `README`)
++
++```
++$ readcount
++Initial read count: 10
++Read 100 bytes from README
++Read count after read: 110
++Increase: 100 bytes
++OK: read count increased by 100 as expected
++```
++
++The starting value is not 0, because the counter also includes the reads made while booting
++(`init`, `sh`).
++
++---
++
++## Part B: Schedulers
++
++All policies share one structure:
++- `scheduler()` in `kernel/proc.c` has one `#if` branch per policy. The original Round Robin code
++  is kept, unchanged, as the `#else` branch.
++- Both timer-interrupt paths in `kernel/trap.c` call `sched_tick()`. It does the per-tick
++  accounting and decides whether the running process must give up the CPU.
++
++| Policy | Next process to run | When the running process is preempted |
++|---|---|---|
++| RR | Next RUNNABLE entry in the process table | Every tick |
++| FCFS | Earliest creation time (`ctime`), ties → lower pid | Never (runs until it exits or blocks) |
++| CFS | Lowest `vruntime`, ties → lower pid | When its time slice `max(48 / N, 3)` ticks is used up |
++| MLFQ | Highest non-empty queue, then first to join that queue | At the end of its slice (1/4/8/16 ticks), or when a higher-queue process is waiting |
++
++### FCFS
++- `allocproc()` records `ctime = ticks` for every new process.
++- The scheduler runs the RUNNABLE process with the smallest `ctime`.
++- Under FCFS, `sched_tick()` never asks for preemption.
++
++### CFS
++- **Priority:** `nice` ranges from −20 to 19, defaults to 0 and is inherited on `fork`. The weight
++  is `1024 / 1.25^nice`, read from a 40-entry table: nice −20 = 88761, 0 = 1024, 19 = 15.
++- **vruntime:** starts at 0. Each tick the running process gains `1000 × 1024 / weight`, so
++  vruntime is measured in thousandths of a nice-0 tick. The ×1000 keeps the per-tick increase
++  above 0 even for heavy weights.
++- **Selection:** the RUNNABLE process with the lowest vruntime.
++- **Time slice:** `48 / N` ticks, where N is the number of RUNNABLE processes, but at least 3.
++- **Log format** (with `CFSLOG=1`):
++  ```
++  [Scheduler Tick]
++  PID: 4 | vRuntime: 148944
++  PID: 5 | vRuntime: 16000
++  PID: 6 | vRuntime: 1712
++  --> Scheduling PID 6 (lowest vRuntime)
++  ```
++
++### MLFQ (bonus)
++- 4 queues with time slices of 1, 4, 8 and 16 ticks. New processes join the end of queue 0.
++- A process that uses its full slice moves to the end of the next lower queue. In queue 3 it stays
++  in queue 3, so queue 3 works as round robin.
++- A process that blocks (I/O, sleep) before its slice ends joins the end of the same queue when it
++  wakes up.
++- A RUNNABLE process in a higher queue preempts the running process at the next tick. The
++  preempted process keeps the ticks it has already used, so it cannot dodge demotion.
++- Every 48 ticks, every process moves back to queue 0 (starvation prevention).
++
++Implementation details and design choices are explained in [report.md](report.md).
++
++---
++
++## New system calls
++
++| # | Call | Purpose |
++|---|---|---|
++| 23 | `int getreadcount(void)` | Part A: total bytes read since boot. |
++| 24 | `int setnice(int pid, int nice)` | Sets a process's CFS priority (−20..19). Returns 0, or −1 if the value is out of range or the pid doesn't exist. |
++| 25 | `int waitx(int *status, int *wtime, int *rtime)` | Like `wait()`, but also returns the child's running time and waiting time in ticks (`wtime = exit − creation − running`). Used by `schedulertest`. |
++
++---
++
++## User programs
++
++| Program | Purpose |
++|---|---|
++| `readcount [file]` | Part A test: shows the read counter increasing by the number of bytes read. |
++| `schedulertest` | Report benchmark: 5 I/O-bound and 5 CPU-bound children. Prints `Average rtime X,  wait time Y`. |
++| `fcfstest` | 3 CPU-bound children. Under FCFS they run strictly one after another. |
++| `cfstest` | 3 CPU-bound children with nice 10 / 0 / −10. Under CFS, nice −10 finishes first. |
++| `mlfqtest` | 2 CPU-bound + 1 I/O-bound child. With `MLFQLOG=1`, shows Q0→Q3 demotion, round robin in Q3, the I/O-bound child staying in Q0, and the boost every 48 ticks. |
++
++`user/ulib.c` also gets `sleep(n)`, a thin wrapper for this xv6's `pause(n)` (newer xv6 renamed
++`sleep`), so the standard `schedulertest` source compiles unchanged.
++
++---
++
++## Performance summary
++
++`schedulertest`, `CPUS=1`, logs off, average of 3 runs (ticks):
++
++| Scheduler | Avg running time | Avg waiting time |
++|---|---|---|
++| Round Robin | 9 | 137.7 |
++| FCFS | 9.7 | 119 |
++| CFS | 9.7 | 137.7 |
++| MLFQ | 9 | 136.7 |
++
++Full results and analysis are in [report.md](report.md).
++
++---
++
++## Files modified
++
++| File | Changes |
++|---|---|
++| `Makefile` | `SCHEDULER`, `CFSLOG` and `MLFQLOG` options; new user programs added to `UPROGS`. |
++| `kernel/proc.h` | New `struct proc` fields: `ctime`, `rtime`, `etime`, `nice`, `weight`, `vruntime`, `time_slice`, `slice_used`, `queue`, `qticks`, `qseq`; CFS/MLFQ constants. |
++| `kernel/proc.c` | Field initialisation in `allocproc()`; nice inherited in `kfork()`; `etime` set in `kexit()`; `make_runnable()` helper; nice→weight table and `setnice()`; `sched_tick()`; `kwaitx()`; MLFQ `mlfq_higher_waiting()` / `mlfq_boost()`; FCFS/CFS/MLFQ branches of `scheduler()`; extended `procdump()`. |
++| `kernel/trap.c` | Timer interrupts call `sched_tick()` to decide on `yield()`; MLFQ priority boost in `clockintr()`. |
++| `kernel/sysfile.c` | Read counter in `sys_read()`; `sys_getreadcount()`. |
++| `kernel/sysproc.c` | `sys_setnice()`, `sys_waitx()`. |
++| `kernel/syscall.h`, `kernel/syscall.c` | Syscall numbers 23–25 and their table entries. |
++| `kernel/defs.h` | Prototypes for the new kernel functions. |
++| `user/user.h`, `user/usys.pl` | User-side declarations and stubs for the new syscalls. |
++| `user/ulib.c` | `sleep()` wrapper. |
++| `user/readcount.c`, `schedulertest.c`, `fcfstest.c`, `cfstest.c`, `mlfqtest.c` | New user programs. |
++
++Generate the patch against stock xv6, including the new files:
++
++```bash
++git add -N user/*.c && git diff > xv6_modifications.patch
++```
++
++---
++
++## Assumptions and notes
++
++- **Ticks.** All times are in timer ticks (about 0.1 s each, one clock interrupt in `kernel/trap.c`).
++  Preemption happens only at tick boundaries.
++- **Waiting time.** Waiting time from `waitx` counts every tick the process existed but was not
++  running, including time spent sleeping.
++- **CFS run queue.** CFS finds the lowest-vruntime process by scanning the process table at each
++  decision (at most `NPROC = 64` entries). This always selects the same process as the head of a
++  vruntime-sorted queue would.
++- **New processes and vruntime.** As the spec requires, new processes start at vruntime 0.
++  Waking from sleep keeps vruntime, and a wake-up does not preempt the running slice.
++- **`schedulertest` source.** The course's `schedulertest` link requires an IIIT login, so
++  `user/schedulertest.c` is the standard version of the test (10 children: 5 × `sleep(200)`,
++  5 × busy loop, timed with `waitx`).
++- **Multiple CPUs.** Every policy runs on multiple CPUs, and each CPU makes its own scheduling
++  decisions. xv6's `usertests` pass under RR, CFS and MLFQ on 3 CPUs. Scheduler comparisons
++  should be run with `CPUS=1`.
++- **Logs.** The CFS log is meant to be read with `CPUS=1`. With several CPUs the lines from
++  different CPUs interleave.
++
++---
++
++## LLM usage
++
++Parts of this code and documentation were produced with the help of an LLM. As required by the
++course, LLM-generated code is marked with
++`############## LLM Generated Code Begins ##############` / `############## LLM Generated Code Ends ################`,
++and the prompts and responses are included as screenshots in `llm_completions/`.
+diff --git a/kernel/defs.h b/kernel/defs.h
+index 0ae6896..a279312 100644
+--- a/kernel/defs.h
++++ b/kernel/defs.h
+@@ -9,6 +9,7 @@ struct spinlock;
+ struct sleeplock;
+ struct stat;
+ struct superblock;
++struct vmseg;
+ 
+ // bio.c
+ void            binit(void);
+@@ -67,6 +68,22 @@ void            log_write(struct buf*);
+ void            begin_op(void);
+ void            end_op(void);
+ 
++// ############## LLM Generated Code Begins ##############
++// paging.c
++#define ACC_READ  0
++#define ACC_WRITE 1
++#define ACC_EXEC  2
++void            frameinit(void);
++void            frame_clear(uint64);
++uint64          vm_fault(struct proc*, uint64, int, int);
++void            vm_prefault(uint64, uint64, int);
++void            vm_exec(struct proc*, struct inode*, struct vmseg*, int, uint64, uint64);
++int             vm_fork(struct proc*, struct proc*);
++void            vm_free(struct proc*, int);
++void            vm_shrink(struct proc*, uint64, uint64);
++int             vm_memstat(uint64);
++// ############## LLM Generated Code Ends ################
++
+ // pipe.c
+ int             pipealloc(struct file**, struct file**);
+ void            pipeclose(struct pipe*, int);
+@@ -103,6 +120,11 @@ void            yield(void);
+ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
+ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
+ void            procdump(void);
++int             sched_tick(void);
++int             kwaitx(uint64, uint*, uint*);
++int             mlfq_higher_waiting(struct proc*, int);
++void            mlfq_boost(void);
++int             setnice(int, int);
+ 
+ // swtch.S
+ void            swtch(struct context*, struct context*);
+diff --git a/kernel/exec.c b/kernel/exec.c
+index 8c9673f..dffa15a 100644
+--- a/kernel/exec.c
++++ b/kernel/exec.c
+@@ -7,7 +7,6 @@
+ #include "defs.h"
+ #include "elf.h"
+ 
+-static int loadseg(pde_t *, uint64, struct inode *, uint, uint);
+ 
+ // map ELF permissions to PTE permission bits.
+ int
+@@ -24,15 +23,17 @@ flags2perm(int flags)
+ //
+ // the implementation of the exec() system call
+ //
++// ############## LLM Generated Code Begins ##############
+ int
+ kexec(char *path, char **argv)
+ {
+   char *s, *last;
+-  int i, off;
++  int i, off, nseg = 0;
+   uint64 argc, sz = 0, sp, ustack[MAXARG], stackbase;
+   struct elfhdr elf;
+   struct inode *ip;
+   struct proghdr ph;
++  struct vmseg seg[MAXVMSEG];
+   pagetable_t pagetable = 0, oldpagetable;
+   struct proc *p = myproc();
+ 
+@@ -56,7 +57,8 @@ kexec(char *path, char **argv)
+   if ((pagetable = proc_pagetable(p)) == 0)
+     goto bad;
+ 
+-  // Load program into memory.
++  // Demand paging: only record the loadable segments. Their pages are
++  // read from the executable on the first page fault (LOADEXEC).
+   for (i = 0, off = elf.phoff; i < elf.phnum; i++, off += sizeof(ph)) {
+     if (readi(ip, 0, (uint64)&ph, off, sizeof(ph)) != sizeof(ph))
+       goto bad;
+@@ -68,60 +70,46 @@ kexec(char *path, char **argv)
+       goto bad;
+     if (ph.vaddr % PGSIZE != 0)
+       goto bad;
+-    uint64 sz1;
+-    if ((sz1 = uvmalloc(pagetable, sz, ph.vaddr + ph.memsz,
+-                        flags2perm(ph.flags))) == 0)
++    if (ph.vaddr + ph.memsz > TRAPFRAME)
+       goto bad;
+-    sz = sz1;
+-    if (loadseg(pagetable, ph.vaddr, ip, ph.off, ph.filesz) < 0)
++    if (nseg == MAXVMSEG)
+       goto bad;
++    seg[nseg].vaddr = ph.vaddr;
++    seg[nseg].memsz = ph.memsz;
++    seg[nseg].filesz = ph.filesz;
++    seg[nseg].off = ph.off;
++    seg[nseg].perm = flags2perm(ph.flags);
++    nseg++;
++    if (ph.vaddr + ph.memsz > sz)
++      sz = ph.vaddr + ph.memsz;
+   }
+-  iunlockput(ip);
++  // Keep a reference to the executable for loading pages later.
++  iunlock(ip);
+   end_op();
+-  ip = 0;
+ 
+-  p = myproc();
+-  uint64 oldsz = p->sz;
+-
+-  // Allocate some pages at the next page boundary.
+-  // Make the first inaccessible as a stack guard.
+-  // Use the rest as the user stack.
++  // Layout: [text][data] [guard page] [stack] [heap ...]
++  // Nothing is mapped; the guard page is simply never valid.
+   sz = PGROUNDUP(sz);
+-  uint64 sz1;
+-  if ((sz1 = uvmalloc(pagetable, sz, sz + (USERSTACK + 1) * PGSIZE, PTE_W)) ==
+-      0)
+-    goto bad;
+-  sz = sz1;
+-  uvmclear(pagetable, sz - (USERSTACK + 1) * PGSIZE);
++  stackbase = sz + PGSIZE;
++  sz = sz + (USERSTACK + 1) * PGSIZE;
+   sp = sz;
+-  stackbase = sp - USERSTACK * PGSIZE;
+ 
+-  // Copy argument strings into new stack, remember their
+-  // addresses in ustack[].
++  // Work out where the argument strings go before committing, so that
++  // the only thing that can still fail afterwards is running out of memory.
+   for (argc = 0; argv[argc]; argc++) {
++    if (argc >= MAXARG)
++      goto bad2;
+     sp -= strlen(argv[argc]) + 1;
+     sp -= sp % 16; // riscv sp must be 16-byte aligned
+     if (sp < stackbase)
+-      goto bad;
+-    if (copyout(pagetable, sz, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
+-      goto bad;
++      goto bad2;
+     ustack[argc] = sp;
+   }
+   ustack[argc] = 0;
+-
+-  // push a copy of ustack[], the array of argv[] pointers.
+   sp -= (argc + 1) * sizeof(uint64);
+   sp -= sp % 16;
+   if (sp < stackbase)
+-    goto bad;
+-  if (copyout(pagetable, sz, sp, (char *)ustack, (argc + 1) * sizeof(uint64)) <
+-      0)
+-    goto bad;
+-
+-  // a0 and a1 contain arguments to user main(argc, argv)
+-  // argc is returned via the system call return
+-  // value, which goes in a0.
+-  p->trapframe->a1 = sp;
++    goto bad2;
+ 
+   // Save program name for debugging.
+   for (last = s = path; *s; s++)
+@@ -130,47 +118,51 @@ kexec(char *path, char **argv)
+   safestrcpy(p->name, last, sizeof(p->name));
+ 
+   // Commit to the user image.
++  uint64 oldsz = p->sz;
+   oldpagetable = p->pagetable;
+   p->pagetable = pagetable;
+   p->sz = sz;
++  proc_freepagetable(oldpagetable, oldsz);
++  vm_exec(p, ip, seg, nseg, stackbase, sz); // logs INIT-LAZYMAP
++  p->trapframe->sp = sp; // for the stack-fault check
++
++  // Copy the argument strings and the argv[] array onto the stack.
++  // The first copy faults the stack page in (PAGEFAULT ... cause=stack).
++  for (i = 0; i < argc; i++)
++    if (copyout(pagetable, sz, ustack[i], argv[i], strlen(argv[i]) + 1) < 0)
++      goto killed;
++  if (copyout(pagetable, sz, sp, (char *)ustack, (argc + 1) * sizeof(uint64)) <
++      0)
++    goto killed;
++
++  // a0 and a1 contain arguments to user main(argc, argv)
++  // argc is returned via the system call return
++  // value, which goes in a0.
++  p->trapframe->a1 = sp;
+   p->trapframe->epc = elf.entry; // initial program counter = ulib.c:start()
+   p->trapframe->sp = sp;         // initial stack pointer
+-  proc_freepagetable(oldpagetable, oldsz);
+ 
+   return argc; // this ends up in a0, the first argument to main(argc, argv)
+ 
++killed:
++  // Past the point of no return (out of memory): the process cannot go on.
++  setkilled(p);
++  return -1;
++
++bad2:
++  proc_freepagetable(pagetable, 0);
++  begin_op();
++  iput(ip);
++  end_op();
++  return -1;
++
+ bad:
+   if (pagetable)
+-    proc_freepagetable(pagetable, sz);
++    proc_freepagetable(pagetable, 0);
+   if (ip) {
+     iunlockput(ip);
+     end_op();
+   }
+   return -1;
+ }
+-
+-// Load an ELF program segment into pagetable at virtual address va.
+-// va must be page-aligned
+-// and the pages from va to va+sz must already be mapped.
+-// Returns 0 on success, -1 on failure.
+-static int
+-loadseg(pagetable_t pagetable, uint64 va, struct inode *ip, uint offset,
+-        uint sz)
+-{
+-  uint i, n;
+-  uint64 pa;
+-
+-  for (i = 0; i < sz; i += PGSIZE) {
+-    pa = walkaddr(pagetable, va + i);
+-    if (pa == 0)
+-      panic("loadseg: address should exist");
+-    if (sz - i < PGSIZE)
+-      n = sz - i;
+-    else
+-      n = PGSIZE;
+-    if (readi(ip, 0, (uint64)pa, offset + i, n) != n)
+-      return -1;
+-  }
+-
+-  return 0;
+-}
++// ############## LLM Generated Code Ends ################
+diff --git a/kernel/file.h b/kernel/file.h
+index 03ea70e..ee38c48 100644
+--- a/kernel/file.h
++++ b/kernel/file.h
+@@ -26,7 +26,7 @@ struct inode {
+   short minor;
+   short nlink;
+   uint size;
+-  uint addrs[NDIRECT + 1];
++  uint addrs[NDIRECT + 2];
+ };
+ 
+ // map major device number to device functions.
+diff --git a/kernel/fs.c b/kernel/fs.c
+index 7a4381a..b170490 100644
+--- a/kernel/fs.c
++++ b/kernel/fs.c
+@@ -454,8 +454,44 @@ bmap(struct inode *ip, uint bn)
+     brelse(bp);
+     return addr;
+   }
++// ############## LLM Generated Code Begins ##############
++  bn -= NINDIRECT;
++
++  if (bn < NDINDIRECT) {
++    // Doubly-indirect: addrs[NDIRECT+1] -> block of indirect blocks.
++    if ((addr = ip->addrs[NDIRECT + 1]) == 0) {
++      addr = balloc(ip->dev);
++      if (addr == 0)
++        return 0;
++      ip->addrs[NDIRECT + 1] = addr;
++    }
++    bp = bread(ip->dev, addr);
++    a = (uint *)bp->data;
++    if ((addr = a[bn / NINDIRECT]) == 0) {
++      addr = balloc(ip->dev);
++      if (addr == 0) {
++        brelse(bp);
++        return 0;
++      }
++      a[bn / NINDIRECT] = addr;
++      log_write(bp);
++    }
++    brelse(bp);
++    bp = bread(ip->dev, addr);
++    a = (uint *)bp->data;
++    if ((addr = a[bn % NINDIRECT]) == 0) {
++      addr = balloc(ip->dev);
++      if (addr) {
++        a[bn % NINDIRECT] = addr;
++        log_write(bp);
++      }
++    }
++    brelse(bp);
++    return addr;
++  }
+ 
+   panic("bmap: out of range");
++// ############## LLM Generated Code Ends ################
+ }
+ 
+ // Truncate inode (discard contents).
+@@ -486,6 +522,28 @@ itrunc(struct inode *ip)
+     ip->addrs[NDIRECT] = 0;
+   }
+ 
++// ############## LLM Generated Code Begins ##############
++  if (ip->addrs[NDIRECT + 1]) {
++    bp = bread(ip->dev, ip->addrs[NDIRECT + 1]);
++    a = (uint *)bp->data;
++    for (j = 0; j < NINDIRECT; j++) {
++      if (a[j] == 0)
++        continue;
++      struct buf *bp2 = bread(ip->dev, a[j]);
++      uint *a2 = (uint *)bp2->data;
++      for (int k = 0; k < NINDIRECT; k++) {
++        if (a2[k])
++          bfree(ip->dev, a2[k]);
++      }
++      brelse(bp2);
++      bfree(ip->dev, a[j]);
++    }
++    brelse(bp);
++    bfree(ip->dev, ip->addrs[NDIRECT + 1]);
++    ip->addrs[NDIRECT + 1] = 0;
++  }
++// ############## LLM Generated Code Ends ################
++
+   ip->size = 0;
+   iupdate(ip);
+ }
+diff --git a/kernel/fs.h b/kernel/fs.h
+index b659291..2c44fc4 100644
+--- a/kernel/fs.h
++++ b/kernel/fs.h
+@@ -23,9 +23,17 @@ struct superblock {
+ 
+ #define FSMAGIC 0x10203040
+ 
+-#define NDIRECT   12
+-#define NINDIRECT (BSIZE / sizeof(uint))
+-#define MAXFILE   (NDIRECT + NINDIRECT)
++// ############## LLM Generated Code Begins ##############
++// addrs[0..NDIRECT-1] are direct blocks, addrs[NDIRECT] is a singly-indirect
++// block and addrs[NDIRECT+1] a doubly-indirect block. The doubly-indirect
++// block lets a per-process swap file grow to 4 MB (1024 pages = 4096
++// blocks). Only its first 16 entries are used, so MAXFILE is 4363 blocks
++// (~4.3 MB): enough for a full swap file, small enough for the file system.
++#define NDIRECT    11
++#define NINDIRECT  (BSIZE / sizeof(uint))
++#define NDINDIRECT (16 * NINDIRECT)
++#define MAXFILE    (NDIRECT + NINDIRECT + NDINDIRECT)
++// ############## LLM Generated Code Ends ################
+ #define NLINK_MAX 32767 // nlink is a short; refuse links past its maximum
+ 
+ // On-disk inode structure
+@@ -35,7 +43,7 @@ struct dinode {
+   short minor;             // Minor device number (T_DEVICE only)
+   short nlink;             // Number of links to inode in file system
+   uint size;               // Size of file (bytes)
+-  uint addrs[NDIRECT + 1]; // Data block addresses
++  uint addrs[NDIRECT + 2]; // Data block addresses
+ };
+ 
+ // Inodes per block.
+diff --git a/kernel/kalloc.c b/kernel/kalloc.c
+index 2fcec38..c99ad19 100644
+--- a/kernel/kalloc.c
++++ b/kernel/kalloc.c
+@@ -27,6 +27,7 @@ void
+ kinit()
+ {
+   initlock(&kmem.lock, "kmem");
++  frameinit();
+   freerange(end, (void *)PHYSTOP);
+ }
+ 
+@@ -51,6 +52,11 @@ kfree(void *pa)
+   if (((uint64)pa % PGSIZE) != 0 || (char *)pa < end || (uint64)pa >= PHYSTOP)
+     panic("kfree");
+ 
++// ############## LLM Generated Code Begins ##############
++  // No longer a user page (demand paging's frame table, paging.c).
++  frame_clear((uint64)pa);
++// ############## LLM Generated Code Ends ################
++
+   // Fill with junk to catch dangling refs.
+   memset(pa, 1, PGSIZE);
+ 
+diff --git a/kernel/memlayout.h b/kernel/memlayout.h
+index 4f026ed..cf01635 100644
+--- a/kernel/memlayout.h
++++ b/kernel/memlayout.h
+@@ -41,7 +41,14 @@
+ // for use by the kernel and user pages
+ // from physical address 0x80000000 to PHYSTOP.
+ #define KERNBASE 0x80000000L
+-#define PHYSTOP  (KERNBASE + 128 * 1024 * 1024)
++// ############## LLM Generated Code Begins ##############
++// PHYSMEM_MB (make PHYSMEM=..) limits the RAM the kernel uses, so that
++// page replacement can be tested without filling 128 MB.
++#ifndef PHYSMEM_MB
++#define PHYSMEM_MB 128
++#endif
++#define PHYSTOP  (KERNBASE + PHYSMEM_MB * 1024L * 1024)
++// ############## LLM Generated Code Ends ################
+ 
+ // map the trampoline page to the highest address,
+ // in both user and kernel space.
+diff --git a/kernel/memstat.h b/kernel/memstat.h
+new file mode 100644
+index 0000000..fe4d537
+--- /dev/null
++++ b/kernel/memstat.h
+@@ -0,0 +1,28 @@
++// ############## LLM Generated Code Begins ##############
++// memstat() system call: a snapshot of the calling process's pages.
++// Shared by the kernel and user programs.
++
++#define MAX_PAGES_INFO 128 // max pages reported (lowest addresses first)
++
++// Page states
++#define UNMAPPED 0
++#define RESIDENT 1
++#define SWAPPED  2
++
++struct page_stat {
++  uint va;       // page-aligned virtual address
++  int state;     // UNMAPPED, RESIDENT or SWAPPED
++  int is_dirty;  // 1 if written since it was brought into memory
++  int seq;       // FIFO sequence number (resident pages), else -1
++  int swap_slot; // swap slot (swapped pages), else -1
++};
++
++struct proc_mem_stat {
++  int pid;
++  int num_pages_total;    // pages in [0, sz): resident + swapped + unmapped
++  int num_resident_pages;
++  int num_swapped_pages;
++  int next_fifo_seq;      // seq the next resident page will get
++  struct page_stat pages[MAX_PAGES_INFO];
++};
++// ############## LLM Generated Code Ends ################
+diff --git a/kernel/paging.c b/kernel/paging.c
+new file mode 100644
+index 0000000..50c94f1
+--- /dev/null
++++ b/kernel/paging.c
+@@ -0,0 +1,853 @@
++// ############## LLM Generated Code Begins ##############
++// Demand paging, page replacement and per-process swap files.
++//
++// - exec() and sbrk() map nothing. Every user page is brought in by a
++//   page fault: text/data pages are read from the executable (LOADEXEC),
++//   heap and stack pages are zero-filled (ALLOC), and swapped-out pages
++//   are read back from the process's swap file (SWAPIN).
++// - Every physical frame that holds a user page has an entry in frames[]
++//   (owner, va, FIFO sequence number, dirty bit). A process's resident
++//   set is the set of frames it owns.
++// - When kalloc() fails during a fault, the faulting process evicts one of
++//   ITS OWN resident pages (FIFO: lowest sequence number, or CLEANFIFO,
++//   see pick_victim()). Clean pages that can be rebuilt are dropped;
++//   other pages are written to the swap file /pgswpXXXXX (PID based).
++// - Dirty tracking is done in software: a writable page is mapped
++//   without PTE_W (and with PTE_SWW) until the first write traps.
++//
++// Swapped-out PTEs have PTE_V clear, PTE_SWAP set and the swap slot in
++// the PPN field, so the hardware ignores them.
++
++#include "types.h"
++#include "param.h"
++#include "memlayout.h"
++#include "riscv.h"
++#include "spinlock.h"
++#include "sleeplock.h"
++#include "proc.h"
++#include "defs.h"
++#include "fs.h"
++#include "file.h"
++#include "stat.h"
++#include "memstat.h"
++
++#define NFRAME  ((PHYSTOP - KERNBASE) / PGSIZE)
++#define SEQMASK 0x7fffffff // seq numbers stay non-negative and wrap here
++
++// Replacement policy name for the VICTIM log (make PAGEREPL=...).
++#ifdef CLEANFIFO
++#define ALGO "CLEANFIFO"
++#else
++#define ALGO "FIFO"
++#endif
++
++// The spec's EVICT format has two spaces after "EVICT".
++#define EVICT_FMT "[pid %d] EVICT  va=0x%lx state=%s\n"
++
++static char *accname[] = {[ACC_READ] "read", [ACC_WRITE] "write",
++                          [ACC_EXEC] "exec"};
++enum { C_HEAP, C_STACK, C_EXEC, C_SWAP };
++static char *causename[] = {[C_HEAP] "heap", [C_STACK] "stack",
++                            [C_EXEC] "exec", [C_SWAP] "swap"};
++
++// One entry per physical frame.
++struct frame {
++  struct proc *owner; // process whose user page this is, or 0
++  uint64 va;          // user virtual address of the page
++  uint seq;           // FIFO sequence number when it became resident
++  uchar dirty;        // written since it became resident
++  uchar backed;       // can be rebuilt without swap (executable / zero)
++};
++static struct frame frames[NFRAME];
++static struct spinlock framelock;
++
++static struct frame *
++pa2frame(uint64 pa)
++{
++  return &frames[(pa - KERNBASE) / PGSIZE];
++}
++
++static uint64
++frame2pa(struct frame *f)
++{
++  return KERNBASE + (uint64)(f - frames) * PGSIZE;
++}
++
++void
++frameinit(void)
++{
++  initlock(&framelock, "frames");
++}
++
++// Called by kfree(): the frame no longer holds a user page.
++void
++frame_clear(uint64 pa)
++{
++  acquire(&framelock);
++  pa2frame(pa)->owner = 0;
++  release(&framelock);
++}
++
++static void
++frame_add(struct proc *p, uint64 pa, uint64 va, uint seq, int dirty,
++          int backed)
++{
++  acquire(&framelock);
++  struct frame *f = pa2frame(pa);
++  f->owner = p;
++  f->va = va;
++  f->seq = seq;
++  f->dirty = dirty;
++  f->backed = backed;
++  release(&framelock);
++}
++
++// Is the caller holding no spinlocks (so it may sleep for disk I/O)?
++static int
++cansleep(void)
++{
++  push_off();
++  int ok = (mycpu()->noff == 1);
++  pop_off();
++  return ok;
++}
++
++// ---------------------------------------------------------------------
++// Swap slots and the swap file.
++
++static int
++slot_alloc(struct proc *p)
++{
++  // Lowest free slot. This keeps the file dense: slots below the one
++  // returned are in use, so they were written and the file is at least
++  // that long (writei() cannot write past the end of a file).
++  for (int i = 0; i < NSWAPSLOT; i++) {
++    if ((p->swap_map[i / 8] & (1 << (i % 8))) == 0) {
++      p->swap_map[i / 8] |= (1 << (i % 8));
++      p->swap_used++;
++      return i;
++    }
++  }
++  return -1;
++}
++
++static void
++slot_free(struct proc *p, int slot)
++{
++  if (slot < 0 || slot >= NSWAPSLOT ||
++      (p->swap_map[slot / 8] & (1 << (slot % 8))) == 0)
++    panic("slot_free");
++  p->swap_map[slot / 8] &= ~(1 << (slot % 8));
++  p->swap_used--;
++}
++
++// "/pgswp" followed by the pid in 5 digits, e.g. /pgswp00023.
++static void
++swapname(int pid, char *buf)
++{
++  safestrcpy(buf, "/pgswp", 16);
++  for (int i = 10; i >= 6; i--) {
++    buf[i] = '0' + pid % 10;
++    pid /= 10;
++  }
++  buf[11] = 0;
++}
++
++// Create (or empty, if left over from an earlier boot) the swap file of
++// process pid in the root directory. Returns an unlocked, referenced
++// inode, or 0.
++static struct inode *
++swap_create(int pid)
++{
++  char path[16], name[DIRSIZ];
++  struct inode *dp, *ip;
++
++  swapname(pid, path);
++  begin_op();
++  if ((dp = nameiparent(path, name)) == 0) {
++    end_op();
++    return 0;
++  }
++  ilock(dp);
++  if ((ip = dirlookup(dp, name, 0)) != 0) {
++    iunlockput(dp);
++    ilock(ip);
++    if (ip->type != T_FILE) {
++      iunlockput(ip);
++      end_op();
++      return 0;
++    }
++    itrunc(ip);
++    iunlock(ip);
++    end_op();
++    return ip;
++  }
++  if ((ip = ialloc(dp->dev, T_FILE)) == 0) {
++    iunlockput(dp);
++    end_op();
++    return 0;
++  }
++  ilock(ip);
++  ip->major = 0;
++  ip->minor = 0;
++  ip->nlink = 1;
++  iupdate(ip);
++  if (dirlink(dp, name, ip->inum) < 0) {
++    ip->nlink = 0;
++    iupdate(ip);
++    iunlockput(ip);
++    iunlockput(dp);
++    end_op();
++    return 0;
++  }
++  iunlockput(dp);
++  iunlock(ip);
++  end_op();
++  return ip;
++}
++
++// Remove p's swap file from the root directory and drop our reference,
++// which frees its blocks.
++static void
++swap_delete(struct proc *p)
++{
++  char path[16], name[DIRSIZ];
++  struct inode *ip = p->swap_ip, *dp, *dip;
++  struct dirent de;
++  uint off;
++
++  if (ip == 0)
++    return;
++  p->swap_ip = 0;
++  swapname(p->pid, path);
++  begin_op();
++  if ((dp = nameiparent(path, name)) != 0) {
++    ilock(dp);
++    if ((dip = dirlookup(dp, name, &off)) != 0) {
++      if (dip == ip) {
++        memset(&de, 0, sizeof(de));
++        if (writei(dp, 0, (uint64)&de, off, sizeof(de)) != sizeof(de))
++          panic("swap_delete");
++        ilock(ip);
++        ip->nlink--;
++        iupdate(ip);
++        iunlock(ip);
++      }
++      iput(dip);
++    }
++    iunlockput(dp);
++  }
++  iput(ip);
++  end_op();
++}
++
++// Write one page (kernel address src) to a swap slot.
++// Two half-page transactions keep each one well under MAXOPBLOCKS.
++#define SWAPCHUNK (PGSIZE / 2)
++static int
++swap_write(struct proc *p, int slot, uint64 src)
++{
++  struct inode *ip = p->swap_ip;
++  uint off = slot * PGSIZE;
++
++  if (ip == 0)
++    return -1;
++  for (int i = 0; i < PGSIZE; i += SWAPCHUNK) {
++    begin_op();
++    ilock(ip);
++    int n = writei(ip, 0, src + i, off + i, SWAPCHUNK);
++    iunlock(ip);
++    end_op();
++    if (n != SWAPCHUNK)
++      return -1;
++  }
++  return 0;
++}
++
++// Read one page from a swap slot of p's swap file into kernel address dst.
++static int
++swap_read(struct inode *ip, int slot, uint64 dst, uint n, uint off)
++{
++  if (ip == 0)
++    return -1;
++  ilock(ip);
++  int r = readi(ip, 0, dst, slot * PGSIZE + off, n);
++  iunlock(ip);
++  return r == n ? 0 : -1;
++}
++
++// ---------------------------------------------------------------------
++// Page replacement.
++
++// Choose a victim among p's resident pages. Caller holds framelock.
++static struct frame *
++pick_victim(struct proc *p)
++{
++  struct frame *best = 0;
++  uint bestage = 0;
++
++  for (struct frame *f = frames; f < &frames[NFRAME]; f++) {
++    if (f->owner != p)
++      continue;
++    // Age relative to the next sequence number; correct across wraparound.
++    uint age = (p->next_seq - f->seq) & SEQMASK;
++    if (best == 0 || age > bestage) {
++      best = f;
++      bestage = age;
++    }
++  }
++#ifdef CLEANFIFO
++  // Bonus policy: the oldest page that can be dropped without disk I/O
++  // (clean and rebuildable), but only from the older half of the FIFO
++  // queue (age >= half the oldest page's age). A page that was just
++  // brought back is young, so it is not evicted again straight away.
++  // If there is no such page, plain FIFO.
++  struct frame *bestclean = 0;
++  uint cleanage = 0;
++  for (struct frame *f = frames; best && f < &frames[NFRAME]; f++) {
++    if (f->owner != p || f->dirty || !f->backed)
++      continue;
++    uint age = (p->next_seq - f->seq) & SEQMASK;
++    if (age >= bestage / 2 && (bestclean == 0 || age > cleanage)) {
++      bestclean = f;
++      cleanage = age;
++    }
++  }
++  if (bestclean)
++    return bestclean;
++#endif
++  return best;
++}
++
++// Evict one of p's resident pages.
++// Returns 0 if a frame was freed, -1 if p has nothing to evict,
++// -2 if p was killed because its swap is full.
++static int
++evict(struct proc *p)
++{
++  acquire(&framelock);
++  struct frame *f = pick_victim(p);
++  if (f == 0) {
++    release(&framelock);
++    return -1;
++  }
++  uint64 va = f->va;
++  uint seq = f->seq;
++  int dirty = f->dirty, backed = f->backed;
++  f->owner = 0; // out of the resident set
++  release(&framelock);
++
++  uint64 pa = frame2pa(f);
++  pte_t *pte = walk(p->pagetable, va, 0);
++  if (pte == 0 || (*pte & PTE_V) == 0 || PTE2PA(*pte) != pa)
++    panic("evict: bad victim");
++
++  printk("[pid %d] VICTIM va=0x%lx seq=%d algo=%s\n", p->pid, va, (int)seq,
++         ALGO);
++  printk(EVICT_FMT, p->pid, va, dirty ? "dirty" : "clean");
++
++  if (!dirty && backed) {
++    // Its contents are still in the executable (or it is all zeros):
++    // the next fault rebuilds it.
++    printk("[pid %d] DISCARD va=0x%lx\n", p->pid, va);
++    *pte = 0;
++  } else {
++    int slot = slot_alloc(p);
++    if (slot >= 0 && swap_write(p, slot, pa) < 0) {
++      slot_free(p, slot); // disk full: same as no slot
++      slot = -1;
++    }
++    if (slot < 0) {
++      printk("[pid %d] SWAPFULL\n", p->pid);
++      printk("[pid %d] KILL swap-exhausted\n", p->pid);
++      frame_add(p, pa, va, seq, dirty, backed); // still resident
++      setkilled(p);
++      return -2;
++    }
++    printk("[pid %d] SWAPOUT va=0x%lx slot=%d\n", p->pid, va, slot);
++    uint64 flags = *pte & (PTE_R | PTE_X | PTE_U | PTE_SWW);
++    if (*pte & PTE_W)
++      flags |= PTE_SWW;
++    if (dirty)
++      flags |= PTE_D; // remembered only for memstat
++    *pte = SLOT2PTE(slot) | flags | PTE_SWAP;
++  }
++  sfence_vma();
++  kfree((void *)pa);
++  return 0;
++}
++
++// Allocate a frame for p, evicting p's own pages while memory is full.
++// Returns 0 (and marks p killed) if that is impossible.
++static uint64
++getframe(struct proc *p)
++{
++  for (;;) {
++    void *mem = kalloc();
++    if (mem)
++      return (uint64)mem;
++    if (!cansleep())
++      return 0; // caller holds a spinlock; just fail this access
++    printk("[pid %d] MEMFULL\n", p->pid);
++    int r = evict(p);
++    if (r == -1)
++      setkilled(p); // out of memory and nothing of its own to evict
++    if (r < 0)
++      return 0;
++  }
++}
++
++// walk(..., alloc=1), evicting p's pages if a page-table page is needed
++// and memory is full.
++static pte_t *
++walk_alloc(struct proc *p, uint64 va)
++{
++  for (;;) {
++    pte_t *pte = walk(p->pagetable, va, 1);
++    if (pte)
++      return pte;
++    if (!cansleep())
++      return 0;
++    printk("[pid %d] MEMFULL\n", p->pid);
++    int r = evict(p);
++    if (r == -1)
++      setkilled(p);
++    if (r < 0)
++      return 0;
++  }
++}
++
++// ---------------------------------------------------------------------
++// Page faults.
++
++static struct vmseg *
++findseg(struct proc *p, uint64 va)
++{
++  for (int i = 0; i < p->nseg; i++) {
++    struct vmseg *s = &p->seg[i];
++    if (va >= s->vaddr && va < PGROUNDUP(s->vaddr + s->memsz))
++      return s;
++  }
++  return 0;
++}
++
++// Which region an (invalid) address is in, for the PAGEFAULT log.
++static int
++region_cause(struct proc *p, uint64 va)
++{
++  if (va >= p->stack_top)
++    return C_HEAP;
++  if (va + PGSIZE >= p->stack_bottom) // stack or its guard page
++    return C_STACK;
++  return C_EXEC;
++}
++
++// Read the file-backed part of page va from the executable into pa.
++static int
++load_exec_page(struct proc *p, uint64 va, uint64 pa)
++{
++  int ok = 1;
++
++  memset((void *)pa, 0, PGSIZE);
++  ilock(p->exec_ip);
++  for (int i = 0; i < p->nseg; i++) {
++    struct vmseg *s = &p->seg[i];
++    uint64 lo = va > s->vaddr ? va : s->vaddr;
++    uint64 hi = va + PGSIZE;
++    if (hi > s->vaddr + s->filesz)
++      hi = s->vaddr + s->filesz;
++    if (lo >= hi)
++      continue;
++    uint n = hi - lo;
++    if (readi(p->exec_ip, 0, pa + (lo - va), s->off + (lo - s->vaddr), n) != n)
++      ok = 0;
++  }
++  iunlock(p->exec_ip);
++  return ok ? 0 : -1;
++}
++
++// Handle a fault at va in process p.
++// access: ACC_READ, ACC_WRITE or ACC_EXEC.
++// user:   1 for a hardware page fault from user mode; 0 for a kernel
++//         access through copyin()/copyout(). An invalid kernel access just
++//         fails (the system call returns -1) instead of killing.
++// Returns the physical address of the page, or 0 on failure.
++uint64
++vm_fault(struct proc *p, uint64 va, int access, int user)
++{
++  int cause, valid = 1;
++  struct vmseg *s = 0;
++  pte_t *pte = 0;
++
++  uint64 va0 = PGROUNDDOWN(va);
++  if (va0 < MAXVA)
++    pte = walk(p->pagetable, va0, 0);
++
++  if (pte && (*pte & PTE_V)) {
++    // The page is resident.
++    if ((*pte & PTE_U) && access == ACC_WRITE && (*pte & PTE_SWW)) {
++      // First write to a clean writable page: now it is dirty.
++      *pte = (*pte & ~PTE_SWW) | PTE_W | PTE_D;
++      sfence_vma();
++      acquire(&framelock);
++      pa2frame(PTE2PA(*pte))->dirty = 1;
++      release(&framelock);
++      return PTE2PA(*pte);
++    }
++    if ((*pte & PTE_U) && !(access == ACC_WRITE && !(*pte & PTE_W)) &&
++        !(access == ACC_EXEC && !(*pte & PTE_X)))
++      return PTE2PA(*pte); // nothing to do (stale TLB entry)
++    cause = region_cause(p, va0); // e.g. a write to the text segment
++    valid = 0;
++  } else if (pte && (*pte & PTE_SWAP)) {
++    cause = C_SWAP;
++    if ((access == ACC_WRITE && !(*pte & PTE_SWW)) ||
++        (access == ACC_EXEC && !(*pte & PTE_X)))
++      valid = 0;
++  } else if (va0 >= MAXVA || va0 >= p->sz) {
++    cause = region_cause(p, va0);
++    valid = 0;
++  } else if ((s = findseg(p, va0)) != 0) {
++    cause = C_EXEC;
++    if ((access == ACC_WRITE && !(s->perm & PTE_W)) ||
++        (access == ACC_EXEC && !(s->perm & PTE_X)))
++      valid = 0;
++  } else if (va0 >= p->stack_bottom && va0 < p->stack_top) {
++    cause = C_STACK;
++    // Valid only within one page below the current stack pointer.
++    if (access == ACC_EXEC || va + PGSIZE < p->trapframe->sp)
++      valid = 0;
++  } else if (va0 >= p->stack_top) {
++    cause = C_HEAP; // between stack_top and sz
++    if (access == ACC_EXEC)
++      valid = 0;
++  } else {
++    cause = region_cause(p, va0); // guard page or a gap
++    valid = 0;
++  }
++
++  if (!user) {
++    if (!valid)
++      return 0;
++    // copyin/copyout called with a spinlock held cannot sleep for I/O.
++    if ((cause == C_SWAP || cause == C_EXEC) && !cansleep())
++      return 0;
++  }
++
++  printk("[pid %d] PAGEFAULT va=0x%lx access=%s cause=%s\n", p->pid, va0,
++         accname[access], causename[cause]);
++
++  if (!valid) {
++    printk("[pid %d] KILL invalid-access va=0x%lx access=%s\n", p->pid, va0,
++           accname[access]);
++    setkilled(p);
++    return 0;
++  }
++
++  // Page-table pages first, then the frame, so that any eviction is logged
++  // before ALLOC/LOADEXEC/SWAPIN.
++  if ((pte = walk_alloc(p, va0)) == 0)
++    return 0;
++  uint64 mem = getframe(p);
++  if (mem == 0)
++    return 0;
++
++  uint64 perm;
++  int backed;
++  if (cause == C_SWAP) {
++    int slot = PTE2SLOT(*pte);
++    if (swap_read(p->swap_ip, slot, mem, PGSIZE, 0) < 0)
++      panic("vm_fault: swap read");
++    slot_free(p, slot);
++    printk("[pid %d] SWAPIN va=0x%lx slot=%d\n", p->pid, va0, slot);
++    perm = *pte & (PTE_R | PTE_X | PTE_U | PTE_SWW);
++    backed = 0; // the only copy is now in memory
++  } else if (cause == C_EXEC) {
++    if (load_exec_page(p, va0, mem) < 0) {
++      kfree((void *)mem);
++      setkilled(p);
++      return 0;
++    }
++    printk("[pid %d] LOADEXEC va=0x%lx\n", p->pid, va0);
++    perm = PTE_R | PTE_U | (s->perm & PTE_X) |
++           ((s->perm & PTE_W) ? PTE_SWW : 0);
++    backed = 1;
++  } else {
++    memset((void *)mem, 0, PGSIZE);
++    printk("[pid %d] ALLOC va=0x%lx\n", p->pid, va0);
++    perm = PTE_R | PTE_U | PTE_SWW;
++    backed = 1;
++  }
++
++  // A write fault writes the page right away, so map it dirty now.
++  int dirty = 0;
++  if (access == ACC_WRITE && (perm & PTE_SWW)) {
++    perm = (perm & ~PTE_SWW) | PTE_W | PTE_D;
++    dirty = 1;
++  }
++  *pte = PA2PTE(mem) | perm | PTE_V | PTE_A;
++  sfence_vma();
++
++  uint seq = p->next_seq;
++  p->next_seq = (p->next_seq + 1) & SEQMASK;
++  frame_add(p, mem, va0, seq, dirty, backed);
++  printk("[pid %d] RESIDENT va=0x%lx seq=%d\n", p->pid, va0, (int)seq);
++  return mem;
++}
++
++// Fault in [addr, addr+n) of the current process ahead of a copyin()
++// (write=0) or copyout() (write=1) that will run with a spinlock held
++// (pipes, console, wait), where the fault could not sleep.
++void
++vm_prefault(uint64 addr, uint64 n, int write)
++{
++  struct proc *p = myproc();
++  if (n == 0 || addr >= p->sz || addr + n < addr)
++    return;
++  uint64 end = addr + n;
++  if (end > p->sz)
++    end = p->sz;
++  for (uint64 va = PGROUNDDOWN(addr); va < end; va += PGSIZE) {
++    pte_t *pte = walk(p->pagetable, va, 0);
++    if (pte && (*pte & PTE_V) && (!write || (*pte & PTE_W)))
++      continue;
++    if (vm_fault(p, va, write ? ACC_WRITE : ACC_READ, 0) == 0)
++      return;
++  }
++}
++
++// ---------------------------------------------------------------------
++// Process life cycle.
++
++// exec() committed to a new image: record its layout, start a fresh swap
++// file and FIFO, and log INIT-LAZYMAP. ip is a referenced, unlocked inode.
++void
++vm_exec(struct proc *p, struct inode *ip, struct vmseg *seg, int nseg,
++        uint64 stack_bottom, uint64 stack_top)
++{
++  begin_op();
++  if (p->exec_ip)
++    iput(p->exec_ip);
++  end_op();
++  p->exec_ip = ip;
++  p->nseg = nseg;
++  p->text_start = p->text_end = 0;
++  p->data_start = p->data_end = 0;
++  int havetext = 0, havedata = 0;
++  for (int i = 0; i < nseg; i++) {
++    p->seg[i] = seg[i];
++    uint64 lo = seg[i].vaddr, hi = PGROUNDUP(seg[i].vaddr + seg[i].memsz);
++    if ((seg[i].perm & PTE_X) && !havetext) {
++      p->text_start = lo;
++      p->text_end = hi;
++      havetext = 1;
++    } else if (!(seg[i].perm & PTE_X) && !havedata) {
++      p->data_start = lo;
++      p->data_end = hi;
++      havedata = 1;
++    }
++  }
++  if (!havedata)
++    p->data_start = p->data_end = p->text_end;
++  p->stack_bottom = stack_bottom;
++  p->stack_top = stack_top;
++  p->next_seq = 0;
++
++  // The old image's swapped pages are gone with its page table.
++  memset(p->swap_map, 0, sizeof(p->swap_map));
++  p->swap_used = 0;
++  if (p->swap_ip) {
++    begin_op();
++    ilock(p->swap_ip);
++    itrunc(p->swap_ip);
++    iunlock(p->swap_ip);
++    end_op();
++  } else {
++    p->swap_ip = swap_create(p->pid);
++  }
++
++  printk("[pid %d] INIT-LAZYMAP text=[0x%lx,0x%lx) data=[0x%lx,0x%lx) "
++         "heap_start=0x%lx stack_top=0x%lx\n",
++         p->pid, p->text_start, p->text_end, p->data_start, p->data_end,
++         stack_top, stack_top);
++}
++
++// fork(): give child np a copy of p's address space. np->pagetable is
++// empty. Resident pages are copied into new frames (or, if memory is
++// full, straight into np's swap file); swapped pages are copied from p's
++// swap file into np's. np gets its own swap file. Returns 0 or -1.
++int
++vm_fork(struct proc *p, struct proc *np)
++{
++  char buf[512];
++
++  np->exec_ip = p->exec_ip ? idup(p->exec_ip) : 0;
++  np->nseg = p->nseg;
++  for (int i = 0; i < p->nseg; i++)
++    np->seg[i] = p->seg[i];
++  np->text_start = p->text_start;
++  np->text_end = p->text_end;
++  np->data_start = p->data_start;
++  np->data_end = p->data_end;
++  np->stack_bottom = p->stack_bottom;
++  np->stack_top = p->stack_top;
++  np->next_seq = p->next_seq; // child keeps the parent's FIFO order
++  memset(np->swap_map, 0, sizeof(np->swap_map));
++  np->swap_used = 0;
++  if ((np->swap_ip = swap_create(np->pid)) == 0)
++    return -1;
++
++  for (uint64 va = 0; va < p->sz; va += PGSIZE) {
++    pte_t *pte = walk(p->pagetable, va, 0);
++    if (pte == 0 || (*pte & (PTE_V | PTE_SWAP)) == 0)
++      continue; // never touched
++    pte_t *npte = walk(np->pagetable, va, 1);
++    if (npte == 0)
++      return -1;
++    if (*pte & PTE_V) {
++      uint64 pa = PTE2PA(*pte);
++      uint64 flags = PTE_FLAGS(*pte);
++      acquire(&framelock);
++      struct frame f = *pa2frame(pa);
++      release(&framelock);
++      char *mem = kalloc();
++      if (mem) {
++        memmove(mem, (char *)pa, PGSIZE);
++        *npte = PA2PTE(mem) | flags;
++        frame_add(np, (uint64)mem, va, f.seq, f.dirty, f.backed);
++      } else {
++        int slot = slot_alloc(np);
++        if (slot < 0 || swap_write(np, slot, pa) < 0)
++          return -1;
++        uint64 sflags = flags & (PTE_R | PTE_X | PTE_U | PTE_SWW);
++        if (flags & PTE_W)
++          sflags |= PTE_SWW;
++        if (f.dirty)
++          sflags |= PTE_D;
++        *npte = SLOT2PTE(slot) | sflags | PTE_SWAP;
++      }
++    } else {
++      int pslot = PTE2SLOT(*pte);
++      int slot = slot_alloc(np);
++      if (slot < 0)
++        return -1;
++      for (uint off = 0; off < PGSIZE; off += sizeof(buf)) {
++        if (swap_read(p->swap_ip, pslot, (uint64)buf, sizeof(buf), off) < 0)
++          return -1;
++        begin_op();
++        ilock(np->swap_ip);
++        int n = writei(np->swap_ip, 0, (uint64)buf, slot * PGSIZE + off,
++                       sizeof(buf));
++        iunlock(np->swap_ip);
++        end_op();
++        if (n != sizeof(buf))
++          return -1;
++      }
++      *npte = SLOT2PTE(slot) | PTE_FLAGS(*pte);
++    }
++  }
++  return 0;
++}
++
++// Release p's swap file and executable. log=1 on a real exit (prints
++// SWAPCLEANUP), 0 when cleaning up after a failed fork.
++void
++vm_free(struct proc *p, int log)
++{
++  if (log && p->swap_ip)
++    printk("[pid %d] SWAPCLEANUP freed_slots=%d\n", p->pid, p->swap_used);
++  swap_delete(p);
++  memset(p->swap_map, 0, sizeof(p->swap_map));
++  p->swap_used = 0;
++  if (p->exec_ip) {
++    begin_op();
++    iput(p->exec_ip);
++    end_op();
++    p->exec_ip = 0;
++  }
++}
++
++// sbrk(-n): pages in [newsz, oldsz) go away; free their swap slots.
++// (Resident ones are freed by uvmdealloc().)
++void
++vm_shrink(struct proc *p, uint64 oldsz, uint64 newsz)
++{
++  for (uint64 va = PGROUNDUP(newsz); va < PGROUNDUP(oldsz); va += PGSIZE) {
++    pte_t *pte = walk(p->pagetable, va, 0);
++    if (pte && !(*pte & PTE_V) && (*pte & PTE_SWAP)) {
++      slot_free(p, PTE2SLOT(*pte));
++      *pte = 0;
++    }
++  }
++}
++
++// ---------------------------------------------------------------------
++// memstat()
++
++static int
++cpout(uint64 dst, void *src, uint64 n)
++{
++  struct proc *p = myproc();
++  return copyout(p->pagetable, p->sz, dst, (char *)src, n);
++}
++
++int
++vm_memstat(uint64 addr)
++{
++  struct proc *p = myproc();
++  int total = 0, nres = 0, nswap = 0, i = 0;
++
++  // Bring the result buffer in first, so copying it out below does not
++  // change the residency we are reporting.
++  vm_prefault(addr, sizeof(struct proc_mem_stat), 1);
++
++  for (uint64 va = 0; va < p->sz; va += PGSIZE, total++) {
++    pte_t *pte = walk(p->pagetable, va, 0);
++    struct page_stat ps;
++    ps.va = (uint)va;
++    ps.state = UNMAPPED;
++    ps.is_dirty = 0;
++    ps.seq = -1;
++    ps.swap_slot = -1;
++    if (pte && (*pte & PTE_V) && (*pte & PTE_U)) {
++      nres++;
++      ps.state = RESIDENT;
++      acquire(&framelock);
++      struct frame *f = pa2frame(PTE2PA(*pte));
++      ps.seq = (int)f->seq;
++      ps.is_dirty = f->dirty;
++      release(&framelock);
++    } else if (pte && !(*pte & PTE_V) && (*pte & PTE_SWAP)) {
++      nswap++;
++      ps.state = SWAPPED;
++      ps.swap_slot = PTE2SLOT(*pte);
++      ps.is_dirty = (*pte & PTE_D) ? 1 : 0;
++    }
++    if (i < MAX_PAGES_INFO) {
++      uint64 dst = addr + (uint64)&((struct proc_mem_stat *)0)->pages[i];
++      if (cpout(dst, &ps, sizeof(ps)) < 0)
++        return -1;
++      i++;
++    }
++  }
++
++  struct proc_mem_stat *z = 0;
++  int pid = p->pid, seq = (int)p->next_seq;
++  if (cpout(addr + (uint64)&z->pid, &pid, sizeof(int)) < 0 ||
++      cpout(addr + (uint64)&z->num_pages_total, &total, sizeof(int)) < 0 ||
++      cpout(addr + (uint64)&z->num_resident_pages, &nres, sizeof(int)) < 0 ||
++      cpout(addr + (uint64)&z->num_swapped_pages, &nswap, sizeof(int)) < 0 ||
++      cpout(addr + (uint64)&z->next_fifo_seq, &seq, sizeof(int)) < 0)
++    return -1;
++
++  // Unused entries of pages[] are zeroed.
++  struct page_stat zero;
++  memset(&zero, 0, sizeof(zero));
++  for (; i < MAX_PAGES_INFO; i++) {
++    uint64 dst = addr + (uint64)&z->pages[i];
++    if (cpout(dst, &zero, sizeof(zero)) < 0)
++      return -1;
++  }
++  return 0;
++}
++// ############## LLM Generated Code Ends ################
+diff --git a/kernel/param.h b/kernel/param.h
+index 1d69801..27a8cc8 100644
+--- a/kernel/param.h
++++ b/kernel/param.h
+@@ -9,6 +9,6 @@
+ #define MAXOPBLOCKS 10                // max # of blocks any FS op writes
+ #define LOGBLOCKS   (MAXOPBLOCKS * 3) // max data blocks in on-disk log
+ #define NBUF        (MAXOPBLOCKS * 3) // size of disk block cache
+-#define FSSIZE      2000              // size of file system in blocks
++#define FSSIZE      40000             // size of file system in blocks (room for swap files)
+ #define MAXPATH     128               // maximum file path name
+ #define USERSTACK   1                 // user stack pages
+diff --git a/kernel/proc.c b/kernel/proc.c
+index 31f23a3..89e87cf 100644
+--- a/kernel/proc.c
++++ b/kernel/proc.c
+@@ -102,6 +102,34 @@ allocpid()
+   return pid;
+ }
+ 
++#ifdef MLFQ
++// Ticks a process may run in each queue before being demoted.
++static const int mlfq_slice[MLFQ_NQUEUE] = {1, 4, 8, 16};
++// Global "arrival" counter: a process joining a queue gets the next number,
++// so within a queue the smallest qseq is the front (FIFO order).
++static uint64 mlfq_seq = 0;
++#endif
++
++// Every transition to RUNNABLE goes through here (p->lock must be held).
++// Under MLFQ this means "join the END of your current queue".
++// fresh_slice = 1 for new processes and ones waking from sleep (they gave up
++// the CPU voluntarily, so they get a full slice again). yield() passes 0: a
++// process preempted by a higher queue keeps the ticks it already used, so it
++// can't dodge demotion by being preempted repeatedly. (Demotion and the
++// priority boost reset qticks themselves.)
++static void
++make_runnable(struct proc *p, int fresh_slice)
++{
++  p->state = RUNNABLE;
++#ifdef MLFQ
++  p->qseq = __sync_fetch_and_add(&mlfq_seq, 1);
++  if (fresh_slice)
++    p->qticks = 0;
++#else
++  (void)fresh_slice;
++#endif
++}
++
+ // Look in the process table for an UNUSED proc.
+ // If found, initialize state required to run in the kernel,
+ // and return with p->lock held.
+@@ -124,6 +152,33 @@ allocproc(void)
+ found:
+   p->pid = allocpid();
+   p->state = USED;
++  p->ctime = ticks; // creation time, used by FCFS
++  p->rtime = 0;
++  p->etime = 0;
++
++  // CFS defaults: normal priority, no CPU time used yet.
++  p->nice = 0;
++  p->weight = NICE_0_WEIGHT;
++  p->vruntime = 0;
++  p->time_slice = 0;
++  p->slice_used = 0;
++
++  // MLFQ: new processes start in the highest-priority queue.
++  p->queue = 0;
++  p->qticks = 0;
++  p->qseq = 0;
++
++// ############## LLM Generated Code Begins ##############
++  // Demand paging: no executable or swap file until exec()/fork().
++  p->exec_ip = 0;
++  p->swap_ip = 0;
++  p->nseg = 0;
++  p->next_seq = 0;
++  p->swap_used = 0;
++  memset(p->swap_map, 0, sizeof(p->swap_map));
++  p->text_start = p->text_end = p->data_start = p->data_end = 0;
++  p->stack_bottom = p->stack_top = 0;
++// ############## LLM Generated Code Ends ################
+ 
+   // Allocate a trapframe page.
+   if ((p->trapframe = (struct trapframe *)kalloc()) == 0) {
+@@ -162,6 +217,8 @@ freeproc(struct proc *p)
+     proc_freepagetable(p->pagetable, p->sz);
+   p->pagetable = 0;
+   p->sz = 0;
++  p->exec_ip = 0;
++  p->swap_ip = 0;
+   p->pid = 0;
+   p->name[0] = 0;
+   p->chan = 0;
+@@ -225,7 +282,7 @@ userinit(void)
+ 
+   p->cwd = namei("/");
+ 
+-  p->state = RUNNABLE;
++  make_runnable(p, 1);
+ 
+   release(&p->lock);
+ }
+@@ -240,14 +297,19 @@ growproc(int n)
+ 
+   sz = p->sz;
+   if (n > 0) {
+-    if (sz + n > TRAPFRAME) {
+-      return -1;
+-    }
+-    if ((sz = uvmalloc(p->pagetable, sz, sz + n, PTE_W)) == 0) {
++// ############## LLM Generated Code Begins ##############
++    // Demand paging: only grow the size. Pages are zero-filled on the
++    // first access (PAGEFAULT ... cause=heap).
++    if (sz + n < sz || sz + n > TRAPFRAME) {
+       return -1;
+     }
++    sz += n;
+   } else if (n < 0) {
++    if ((uint64)(-n) > sz)
++      return -1;
++    vm_shrink(p, sz, sz + n); // free swap slots of the removed pages
+     sz = uvmdealloc(p->pagetable, sz, sz + n);
++// ############## LLM Generated Code Ends ################
+   }
+   p->sz = sz;
+   return 0;
+@@ -267,13 +329,20 @@ kfork(void)
+     return -1;
+   }
+ 
+-  // Copy user memory from parent to child.
+-  if (uvmcopy(p->pagetable, np->pagetable, p->sz) < 0) {
++// ############## LLM Generated Code Begins ##############
++  // Copy user memory from parent to child. This can sleep (swap file
++  // I/O), so np->lock is dropped; np is USED, so no one else runs it.
++  np->sz = p->sz;
++  release(&np->lock);
++  if (vm_fork(p, np) < 0) {
++    vm_free(np, 0);
++    acquire(&np->lock);
++// ############## LLM Generated Code Ends ################
+     freeproc(np);
+     release(&np->lock);
+     return -1;
+   }
+-  np->sz = p->sz;
++  acquire(&np->lock);
+ 
+   // copy saved user registers.
+   *(np->trapframe) = *(p->trapframe);
+@@ -289,6 +358,10 @@ kfork(void)
+ 
+   safestrcpy(np->name, p->name, sizeof(p->name));
+ 
++  // Child inherits the parent's priority (vruntime still starts at 0).
++  np->nice = p->nice;
++  np->weight = p->weight;
++
+   pid = np->pid;
+ 
+   release(&np->lock);
+@@ -298,7 +371,7 @@ kfork(void)
+   release(&wait_lock);
+ 
+   acquire(&np->lock);
+-  np->state = RUNNABLE;
++  make_runnable(np, 1);
+   release(&np->lock);
+ 
+   return pid;
+@@ -339,6 +412,12 @@ kexit(int status)
+     }
+   }
+ 
++// ############## LLM Generated Code Begins ##############
++  // Delete the swap file (SWAPCLEANUP) and release the executable.
++  // The resident frames are freed with the page table in freeproc().
++  vm_free(p, 1);
++// ############## LLM Generated Code Ends ################
++
+   begin_op();
+   iput(p->cwd);
+   end_op();
+@@ -355,6 +434,7 @@ kexit(int status)
+   acquire(&p->lock);
+ 
+   p->xstate = status;
++  p->etime = ticks; // exit time, used by waitx
+   p->state = ZOMBIE;
+ 
+   release(&wait_lock);
+@@ -368,6 +448,16 @@ kexit(int status)
+ // Return -1 if this process has no children.
+ int
+ kwait(uint64 addr)
++{
++  return kwaitx(addr, 0, 0);
++}
++
++// Like kwait(), but also reports the reaped child's times:
++//   *rtime = ticks it spent RUNNING
++//   *wtime = ticks it existed but was not running = etime - ctime - rtime
++// wtime/rtime may be 0 if the caller doesn't need them.
++int
++kwaitx(uint64 addr, uint *wtime, uint *rtime)
+ {
+   struct proc *pp;
+   int havekids, pid;
+@@ -387,6 +477,10 @@ kwait(uint64 addr)
+         if (pp->state == ZOMBIE) {
+           // Found one.
+           pid = pp->pid;
++          if (rtime)
++            *rtime = pp->rtime;
++          if (wtime)
++            *wtime = pp->etime - pp->ctime - pp->rtime;
+           if (addr != 0 &&
+               copyout(p->pagetable, p->sz, addr, (char *)&pp->xstate,
+                       sizeof(pp->xstate)) < 0) {
+@@ -418,6 +512,153 @@ kwait(uint64 addr)
+   }
+ }
+ 
++// nice -> weight table: weight = 1024 / 1.25^nice (rounded).
++// Index 0 is nice -20, index 39 is nice 19. Same values as Linux.
++static const uint64 prio_to_weight[40] = {
++  // clang-format off
++  /* -20 */ 88761, 71755, 56483, 46273, 36291,
++  /* -15 */ 29154, 23254, 18705, 14949, 11916,
++  /* -10 */  9548,  7620,  6100,  4904,  3906,
++  /*  -5 */  3121,  2501,  1991,  1586,  1277,
++  /*   0 */  1024,   820,   655,   526,   423,
++  /*   5 */   335,   272,   215,   172,   137,
++  /*  10 */   110,    87,    70,    56,    45,
++  /*  15 */    36,    29,    23,    18,    15,
++  // clang-format on
++};
++
++// Set the nice value (and therefore weight) of process pid.
++// Returns 0 on success, -1 if nice is out of range or pid not found.
++int
++setnice(int pid, int nice)
++{
++  struct proc *p;
++
++  if (nice < -20 || nice > 19)
++    return -1;
++  for (p = proc; p < &proc[NPROC]; p++) {
++    acquire(&p->lock);
++    if (p->pid == pid && p->state != UNUSED) {
++      p->nice = nice;
++      p->weight = prio_to_weight[nice + 20];
++      release(&p->lock);
++      return 0;
++    }
++    release(&p->lock);
++  }
++  return -1;
++}
++
++// Called on every timer interrupt on this CPU (from usertrap/kerneltrap).
++// Does per-tick accounting for the running process and returns 1 if it
++// should give up the CPU now (yield), 0 if it should keep running.
++int
++sched_tick(void)
++{
++  struct proc *p = myproc();
++  if (p == 0)
++    return 0;
++
++  int preempt;
++  acquire(&p->lock);
++  if (p->state == RUNNING)
++    p->rtime++; // running-time accounting (all policies), reported by waitx
++
++#if defined(FCFS)
++  preempt = 0; // non-preemptive: never forced off the CPU
++#elif defined(CFS)
++  preempt = 0;
++  if (p->state == RUNNING) {
++    // vruntime grows slower for heavy (high-priority) processes:
++    //   nice 0 -> +1000/tick, nice -20 -> +11/tick, nice 19 -> +68266/tick
++    p->vruntime += (VRUNTIME_SCALE * NICE_0_WEIGHT) / p->weight;
++    p->slice_used++;
++    if (p->slice_used >= p->time_slice)
++      preempt = 1; // slice used up -> preempt
++  }
++#elif defined(MLFQ)
++  preempt = 0;
++  if (p->state == RUNNING) {
++    p->qticks++;
++    if (p->qticks >= mlfq_slice[p->queue]) {
++      // Used its whole slice: demote one level (queue 3 stays in 3, which
++      // with re-joining the end of the queue gives round robin there).
++#ifdef MLFQ_LOG
++      if (p->queue < MLFQ_NQUEUE - 1)
++        printk("[MLFQ] tick %d: PID %d used full slice, Q%d -> Q%d\n", ticks,
++               p->pid, p->queue, p->queue + 1);
++#endif
++      if (p->queue < MLFQ_NQUEUE - 1)
++        p->queue++;
++      p->qticks = 0; // fresh slice in the new (or same, for Q3) queue
++      preempt = 1;
++    }
++  }
++  int myqueue = p->queue;
++  release(&p->lock);
++
++  // A process waiting in a higher queue preempts us at this tick boundary.
++  // It keeps its queue and the ticks already used, and re-joins the end
++  // of the queue (yield -> make_runnable(p, 0)).
++  if (!preempt && mlfq_higher_waiting(p, myqueue)) {
++#ifdef MLFQ_LOG
++    printk("[MLFQ] tick %d: PID %d (Q%d) preempted by a higher-queue process\n",
++           ticks, p->pid, myqueue);
++#endif
++    preempt = 1;
++  }
++  return preempt;
++#else
++  preempt = 1; // round robin: switch on every tick
++#endif
++  release(&p->lock);
++  return preempt;
++}
++
++#ifdef MLFQ
++// Is any process other than self RUNNABLE in a queue above `queue`?
++// Caller must not hold any proc lock.
++int
++mlfq_higher_waiting(struct proc *self, int queue)
++{
++  struct proc *p;
++  int found = 0;
++
++  if (queue == 0)
++    return 0;
++  for (p = proc; p < &proc[NPROC] && !found; p++) {
++    if (p == self)
++      continue;
++    acquire(&p->lock);
++    if (p->state == RUNNABLE && p->queue < queue)
++      found = 1;
++    release(&p->lock);
++  }
++  return found;
++}
++
++// Priority boost (starvation prevention): called from clockintr() on CPU 0
++// every BOOST_INTERVAL ticks. Moves every process back to queue 0 with a
++// fresh slice; their relative order (qseq) is kept.
++void
++mlfq_boost(void)
++{
++  struct proc *p;
++
++#ifdef MLFQ_LOG
++  printk("[MLFQ] tick %d: priority boost, all processes -> Q0\n", ticks);
++#endif
++  for (p = proc; p < &proc[NPROC]; p++) {
++    acquire(&p->lock);
++    if (p->state != UNUSED) {
++      p->queue = 0;
++      p->qticks = 0;
++    }
++    release(&p->lock);
++  }
++}
++#endif
++
+ // Per-CPU process scheduler.
+ // Each CPU calls scheduler() after setting itself up.
+ // Scheduler never returns.  It loops, doing:
+@@ -441,6 +682,142 @@ scheduler(void)
+     intr_on();
+     intr_off();
+ 
++#ifdef FCFS
++    // ---------- FCFS: First Come First Serve (non-preemptive) ----------
++    // Scan the whole table and pick the RUNNABLE process with the
++    // smallest creation time (ties broken by lower pid).
++    // We keep the lock of the best candidate held while scanning the
++    // rest, so it can't change state under us. Locks are always taken in
++    // increasing table order, so two CPUs scanning at once can't deadlock.
++    struct proc *chosen = 0;
++    for (p = proc; p < &proc[NPROC]; p++) {
++      acquire(&p->lock);
++      if (p->state == RUNNABLE &&
++          (chosen == 0 || p->ctime < chosen->ctime ||
++           (p->ctime == chosen->ctime && p->pid < chosen->pid))) {
++        if (chosen)
++          release(&chosen->lock); // previous best is no longer best
++        chosen = p;               // keep chosen->lock held
++      } else {
++        release(&p->lock);
++      }
++    }
++
++    if (chosen == 0) {
++      // nothing to run; stop running on this core until an interrupt.
++      asm volatile("wfi");
++      continue;
++    }
++
++    // Run it. Timer interrupts don't call yield() under FCFS (see trap.c),
++    // so it keeps the CPU until it exits or blocks (sleep/wait/IO).
++    p = chosen;
++    p->state = RUNNING;
++    c->proc = p;
++    swtch(&c->context, &p->context);
++
++    // Don't re-enable interrupts on release.
++    mycpu()->intena = 0;
++    c->proc = 0;
++    release(&p->lock);
++#elif defined(CFS)
++    // ---------- CFS: Completely Fair Scheduler ----------
++    // Pick the RUNNABLE process with the smallest vruntime (ties: lower pid).
++    // Same locking pattern as FCFS: hold only the best candidate's lock.
++    struct proc *chosen = 0;
++    int nrunnable = 0;
++#ifdef CFS_LOG
++    int log_pid[NPROC];
++    uint64 log_vr[NPROC];
++#endif
++    for (p = proc; p < &proc[NPROC]; p++) {
++      acquire(&p->lock);
++      if (p->state == RUNNABLE) {
++#ifdef CFS_LOG
++        log_pid[nrunnable] = p->pid;
++        log_vr[nrunnable] = p->vruntime;
++#endif
++        nrunnable++;
++        if (chosen == 0 || p->vruntime < chosen->vruntime ||
++            (p->vruntime == chosen->vruntime && p->pid < chosen->pid)) {
++          if (chosen)
++            release(&chosen->lock); // previous best is no longer best
++          chosen = p;               // keep chosen->lock held
++          continue;
++        }
++      }
++      release(&p->lock);
++    }
++
++    if (chosen == 0) {
++      // nothing to run; stop running on this core until an interrupt.
++      asm volatile("wfi");
++      continue;
++    }
++
++#ifdef CFS_LOG
++    // Log every runnable process's vruntime before this decision.
++    printk("[Scheduler Tick]\n");
++    for (int i = 0; i < nrunnable; i++)
++      printk("PID: %d | vRuntime: %ld\n", log_pid[i], log_vr[i]);
++    printk("--> Scheduling PID %d (lowest vRuntime)\n", chosen->pid);
++#endif
++
++    // Time slice: share the target latency among runnable processes,
++    // but never less than the minimum granularity.
++    int slice = TARGET_LATENCY / nrunnable;
++    if (slice < MIN_GRANULARITY)
++      slice = MIN_GRANULARITY;
++
++    p = chosen;
++    p->time_slice = slice;
++    p->slice_used = 0;
++    p->state = RUNNING;
++    c->proc = p;
++    swtch(&c->context, &p->context);
++
++    // Don't re-enable interrupts on release.
++    mycpu()->intena = 0;
++    c->proc = 0;
++    release(&p->lock);
++#elif defined(MLFQ)
++    // ---------- MLFQ: Multi-Level Feedback Queue (preemptive) ----------
++    // Pick from the highest non-empty queue (lowest queue number); within a
++    // queue, the process that joined it first (lowest qseq) -> FIFO / RR.
++    // Same locking pattern as FCFS/CFS: hold only the best candidate's lock.
++    struct proc *chosen = 0;
++    for (p = proc; p < &proc[NPROC]; p++) {
++      acquire(&p->lock);
++      if (p->state == RUNNABLE &&
++          (chosen == 0 || p->queue < chosen->queue ||
++           (p->queue == chosen->queue && p->qseq < chosen->qseq))) {
++        if (chosen)
++          release(&chosen->lock);
++        chosen = p;
++        continue;
++      }
++      release(&p->lock);
++    }
++
++    if (chosen == 0) {
++      // nothing to run; stop running on this core until an interrupt.
++      asm volatile("wfi");
++      continue;
++    }
++
++    // Demotion, preemption by higher queues and the priority boost all happen
++    // at tick boundaries in sched_tick()/clockintr().
++    p = chosen;
++    p->state = RUNNING;
++    c->proc = p;
++    swtch(&c->context, &p->context);
++
++    // Don't re-enable interrupts on release.
++    mycpu()->intena = 0;
++    c->proc = 0;
++    release(&p->lock);
++#else
++    // ---------- Default: Round Robin (original xv6 scheduler) ----------
+     int found = 0;
+     for (p = proc; p < &proc[NPROC]; p++) {
+       acquire(&p->lock);
+@@ -466,6 +843,7 @@ scheduler(void)
+       // nothing to run; stop running on this core until an interrupt.
+       asm volatile("wfi");
+     }
++#endif
+   }
+ }
+ 
+@@ -502,7 +880,7 @@ yield(void)
+ {
+   struct proc *p = myproc();
+   acquire(&p->lock);
+-  p->state = RUNNABLE;
++  make_runnable(p, 0); // preempted: keep slice progress
+   sched();
+   release(&p->lock);
+ }
+@@ -587,7 +965,7 @@ wakeup(void *chan)
+       // If this waiting process has gotten so far as to actually
+       // go to sleep, also set it back to RUNNING.
+       if (p->state == SLEEPING) {
+-        p->state = RUNNABLE;
++        make_runnable(p, 1); // woke from sleep: fresh slice
+       }
+     }
+     release(&p->lock);
+@@ -611,7 +989,7 @@ kkill(int pid)
+       p->killed = 1;
+       if (p->state == SLEEPING) {
+         // Wake process from sleep().
+-        p->state = RUNNABLE;
++        make_runnable(p, 1);
+       }
+       release(&p->lock);
+       return 0;
+@@ -697,7 +1075,9 @@ procdump(void)
+       state = states[p->state];
+     else
+       state = "???";
+-    printk("%d %s %s", p->pid, state, p->name);
++    printk("%d %s %s ctime=%d rtime=%d nice=%d vruntime=%ld slice=%d/%d q=%d",
++           p->pid, state, p->name, p->ctime, p->rtime, p->nice, p->vruntime,
++           p->slice_used, p->time_slice, p->queue);
+     printk("\n");
+   }
+ }
+diff --git a/kernel/proc.h b/kernel/proc.h
+index 5603697..f3ca221 100644
+--- a/kernel/proc.h
++++ b/kernel/proc.h
+@@ -78,6 +78,19 @@ struct trapframe {
+ 
+ enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
+ 
++// ############## LLM Generated Code Begins ##############
++// A loadable ELF segment, kept so that exec can load pages on demand.
++struct vmseg {
++  uint64 vaddr;  // page-aligned start
++  uint64 memsz;  // bytes in memory
++  uint64 filesz; // bytes in the file (the rest is zero, e.g. bss)
++  uint64 off;    // offset in the executable
++  int perm;      // PTE_X and/or PTE_W
++};
++#define MAXVMSEG  8
++#define NSWAPSLOT 1024 // max swap slots (4 MB) per process
++// ############## LLM Generated Code Ends ################
++
+ // Per-process state
+ struct proc {
+   struct spinlock lock;
+@@ -101,4 +114,46 @@ struct proc {
+   struct file *ofile[NOFILE];  // Open files
+   struct inode *cwd;           // Current directory
+   char name[16];               // Process name (debugging)
++
++  // Scheduling info
++  uint ctime;                  // Tick at which the process was created (FCFS)
++  uint rtime;                  // Ticks spent RUNNING (for waitx / report)
++  uint etime;                  // Tick at which the process exited (for waitx)
++
++  // CFS (p->lock must be held when using these)
++  int nice;                    // -20 (highest priority) .. 19 (lowest)
++  uint64 weight;               // 1024 / 1.25^nice, from prio_to_weight[]
++  uint64 vruntime;             // weighted CPU time, in VRUNTIME_SCALE units per nice-0 tick
++  int time_slice;              // ticks this process may run before preemption
++  int slice_used;              // ticks used of the current time slice
++
++  // MLFQ (p->lock must be held when using these)
++  int queue;                   // current queue: 0 (highest) .. 3 (lowest)
++  int qticks;                  // ticks used of the current queue's slice
++  uint64 qseq;                 // when it joined its queue; lower = nearer the front
++
++// ############## LLM Generated Code Begins ##############
++  // Demand paging and swap (private to the process; see paging.c).
++  struct inode *exec_ip;       // executable, for loading text/data on demand
++  int nseg;                    // number of loadable ELF segments
++  struct vmseg seg[MAXVMSEG];  // loadable ELF segments
++  uint64 text_start, text_end; // for the INIT-LAZYMAP log
++  uint64 data_start, data_end;
++  uint64 stack_bottom;         // lowest stack page (just above the guard page)
++  uint64 stack_top;            // top of the user stack = start of the heap
++  uint next_seq;               // next FIFO sequence number
++  struct inode *swap_ip;       // this process's swap file /pgswpXXXXX
++  int swap_used;               // swap slots in use
++  uchar swap_map[NSWAPSLOT / 8]; // bitmap of used swap slots
++// ############## LLM Generated Code Ends ################
+ };
++
++// MLFQ parameters
++#define MLFQ_NQUEUE     4      // queues 0..3, slices 1, 4, 8, 16 ticks (mlfq_slice[] in proc.c)
++#define BOOST_INTERVAL  48     // ticks; every 48 ticks all processes go back to queue 0
++
++// CFS parameters
++#define NICE_0_WEIGHT   1024   // weight of a nice-0 process
++#define TARGET_LATENCY  48     // ticks; every runnable process should run once in this window
++#define MIN_GRANULARITY 3      // ticks; smallest allowed time slice
++#define VRUNTIME_SCALE  1000   // nice-0 process gains 1000 vruntime per tick (avoids fractions)
+diff --git a/kernel/riscv.h b/kernel/riscv.h
+index 3e982ab..853d0b4 100644
+--- a/kernel/riscv.h
++++ b/kernel/riscv.h
+@@ -397,6 +397,19 @@ typedef uint64 *pagetable_t; // 512 PTEs
+ #define PTE_W (1L << 2)
+ #define PTE_X (1L << 3)
+ #define PTE_U (1L << 4) // user can access
++// ############## LLM Generated Code Begins ##############
++#define PTE_A (1L << 6) // accessed
++#define PTE_D (1L << 7) // dirty
++// Software bits (RSW, ignored by the hardware), used by demand paging.
++// PTE_SWW:  page is writable, but PTE_W is left off until the first write
++//           so that the write traps and the page can be marked dirty.
++// PTE_SWAP: page is in the process's swap file. PTE_V is 0 and the
++//           PPN field holds the swap slot number instead of a frame.
++#define PTE_SWW  (1L << 8)
++#define PTE_SWAP (1L << 9)
++#define PTE2SLOT(pte)  ((int)((pte) >> 10))
++#define SLOT2PTE(slot) (((uint64)(slot)) << 10)
++// ############## LLM Generated Code Ends ################
+ 
+ // shift a physical address to the right place for a PTE.
+ #define PA2PTE(pa) ((((uint64)pa) >> 12) << 10)
+diff --git a/kernel/syscall.c b/kernel/syscall.c
+index 1a51d9c..574e7f6 100644
+--- a/kernel/syscall.c
++++ b/kernel/syscall.c
+@@ -80,7 +80,7 @@ argstr(int n, char *buf, int max)
+   return fetchstr(addr, buf, max);
+ }
+ 
+-// Prototypes fimor the functions that handle system calls.
++// Prototypes for the functions that handle system calls.
+ extern uint64 sys_fork(void);
+ extern uint64 sys_exit(void);
+ extern uint64 sys_wait(void);
+@@ -103,6 +103,10 @@ extern uint64 sys_link(void);
+ extern uint64 sys_mkdir(void);
+ extern uint64 sys_close(void);
+ extern uint64 sys_sync(void);
++extern uint64 sys_getreadcount(void);
++extern uint64 sys_setnice(void);
++extern uint64 sys_waitx(void);
++extern uint64 sys_memstat(void);
+ 
+ // An array mapping syscall numbers from syscall.h
+ // to the function that handles the system call.
+@@ -130,6 +134,10 @@ static uint64 (*syscalls[])(void) = {
+   [SYS_mkdir]   = sys_mkdir,
+   [SYS_close]   = sys_close,
+   [SYS_sync]    = sys_sync,
++  [SYS_getreadcount] = sys_getreadcount,
++  [SYS_setnice] = sys_setnice,
++  [SYS_waitx]   = sys_waitx,
++  [SYS_memstat] = sys_memstat,
+   // clang-format on
+ };
+ 
+diff --git a/kernel/syscall.h b/kernel/syscall.h
+index 5a4a39f..96994bd 100644
+--- a/kernel/syscall.h
++++ b/kernel/syscall.h
+@@ -21,3 +21,7 @@
+ #define SYS_mkdir  20
+ #define SYS_close  21
+ #define SYS_sync   22
++#define SYS_getreadcount 23
++#define SYS_setnice 24
++#define SYS_waitx   25
++#define SYS_memstat 26
+diff --git a/kernel/sysfile.c b/kernel/sysfile.c
+index 7781287..d4670de 100644
+--- a/kernel/sysfile.c
++++ b/kernel/sysfile.c
+@@ -16,6 +16,9 @@
+ #include "file.h"
+ #include "fcntl.h"
+ 
++// Bytes read by read() system-wide since boot 
++static uint readcount = 0;
++
+ // Fetch the nth word-sized system call argument as a file descriptor
+ // and return both the descriptor and the corresponding struct file.
+ static int
+@@ -76,7 +79,23 @@ sys_read(void)
+   argint(2, &n);
+   if (argfd(0, 0, &f) < 0)
+     return -1;
+-  return fileread(f, p, n);
++// ############## LLM Generated Code Begins ##############
++  // Demand paging: fault the user buffer in now. The copy into it happens
++  // with locks held (pipe, console, inode), where a fault cannot sleep.
++  if (n > 0)
++    vm_prefault(p, n, 1);
++// ############## LLM Generated Code Ends ################
++  int r = fileread(f, p, n);
++  if (r > 0)
++    __sync_fetch_and_add(&readcount, (uint)r); // atomic; uint wraps to 0 on overflow
++  return r;
++}
++
++// Total bytes returned by read() across all processes since boot.
++uint64
++sys_getreadcount(void)
++{
++  return __atomic_load_n(&readcount, __ATOMIC_SEQ_CST);
+ }
+ 
+ uint64
+@@ -91,6 +110,10 @@ sys_write(void)
+   if (argfd(0, 0, &f) < 0)
+     return -1;
+ 
++// ############## LLM Generated Code Begins ##############
++  if (n > 0)
++    vm_prefault(p, n, 0); // see sys_read()
++// ############## LLM Generated Code Ends ################
+   return filewrite(f, p, n);
+ }
+ 
+diff --git a/kernel/sysproc.c b/kernel/sysproc.c
+index cd25557..1a43aac 100644
+--- a/kernel/sysproc.c
++++ b/kernel/sysproc.c
+@@ -33,9 +33,47 @@ sys_wait(void)
+ {
+   uint64 p;
+   argaddr(0, &p);
++// ############## LLM Generated Code Begins ##############
++  // kwait() copies the status out while holding locks; fault it in now.
++  if (p)
++    vm_prefault(p, sizeof(int), 1);
+   return kwait(p);
+ }
+ 
++// memstat(struct proc_mem_stat *info): page-level snapshot of the caller.
++uint64
++sys_memstat(void)
++{
++  uint64 addr;
++
++  argaddr(0, &addr);
++  return vm_memstat(addr);
++}
++// ############## LLM Generated Code Ends ################
++
++// waitx(status, wtime, rtime): like wait(), and also copies out the
++// reaped child's waiting time and running time (in ticks).
++uint64
++sys_waitx(void)
++{
++  uint64 addr, waddr, raddr;
++  uint wtime, rtime;
++  struct proc *p = myproc();
++
++  argaddr(0, &addr);
++  argaddr(1, &waddr);
++  argaddr(2, &raddr);
++  if (addr)
++    vm_prefault(addr, sizeof(int), 1);
++  int pid = kwaitx(addr, &wtime, &rtime);
++  if (pid < 0)
++    return -1;
++  if (copyout(p->pagetable, p->sz, waddr, (char *)&wtime, sizeof(wtime)) < 0 ||
++      copyout(p->pagetable, p->sz, raddr, (char *)&rtime, sizeof(rtime)) < 0)
++    return -1;
++  return pid;
++}
++
+ uint64
+ sys_sbrk(void)
+ {
+@@ -47,21 +85,14 @@ sys_sbrk(void)
+   argint(1, &t);
+   addr = myproc()->sz;
+ 
+-  if (t == SBRK_EAGER || n < 0) {
+-    if (growproc(n) < 0) {
+-      return -1;
+-    }
+-  } else {
+-    // Lazily allocate memory for this process: increase its memory
+-    // size but don't allocate memory. If the processes uses the
+-    // memory, vmfault() will allocate it.
+-    if (addr + n < addr)
+-      return -1;
+-    if (addr + n > TRAPFRAME)
+-      return -1;
+-    myproc()->sz += n;
+-  }
++// ############## LLM Generated Code Begins ##############
++  // Demand paging: sbrk() never allocates physical pages, whatever t is.
++  // growproc() only changes p->sz; pages are zero-filled on first use.
++  (void)t;
++  if (growproc(n) < 0)
++    return -1;
+   return addr;
++// ############## LLM Generated Code Ends ################
+ }
+ 
+ uint64
+@@ -89,6 +120,17 @@ sys_pause(void)
+   return 0;
+ }
+ 
++// setnice(pid, nice): set a process's CFS priority (-20..19).
++uint64
++sys_setnice(void)
++{
++  int pid, nice;
++
++  argint(0, &pid);
++  argint(1, &nice);
++  return setnice(pid, nice);
++}
++
+ uint64
+ sys_kill(void)
+ {
+diff --git a/kernel/trap.c b/kernel/trap.c
+index 00e99bc..4b09224 100644
+--- a/kernel/trap.c
++++ b/kernel/trap.c
+@@ -66,12 +66,18 @@ usertrap(void)
+     intr_on();
+ 
+     syscall();
++// ############## LLM Generated Code Begins ##############
++  } else if (r_scause() == 12 || r_scause() == 13 || r_scause() == 15) {
++    // page fault: 12 = instruction fetch, 13 = load, 15 = store.
++    // Demand paging (paging.c); kills the process if the access is invalid.
++    uint64 scause = r_scause(), va = r_stval();
++    int access = scause == 12 ? ACC_EXEC : scause == 13 ? ACC_READ : ACC_WRITE;
++    // Loading a page may sleep for disk I/O, as a system call can.
++    intr_on();
++    vm_fault(p, va, access, 1);
++// ############## LLM Generated Code Ends ################
+   } else if ((which_dev = devintr()) != 0) {
+     // ok
+-  } else if ((r_scause() == 15 || r_scause() == 13) &&
+-             vmfault(p->pagetable, p->sz, r_stval(),
+-                     (r_scause() == 13) ? 1 : 0) != 0) {
+-    // page fault on lazily-allocated page
+   } else {
+     printk("usertrap(): unexpected scause 0x%lx pid=%d\n", r_scause(), p->pid);
+     printk("            sepc=0x%lx stval=0x%lx\n", r_sepc(), r_stval());
+@@ -81,8 +87,10 @@ usertrap(void)
+   if (killed(p))
+     kexit(-1);
+ 
+-  // give up the CPU if this is a timer interrupt.
+-  if (which_dev == 2)
++  // On a timer interrupt, let the scheduling policy decide whether the
++  // process must give up the CPU (RR: always, FCFS: never,
++  // CFS: when its time slice is used up). See sched_tick() in proc.c.
++  if (which_dev == 2 && sched_tick())
+     yield();
+ 
+   prepare_return();
+@@ -154,7 +162,8 @@ kerneltrap()
+   }
+ 
+   // give up the CPU if this is a timer interrupt.
+-  if (which_dev == 2 && myproc() != 0)
++  // (sched_tick() returns 0 when no process is running on this CPU.)
++  if (which_dev == 2 && sched_tick())
+     yield();
+ 
+   // the yield() may have caused some traps to occur,
+@@ -169,8 +178,16 @@ clockintr()
+   if (cpuid() == 0) {
+     acquire(&tickslock);
+     ticks++;
++    uint now = ticks;
+     wakeup(&ticks);
+     release(&tickslock);
++#ifdef MLFQ
++    // Starvation prevention: every BOOST_INTERVAL ticks, all -> queue 0.
++    if (now % BOOST_INTERVAL == 0)
++      mlfq_boost();
++#else
++    (void)now;
++#endif
+   }
+ 
+   // ask for the next timer interrupt. this also clears
+diff --git a/kernel/vm.c b/kernel/vm.c
+index f50650b..aecb80e 100644
+--- a/kernel/vm.c
++++ b/kernel/vm.c
+@@ -360,9 +360,16 @@ copyout(pagetable_t pagetable, uint64 psz, uint64 dstva, char *src, uint64 len)
+     }
+ 
+     pte = walk(pagetable, va0, 0);
+-    // forbid copyout over read-only user text pages.
+-    if ((*pte & PTE_W) == 0)
+-      return -1;
++// ############## LLM Generated Code Begins ##############
++    // forbid copyout over read-only user text pages. A clean writable
++    // page (PTE_SWW) becomes writable and dirty, like a user write fault.
++    if ((*pte & PTE_W) == 0) {
++      if ((*pte & PTE_SWW) == 0)
++        return -1;
++      if ((pa0 = vmfault(pagetable, psz, va0, 0)) == 0)
++        return -1;
++    }
++// ############## LLM Generated Code Ends ################
+ 
+     n = PGSIZE - (dstva - va0);
+     if (n > len)
+@@ -451,31 +458,21 @@ copyinstr(pagetable_t pagetable, uint64 psz, char *dst, uint64 srcva,
+   }
+ }
+ 
+-// allocate and map user memory if process is referencing a page
+-// that was lazily allocated in sys_sbrk().
+-// returns 0 if va is invalid or already mapped, or if
+-// out of physical memory, and physical address if successful.
++// ############## LLM Generated Code Begins ##############
++// A kernel access (copyin/copyout) to a user page that is not present,
++// or a first write to a clean page: let demand paging bring it in
++// (paging.c). Returns the physical address, or 0 if the access is
++// invalid or cannot be satisfied.
+ uint64
+ vmfault(pagetable_t pagetable, uint64 psz, uint64 va, int read)
+ {
+-  uint64 mem;
++  struct proc *p = myproc();
+ 
+-  if (va >= psz)
+-    return 0;
+-  va = PGROUNDDOWN(va);
+-  if (ismapped(pagetable, va)) {
++  if (p == 0 || pagetable != p->pagetable)
+     return 0;
+-  }
+-  mem = (uint64)kalloc();
+-  if (mem == 0)
+-    return 0;
+-  memset((void *)mem, 0, PGSIZE);
+-  if (mappages(pagetable, va, PGSIZE, mem, PTE_W | PTE_U | PTE_R) != 0) {
+-    kfree((void *)mem);
+-    return 0;
+-  }
+-  return mem;
++  return vm_fault(p, va, read ? ACC_READ : ACC_WRITE, 0);
+ }
++// ############## LLM Generated Code Ends ################
+ 
+ int
+ ismapped(pagetable_t pagetable, uint64 va)
+diff --git a/report.md b/report.md
+new file mode 100644
+index 0000000..8c298ca
+--- /dev/null
++++ b/report.md
+@@ -0,0 +1,283 @@
++# xv6 Report — getreadcount, FCFS, CFS, MLFQ (bonus)
++
++## Building
++
++```
++make clean; make qemu                          # Round Robin (default)
++make clean; make qemu SCHEDULER=FCFS
++make clean; make qemu SCHEDULER=CFS            # with [Scheduler Tick] log
++make clean; make qemu SCHEDULER=CFS CFSLOG=0   # CFS without the log
++make clean; make qemu SCHEDULER=MLFQ           # MLFQLOG=1 for the queue-event log
++```
++
++The Makefile passes `-D$(SCHEDULER)` to the compiler (RR when not given), so exactly one
++policy is compiled in. `make clean` is needed when switching so every file is rebuilt.
++
++---
++
++## Part A — `getreadcount`
++
++- **Counter:** `static uint readcount` in `kernel/sysfile.c`. In `sys_read()`, after
++  `fileread()` returns `r`, if `r > 0` it is added with `__sync_fetch_and_add`, so concurrent
++  reads on several CPUs are not lost. Only bytes actually read are counted (errors/EOF add 0).
++  Being a 32-bit unsigned int, it wraps to 0 on overflow.
++- **Syscall:** `sys_getreadcount()` returns the counter. Registered as `SYS_getreadcount` (23)
++  in `syscall.h`/`syscall.c`, with the user stub from `usys.pl` and the prototype in `user.h`.
++- **`user/readcount.c`:** prints the count, reads 100 bytes from a file (default `README`),
++  prints the count again and checks the increase equals the bytes read (unsigned subtraction,
++  so it is correct even across a wrap).
++
++```
++$ readcount
++Initial read count: 10
++Read 100 bytes from README
++Read count after read: 110
++Increase: 100 bytes
++OK: read count increased by 100 as expected
++```
++
++---
++
++## Part B — Common changes
++
++- **New `struct proc` fields** (`kernel/proc.h`): `ctime`, `rtime`, `etime`, `nice`, `weight`,
++  `vruntime`, `time_slice`, `slice_used`. All are initialised in `allocproc()`.
++- **One timer hook for all policies:** both timer-interrupt paths in `kernel/trap.c`
++  (`usertrap`, `kerneltrap`) now do `if (which_dev == 2 && sched_tick()) yield();`.
++  `sched_tick()` (`kernel/proc.c`) does the per-tick accounting for the running process and
++  returns whether it must be preempted: RR → always, FCFS → never, CFS → when its slice is used up.
++- **`scheduler()`** is split with `#if defined(FCFS) / #elif defined(CFS) / #else`, where the
++  `#else` branch is the original round-robin code, kept unchanged.
++- **`procdump()`** (Ctrl-P) also prints ctime, nice, vruntime and slice used/total.
++
++## FCFS
++
++- **Creation time:** `allocproc()` sets `p->ctime = ticks`. Every process is created through
++  `allocproc()`, so all processes get an arrival time.
++- **Selection:** the scheduler scans the whole process table and picks the RUNNABLE process
++  with the smallest `ctime` (ties → smaller pid, since several forks can happen in one tick).
++  The best candidate's lock is kept while scanning; locks are taken in table order, so two CPUs
++  scanning together cannot deadlock.
++- **Non-preemptive:** `sched_tick()` returns 0 under FCFS, so a timer interrupt never forces a
++  `yield()`. A process leaves the CPU only when it exits or blocks (sleep, wait, I/O).
++
++`fcfstest` (3 CPU-bound children, 1 CPU) shows they run strictly one after another:
++
++```
++child 0 (pid 5) started at tick 48      child 0 finished at tick 53
++child 1 (pid 6) started at tick 54      child 1 finished at tick 59
++child 2 (pid 7) started at tick 59      child 2 finished at tick 65
++```
++(Under RR the same three start at ticks 4, 5, 6 and all finish at ticks 19–20.)
++
++## CFS
++
++### B.1 Priority
++- Each process has `nice` (−20..19, default 0, inherited from the parent on `fork`).
++- `weight = 1024 / 1.25^nice` is taken from a 40-entry table `prio_to_weight[]` (same values
++  as Linux: nice −20 = 88761, 0 = 1024, 19 = 15), because the kernel has no floating point.
++- A new syscall `setnice(pid, nice)` (number 24) changes a process's nice/weight; it is needed
++  to test priorities.
++
++### B.2 Virtual runtime
++- `vruntime` starts at 0 in `allocproc()`.
++- On every timer tick, `sched_tick()` adds `1000 × 1024 / weight` to the running process's
++  vruntime, i.e. vruntime is measured in 1/1000 of a nice-0 tick. The ×1000 scaling keeps
++  high-weight increments non-zero in integer arithmetic (nice 0: +1000/tick, nice −10: +107,
++  nice 10: +9309, nice −20: +11).
++
++### B.2 Scheduling
++- At every decision the scheduler scans the table and runs the RUNNABLE process with the
++  **lowest vruntime** (ties → lower pid). This always selects the same process as the head of a
++  vruntime-sorted queue would; with at most NPROC = 64 processes a scan is cheap and needs no
++  extra bookkeeping when processes become runnable. Same locking scheme as FCFS.
++- A process that sleeps keeps its vruntime when it wakes. Wake-ups do not preempt the running
++  process; it finishes its slice first.
++
++### B.3 Time slices
++- When a process is chosen: `time_slice = 48 / N` where N = number of RUNNABLE processes at
++  that decision, with a minimum of 3 ticks; `slice_used` is reset to 0.
++- `sched_tick()` increments `slice_used` each tick and requests a `yield()` once
++  `slice_used ≥ time_slice`.
++
++### Logging
++Compiled in with `SCHEDULER=CFS` (default `CFSLOG=1`). During the scan the scheduler records
++every runnable PID and its vruntime; after the scan it prints them and the chosen PID.
++
++**Excerpt 1 — `cfstest`** (3 equal CPU-bound children with nice 10 / 0 / −10; pids 4 / 5 / 6).
++N = 3, so each slice is 48/3 = 16 ticks:
++
++```
++[Scheduler Tick]
++PID: 4 | vRuntime: 0
++PID: 5 | vRuntime: 0
++PID: 6 | vRuntime: 0
++--> Scheduling PID 4 (lowest vRuntime)
++[Scheduler Tick]
++PID: 4 | vRuntime: 148944        <- nice 10: 16 ticks × 9309
++PID: 5 | vRuntime: 0
++PID: 6 | vRuntime: 0
++--> Scheduling PID 5 (lowest vRuntime)
++[Scheduler Tick]
++PID: 4 | vRuntime: 148944
++PID: 5 | vRuntime: 16000         <- nice 0: 16 ticks × 1000
++PID: 6 | vRuntime: 0
++--> Scheduling PID 6 (lowest vRuntime)
++[Scheduler Tick]
++PID: 4 | vRuntime: 148944
++PID: 5 | vRuntime: 16000
++PID: 6 | vRuntime: 1712          <- nice -10: 16 ticks × 107
++--> Scheduling PID 6 (lowest vRuntime)
++[Scheduler Tick]
++PID: 4 | vRuntime: 148944
++PID: 5 | vRuntime: 16000
++PID: 6 | vRuntime: 3424
++--> Scheduling PID 6 (lowest vRuntime)
++```
++
++Every decision picks the lowest vruntime, and the chosen process's vruntime grows after each
++slice in inverse proportion to its weight. Result (1 CPU):
++
++| child | nice | finished at (CFS) | finished at (RR) |
++|---|---|---|---|
++| child 2 | −10 | tick 70 | tick 116 |
++| child 1 | 0 | tick 93 | tick 116 |
++| child 0 | 10 | tick 116 | tick 117 |
++
++**Excerpt 2 — `schedulertest`** (pids 4–8 I/O-bound, 9–13 CPU-bound, all nice 0). The five
++CPU-bound processes have each run one 9-tick slice (48/5 runnable = 9) and have vruntime 9000.
++The I/O-bound ones (vruntime 0) are picked first whenever they are runnable: xv6's `pause()`
++wakes sleepers on every tick to re-check the time, and they immediately sleep again, using
++almost no CPU.
++
++```
++[Scheduler Tick]
++PID: 4 | vRuntime: 0
++PID: 5 | vRuntime: 0
++PID: 6 | vRuntime: 0
++PID: 7 | vRuntime: 0
++PID: 8 | vRuntime: 0
++PID: 9 | vRuntime: 9000
++PID: 10 | vRuntime: 9000
++PID: 11 | vRuntime: 9000
++PID: 12 | vRuntime: 9000
++PID: 13 | vRuntime: 9000
++--> Scheduling PID 4 (lowest vRuntime)
++[Scheduler Tick]
++PID: 5 | vRuntime: 0
++...
++PID: 13 | vRuntime: 9000
++--> Scheduling PID 5 (lowest vRuntime)
++```
++
++---
++
++## Performance comparison
++
++### Method
++- **Time accounting:** `rtime` is incremented in `sched_tick()` on each tick the process is
++  RUNNING (all policies); `etime = ticks` is set in `kexit()`.
++- **`waitx(status, &wtime, &rtime)`** (syscall 25) behaves like `wait()` and also returns the
++  reaped child's `rtime` and `wtime = etime − ctime − rtime` (all non-running time, including
++  sleeping). `kwait()` now calls the shared `kwaitx()`.
++- **`schedulertest`:** forks 10 children — 5 I/O-bound (`sleep(200)`) and 5 CPU-bound
++  (1,000,000,000-iteration busy loop) — reaps them with `waitx` and prints the averages.
++  (The course link to the original file needs an IIIT login; this is the standard version of
++  the test. A `sleep()` wrapper for `pause()` was added to `user/ulib.c`, as this xv6 renamed it.)
++- **Setup:** `CPUS=1`, `CFSLOG=0` (printing would distort timing), 3 runs per scheduler in
++  one boot. Times are in ticks.
++
++### Results
++
++| Scheduler | Run 1 (rtime / wtime) | Run 2 | Run 3 | **Avg rtime** | **Avg wtime** |
++|---|---|---|---|---|---|
++| Round Robin | 9 / 138 | 9 / 137 | 9 / 138 | **9** | **137.7** |
++| FCFS | 10 / 119 | 10 / 119 | 9 / 119 | **9.7** | **119** |
++| CFS | 9 / 137 | 10 / 138 | 10 / 138 | **9.7** | **137.7** |
++| MLFQ (bonus) | 9 / 136 | 9 / 137 | 9 / 137 | **9** | **136.7** |
++
++### Analysis
++- **Running time is the same (~9–10 ticks)** for all policies: it is the CPU work each process
++  needs (CPU-bound ≈ 19 ticks, I/O-bound ≈ 0, averaged over 10), which the scheduler does not
++  change. The small differences come from tick-granularity rounding.
++- **Wait time.** The I/O-bound processes wait ≈ 200 ticks in every policy, since they sleep
++  200 ticks and sleeping counts as waiting. The difference comes from the 5 CPU-bound processes
++  (~95 ticks of total work):
++  - **FCFS (119)** runs them one after another. They finish at ≈ 19, 38, 57, 76, 95, so their
++    waits are ≈ 0, 19, 38, 57, 76 (mean ≈ 38) → (5·200 + 5·38)/10 ≈ 119.
++  - **RR (137.7)** interleaves them every tick, so all five finish near the end (≈ 95) and each
++    waits ≈ 76 → (5·200 + 5·76)/10 ≈ 138.
++  - **CFS (137.7)**: all processes have nice 0, so CFS divides the CPU equally just like RR, only
++    in longer slices (≈ 9 ticks). All CPU-bound processes again finish near the end, giving the
++    same average wait as RR.
++  - **MLFQ (136.7)**: the I/O-bound processes never use a full slice and stay in queue 0, so they
++    are served immediately whenever they wake. The CPU-bound ones sink to the lower queues and
++    share the CPU there. The 48-tick boost keeps lifting them back to queue 0, so over the run
++    they still share the CPU in turns and finish close together. This gives about the same
++    average wait as RR/CFS (slightly lower).
++- **Trade-off.** FCFS has the lowest average wait on this workload because it never shares the
++  CPU: for equal-length jobs, running them to completion one at a time minimises the average
++  completion time, while sharing makes every job finish late. However, it gives
++  no responsiveness: a long job blocks every later one (convoy effect), and an infinite loop
++  would block the CPU. RR and CFS are fair and responsive. CFS additionally respects priorities
++  (see the `cfstest` table: nice −10 finished at tick 70 vs. 116 under RR) and switches less
++  often than RR (slices of 48/N ticks instead of 1 tick). MLFQ needs no priorities from the
++  user: it learns from behaviour which processes are interactive (keep them in queue 0, so they
++  respond fast) and which are CPU-bound (move them down to longer slices with fewer switches).
++  The boost prevents starvation.
++
++## Bonus — Preemptive MLFQ (`SCHEDULER=MLFQ`)
++
++### Implementation
++- **Queues without linked lists.** Each process stores `queue` (0–3), `qticks` (ticks used of the
++  current slice) and `qseq` (taken from a global counter when it joins a queue). "Front of
++  queue q" means the RUNNABLE process in q with the smallest `qseq`, so FIFO order within a queue
++  follows from that number.
++- **Joining a queue.** Every transition to RUNNABLE (`userinit`, `fork`, `yield`, `wakeup`,
++  `kill`) goes through one helper, `make_runnable(p, fresh_slice)`. It gives the process a new
++  `qseq`, putting it at the end of its queue.
++- **New processes.** `allocproc()` sets `queue = 0`, so a new process joins the end of queue 0.
++- **Selection.** The scheduler picks the RUNNABLE process with the lowest `queue`, then the lowest
++  `qseq` (same locking scheme as FCFS/CFS).
++- **Full slice → demote** (`sched_tick()`). Each tick, `qticks++`. When `qticks` reaches the
++  slice of the current queue (1, 4, 8, 16), the process moves one queue down (it stays in queue
++  3), gets `qticks = 0` and yields. It therefore joins the end of the lower queue.
++- **Queue 3 is round robin.** A process that uses its 16 ticks stays in queue 3 and joins its end,
++  so queue-3 processes take turns.
++- **Leaving early (I/O) → same queue.** A process that sleeps before its slice ends keeps its
++  queue. When `wakeup()` makes it RUNNABLE, it joins the end of the same queue with a fresh slice.
++- **Preemption by a higher queue.** At every tick, `sched_tick()` checks
++  (`mlfq_higher_waiting()`) whether some RUNNABLE process is in a higher queue. If so, the
++  running process yields at that tick boundary. It keeps its queue and the ticks already used
++  (`make_runnable(p, 0)`). This stops a process dodging demotion by being preempted repeatedly:
++  in xv6 `pause()` wakes sleepers on every tick, which would otherwise reset the slice forever.
++- **Priority boost.** In `clockintr()` (CPU 0), whenever `ticks % 48 == 0`, `mlfq_boost()` moves
++  every process to queue 0 with `qticks = 0`. Their relative `qseq` order is kept.
++- **Exit.** An exited process becomes ZOMBIE and is never RUNNABLE again, so it leaves all queues.
++- **Ticks only.** Every decision above is made in the timer interrupt (`trap.c`), so preemption
++  happens only at tick boundaries.
++- **Event log.** Optional, with `MLFQLOG=1`: prints demotions, preemptions and boosts.
++
++### Behaviour (`mlfqtest`: 2 CPU-bound + 1 I/O-bound, 1 CPU, `MLFQLOG=1`; preemption lines omitted)
++
++```
++[MLFQ] tick 12: PID 4 used full slice, Q0 -> Q1
++[MLFQ] tick 13: PID 5 used full slice, Q0 -> Q1
++[MLFQ] tick 20: PID 4 used full slice, Q1 -> Q2
++[MLFQ] tick 21: PID 5 used full slice, Q1 -> Q2
++[MLFQ] tick 36: PID 4 used full slice, Q2 -> Q3
++[MLFQ] tick 37: PID 5 used full slice, Q2 -> Q3
++[MLFQ] tick 48: priority boost, all processes -> Q0
++[MLFQ] tick 48: PID 4 used full slice, Q0 -> Q1
++[MLFQ] tick 49: PID 5 used full slice, Q0 -> Q1
++...
++mlfqtest: pid 6 done, rtime 0, wtime 122      <- I/O-bound: never demoted, stays in Q0
++mlfqtest: pid 4 done, rtime 80, wtime 74
++mlfqtest: pid 5 done, rtime 77, wtime 80
++```
++
++- The two CPU-bound processes sink one queue at a time. The gaps between demotions match the
++  slice sizes: Q1 takes 4 + 4 ticks (12→20) and Q2 takes 8 + 8 ticks (20→36), since the two
++  processes alternate.
++- They take turns in Q3 until the boost at tick 48 (and again at 96, 144, …) lifts them back to Q0.
++- The I/O-bound process never appears in a demotion line.
+diff --git a/user/cfstest.c b/user/cfstest.c
+new file mode 100644
+index 0000000..bd11887
+--- /dev/null
++++ b/user/cfstest.c
+@@ -0,0 +1,49 @@
++// cfstest: CPU-bound children with different nice values.
++//
++//   make clean; make qemu CPUS=1 SCHEDULER=CFS CFSLOG=0   -> nice -10 finishes first
++//   make clean; make qemu CPUS=1 SCHEDULER=CFS            -> same, with vruntime log
++//
++// Each child does the same amount of work. Under CFS a lower nice value
++// (higher weight) makes vruntime grow slower, so that child is picked more
++// often and finishes earlier.
++
++#include "kernel/types.h"
++#include "user/user.h"
++
++#define NCHILD 3
++
++static int nices[NCHILD] = {10, 0, -10};
++
++static void
++spin(void)
++{
++  volatile unsigned long x = 0;
++  for (unsigned long i = 0; i < 2000000000UL; i++)
++    x += i;
++}
++
++int
++main(void)
++{
++  for (int i = 0; i < NCHILD; i++) {
++    int pid = fork();
++    if (pid < 0) {
++      fprintf(2, "cfstest: fork failed\n");
++      exit(1);
++    }
++    if (pid == 0) {
++      if (setnice(getpid(), nices[i]) < 0)
++        fprintf(2, "cfstest: setnice failed\n");
++      int start = uptime();
++      spin();
++      int end = uptime();
++      printf("child %d (pid %d, nice %d) finished at tick %d (took %d ticks)\n",
++             i, getpid(), nices[i], end, end - start);
++      exit(0);
++    }
++  }
++  for (int i = 0; i < NCHILD; i++)
++    wait(0);
++  printf("cfstest: all children done\n");
++  exit(0);
++}
+diff --git a/user/fcfstest.c b/user/fcfstest.c
+new file mode 100644
+index 0000000..bb1f890
+--- /dev/null
++++ b/user/fcfstest.c
+@@ -0,0 +1,43 @@
++// fcfstest: shows the order in which CPU-bound children run.
++//
++// Run with one CPU to see the policy clearly:
++//   make clean; make qemu CPUS=1 SCHEDULER=FCFS     -> children run one after another
++//   make clean; make qemu CPUS=1                    -> round robin: children interleave
++
++#include "kernel/types.h"
++#include "user/user.h"
++
++#define NCHILD 3
++
++static void
++spin(void)
++{
++  volatile unsigned long x = 0;
++  for (unsigned long i = 0; i < 300000000UL; i++)
++    x += i;
++}
++
++int
++main(void)
++{
++  for (int i = 0; i < NCHILD; i++) {
++    int pid = fork();
++    if (pid < 0) {
++      fprintf(2, "fcfstest: fork failed\n");
++      exit(1);
++    }
++    if (pid == 0) {
++      int start = uptime();
++      printf("child %d (pid %d) started at tick %d\n", i, getpid(), start);
++      spin();
++      int end = uptime();
++      printf("child %d (pid %d) finished at tick %d (ran %d ticks)\n", i,
++             getpid(), end, end - start);
++      exit(0);
++    }
++  }
++  for (int i = 0; i < NCHILD; i++)
++    wait(0);
++  printf("fcfstest: all children done\n");
++  exit(0);
++}
+diff --git a/user/lazytest.c b/user/lazytest.c
+new file mode 100644
+index 0000000..986c496
+--- /dev/null
++++ b/user/lazytest.c
+@@ -0,0 +1,127 @@
++// ############## LLM Generated Code Begins ##############
++// lazytest: demand paging basics and memstat().
++//   - sbrk() maps nothing; the first access zero-fills a page (ALLOC)
++//   - reads leave a page clean, writes make it dirty
++//   - invalid accesses kill the process (run in children)
++#include "kernel/types.h"
++#include "kernel/memstat.h"
++#include "user/user.h"
++
++#define PG 4096
++
++static struct proc_mem_stat st;
++static char *statename[] = {"UNMAPPED", "RESIDENT", "SWAPPED"};
++
++static void
++show(char *when)
++{
++  if (memstat(&st) < 0) {
++    printf("lazytest: memstat failed\n");
++    exit(1);
++  }
++  printf("-- %s: pid=%d total=%d resident=%d swapped=%d next_seq=%d\n", when,
++         st.pid, st.num_pages_total, st.num_resident_pages,
++         st.num_swapped_pages, st.next_fifo_seq);
++  int n = st.num_pages_total < MAX_PAGES_INFO ? st.num_pages_total
++                                              : MAX_PAGES_INFO;
++  for (int i = 0; i < n; i++) {
++    struct page_stat *ps = &st.pages[i];
++    if (ps->state == UNMAPPED)
++      continue;
++    printf("   va=0x%x %s dirty=%d seq=%d slot=%d\n", ps->va,
++           statename[ps->state], ps->is_dirty, ps->seq, ps->swap_slot);
++  }
++}
++
++// Find a page's entry in the last memstat() result.
++static struct page_stat *
++page(char *va)
++{
++  for (int i = 0; i < MAX_PAGES_INFO; i++)
++    if (st.pages[i].va == (uint)(uint64)va)
++      return &st.pages[i];
++  return 0;
++}
++
++static int fails = 0;
++static void
++check(int ok, char *what)
++{
++  printf("%s: %s\n", ok ? "PASS" : "FAIL", what);
++  if (!ok)
++    fails++;
++}
++
++// Run f in a child; it must be killed (exit status -1).
++static void
++mustdie(void (*f)(void), char *what)
++{
++  int pid = fork();
++  if (pid == 0) {
++    f();
++    exit(0); // not reached if the kernel kills us
++  }
++  int status = 0;
++  wait(&status);
++  check(status == -1, what);
++}
++
++static void
++read_past_sz(void)
++{
++  volatile char *bad = sbrk(0) + 8 * PG;
++  printf("%d\n", *bad);
++}
++
++static void
++write_text(void)
++{
++  *(volatile char *)(uint64)show = 0;
++}
++
++static void
++exec_heap(void)
++{
++  char *h = sbrk(PG);
++  h[0] = 0;
++  ((void (*)(void))h)();
++}
++
++int
++main(void)
++{
++  show("start");
++
++  char *p = sbrk(3 * PG);
++  show("after sbrk(3 pages)");
++  check(memstat(&st) == 0 && page(p)->state == UNMAPPED,
++        "sbrk does not allocate");
++
++  p[0] = 'x'; // write fault -> ALLOC, dirty
++  volatile char c = p[PG]; // read fault -> ALLOC, clean
++  (void)c;
++  memstat(&st);
++  check(page(p)->state == RESIDENT && page(p)->is_dirty == 1,
++        "write fault: resident and dirty");
++  check(page(p + PG)->state == RESIDENT && page(p + PG)->is_dirty == 0 &&
++          p[PG] == 0,
++        "read fault: resident, clean, zero-filled");
++  check(page(p + 2 * PG)->state == UNMAPPED, "untouched page stays unmapped");
++  check(page(p + PG)->seq > page(p)->seq, "FIFO seq increases");
++
++  p[PG] = 'y'; // first write to a clean page
++  memstat(&st);
++  check(page(p + PG)->is_dirty == 1, "first write marks page dirty");
++  show("after touching 2 of 3 heap pages");
++
++  mustdie(read_past_sz, "read beyond sz kills the process");
++  mustdie(write_text, "write to text kills the process");
++  mustdie(exec_heap, "executing the heap kills the process");
++
++  if (fails == 0)
++    printf("lazytest: OK\n");
++  else
++    printf("lazytest: %d FAILED\n", fails);
++  exit(fails != 0);
++}
++// ############## LLM Generated Code Ends ################
+diff --git a/user/mlfqtest.c b/user/mlfqtest.c
+new file mode 100644
+index 0000000..986a6b6
+--- /dev/null
++++ b/user/mlfqtest.c
+@@ -0,0 +1,49 @@
++// mlfqtest: shows MLFQ queue movement.
++//
++//   make clean; make qemu CPUS=1 SCHEDULER=MLFQ MLFQLOG=1
++//   $ mlfqtest
++//
++// Two CPU-bound children sink Q0 -> Q1 -> Q2 -> Q3 and then take turns in
++// Q3 (round robin, 16-tick slices) until the 48-tick boost lifts them back to
++// Q0. One I/O-bound child sleeps most of the time, never uses a full slice,
++// stays in Q0 and preempts the CPU-bound ones whenever it wakes.
++
++#include "kernel/types.h"
++#include "user/user.h"
++
++static void
++spin(void)
++{
++  volatile unsigned long x = 0;
++  for (unsigned long i = 0; i < 4000000000UL; i++)
++    x += i;
++}
++
++int
++main(void)
++{
++  int cpu1 = fork();
++  if (cpu1 == 0) {
++    spin();
++    exit(0);
++  }
++  int cpu2 = fork();
++  if (cpu2 == 0) {
++    spin();
++    exit(0);
++  }
++  int io = fork();
++  if (io == 0) {
++    for (int i = 0; i < 6; i++)
++      sleep(20); // I/O-bound: blocks long before its 1-tick slice ends
++    exit(0);
++  }
++  printf("mlfqtest: CPU-bound pids %d %d, I/O-bound pid %d\n", cpu1, cpu2, io);
++
++  int wtime, rtime;
++  for (int i = 0; i < 3; i++) {
++    int pid = waitx(0, &wtime, &rtime);
++    printf("mlfqtest: pid %d done, rtime %d, wtime %d\n", pid, rtime, wtime);
++  }
++  exit(0);
++}
+diff --git a/user/readcount.c b/user/readcount.c
+new file mode 100644
+index 0000000..d417d93
+--- /dev/null
++++ b/user/readcount.c
+@@ -0,0 +1,59 @@
++// readcount: test for the getreadcount() system call (Part A.2).
++//
++// Usage: readcount [file]      (default file: README)
++//
++// 1. Prints the current system-wide read byte count.
++// 2. Reads 100 bytes from the file.
++// 3. Prints the count again and checks it increased by the bytes read.
++
++#include "kernel/types.h"
++#include "kernel/fcntl.h"
++#include "user/user.h"
++
++#define NBYTES 100
++
++int
++main(int argc, char *argv[])
++{
++  char *file = (argc > 1) ? argv[1] : "README";
++  char buf[NBYTES];
++
++  uint before = getreadcount();
++  printf("Initial read count: %u\n", before);
++
++  int fd = open(file, O_RDONLY);
++  if (fd < 0) {
++    fprintf(2, "readcount: cannot open %s\n", file);
++    exit(1);
++  }
++
++  // read() may return fewer bytes than asked, so loop until 100 bytes or EOF.
++  int total = 0;
++  while (total < NBYTES) {
++    int n = read(fd, buf + total, NBYTES - total);
++    if (n < 0) {
++      fprintf(2, "readcount: read error on %s\n", file);
++      close(fd);
++      exit(1);
++    }
++    if (n == 0)
++      break; // EOF: file is shorter than 100 bytes
++    total += n;
++  }
++  close(fd);
++  printf("Read %d bytes from %s\n", total, file);
++
++  uint after = getreadcount();
++  printf("Read count after read: %u\n", after);
++
++  // Unsigned subtraction gives the right answer even if the counter wrapped.
++  uint diff = after - before;
++  printf("Increase: %u bytes\n", diff);
++
++  if (diff == (uint)total)
++    printf("OK: read count increased by %d as expected\n", total);
++  else
++    printf("MISMATCH: expected increase of %d, got %u\n", total, diff);
++
++  exit(0);
++}
+diff --git a/user/schedulertest.c b/user/schedulertest.c
+new file mode 100644
+index 0000000..13c7d63
+--- /dev/null
++++ b/user/schedulertest.c
+@@ -0,0 +1,46 @@
++// schedulertest: standard workload for comparing schedulers.
++//
++// Forks NFORK children: the first IO of them are I/O-bound (they just
++// sleep), the rest are CPU-bound (busy loop). The parent reaps each one
++// with waitx() and prints the average running time and waiting time.
++//
++// Run on one CPU:  make clean; make qemu CPUS=1 SCHEDULER=<RR|FCFS|CFS>
++
++#include "kernel/types.h"
++#include "kernel/stat.h"
++#include "user/user.h"
++#include "kernel/fcntl.h"
++
++#define NFORK 10
++#define IO 5
++
++int
++main()
++{
++  int n, pid;
++  int wtime, rtime;
++  int twtime = 0, trtime = 0;
++  for (n = 0; n < NFORK; n++) {
++    pid = fork();
++    if (pid < 0)
++      break;
++    if (pid == 0) {
++      if (n < IO) {
++        sleep(200); // IO bound processes
++      } else {
++        for (volatile int i = 0; i < 1000000000; i++) {
++        } // CPU bound process
++      }
++      // printf("Process %d finished\n", n);
++      exit(0);
++    }
++  }
++  for (; n > 0; n--) {
++    if (waitx(0, &wtime, &rtime) >= 0) {
++      trtime += rtime;
++      twtime += wtime;
++    }
++  }
++  printf("Average rtime %d,  wait time %d\n", trtime / NFORK, twtime / NFORK);
++  exit(0);
++}
+diff --git a/user/swaptest.c b/user/swaptest.c
+new file mode 100644
+index 0000000..d67199d
+--- /dev/null
++++ b/user/swaptest.c
+@@ -0,0 +1,73 @@
++// ############## LLM Generated Code Begins ##############
++// swaptest [npages] [nprocs]
++// Each of nprocs processes sbrk()s npages pages, writes a pattern to every
++// page, then reads all of them back and checks the pattern. When the
++// pages do not fit in memory this exercises FIFO replacement, SWAPOUT
++// and SWAPIN, with each process evicting only its own pages.
++// Build with a small memory to see replacement quickly:
++//   make clean; make qemu PHYSMEM=4 CPUS=1
++//   $ swaptest 600 1      (fits in swap: all pages verify)
++//   $ swaptest 600 2      (two processes, each with its own swap file)
++//   $ swaptest 2000 1     (more than memory + 1024 swap slots: swap-exhausted)
++#include "kernel/types.h"
++#include "kernel/memstat.h"
++#include "user/user.h"
++
++#define PG 4096
++
++static struct proc_mem_stat st;
++
++static int
++run(int npages)
++{
++  int pid = getpid();
++  char *a = sbrk(npages * PG);
++  if (a == SBRK_ERROR) {
++    printf("swaptest: sbrk failed\n");
++    return 1;
++  }
++  for (int i = 0; i < npages; i++)
++    *(int *)(a + i * PG + 64) = i * 31 + pid;
++
++  memstat(&st);
++  printf("swaptest pid %d: wrote %d pages, resident=%d swapped=%d\n", pid,
++         npages, st.num_resident_pages, st.num_swapped_pages);
++
++  int bad = 0;
++  for (int i = 0; i < npages; i++)
++    if (*(int *)(a + i * PG + 64) != i * 31 + pid)
++      bad++;
++  memstat(&st);
++  printf("swaptest pid %d: read back %d pages, %d wrong, resident=%d "
++         "swapped=%d\n",
++         pid, npages, bad, st.num_resident_pages, st.num_swapped_pages);
++  return bad != 0;
++}
++
++int
++main(int argc, char *argv[])
++{
++  int npages = argc > 1 ? atoi(argv[1]) : 600;
++  int nprocs = argc > 2 ? atoi(argv[2]) : 1;
++
++  if (nprocs <= 1) {
++    int r = run(npages);
++    printf("swaptest: %s\n", r ? "FAILED" : "OK");
++    exit(r);
++  }
++  for (int i = 0; i < nprocs; i++) {
++    if (fork() == 0)
++      exit(run(npages));
++  }
++  int failed = 0;
++  for (int i = 0; i < nprocs; i++) {
++    int status;
++    int pid = wait(&status);
++    printf("swaptest: child %d exited with %d\n", pid, status);
++    if (status != 0)
++      failed++;
++  }
++  printf("swaptest: %s\n", failed ? "FAILED" : "OK");
++  exit(failed != 0);
++}
++// ############## LLM Generated Code Ends ################
+diff --git a/user/ulib.c b/user/ulib.c
+index 4c5dbe9..a0dace2 100644
+--- a/user/ulib.c
++++ b/user/ulib.c
+@@ -160,3 +160,10 @@ sbrklazy(int n)
+ {
+   return sys_sbrk(n, SBRK_LAZY);
+ }
++
++// The standard OSN schedulertest calls sleep(); this xv6 names it pause().
++int
++sleep(int n)
++{
++  return pause(n);
++}
+diff --git a/user/user.h b/user/user.h
+index 29aad59..9247194 100644
+--- a/user/user.h
++++ b/user/user.h
+@@ -1,6 +1,7 @@
+ #define SBRK_ERROR ((char *)-1)
+ 
+ struct stat;
++struct proc_mem_stat;
+ 
+ // system calls
+ int fork(void);
+@@ -24,9 +25,14 @@ int getpid(void);
+ char *sys_sbrk(int, int);
+ int pause(int);
+ int uptime(void);
++int getreadcount(void);
++int setnice(int pid, int nice);
++int waitx(int *status, int *wtime, int *rtime);
++int memstat(struct proc_mem_stat *info);
+ int sync(void);
+ 
+ // ulib.c
++int sleep(int);
+ int stat(const char *, struct stat *);
+ char *strcpy(char *, const char *);
+ void *memmove(void *, const void *, int);
+diff --git a/user/usys.pl b/user/usys.pl
+index 4d054e8..6bff789 100755
+--- a/user/usys.pl
++++ b/user/usys.pl
+@@ -42,4 +42,8 @@ entry("getpid");
+ entry("sbrk");
+ entry("pause");
+ entry("uptime");
++entry("getreadcount");
++entry("setnice");
++entry("waitx");
++entry("memstat");
+ entry("sync");
